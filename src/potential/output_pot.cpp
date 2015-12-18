@@ -20,38 +20,29 @@ void POTENTIAL::output_single_pot_all( const char* out_file_PATH ){
     func_name = "output_single_pot_all_";
     route( class_name, func_name, 1 );
 
-    if( new_flg_pot ){
+    if( potential != NULL ){
         string hadron_name = channel_to_name(channel);
         char out_file_name[1024];
         snprintf( out_file_name, sizeof(out_file_name),
                  "%s/%s_%s_all_t%d"
                  , out_file_PATH, hadron_name.c_str()
                  , potential_type.c_str(), time_slice );
-        ofstream out_file( out_file_name, ios::out );
+        ofstream out_file( out_file_name, ios::out | ios::binary );
+        
+        cdouble *Rcorr_ptr = NULL;
+        for( int ttt=0; ttt<3; ttt++ )
+            if( Rcorr_t[ttt] == time_slice )
+                Rcorr_ptr = Rcorr[ttt].Rcorr;
         
         cdouble tmp;
-        double R, x_shift, y_shift, z_shift;
         for(int z=0; z<xyzSIZE; z++)
             for(int y=0; y<xyzSIZE; y++)
-                for(int x=0; x<xyzSIZE; x++){
-            
-                    x_shift = 0, y_shift = 0, z_shift = 0;
-                    if( x > xyzSIZE/2 ){ x_shift = xyzSIZE; }
-                    if( y > xyzSIZE/2 ){ y_shift = xyzSIZE; }
-                    if( z > xyzSIZE/2 ){ z_shift = xyzSIZE; }
-                    // make r for each coodinate with periodic boundary condition
-                    R = sqrt( (x - x_shift)*(x - x_shift)
-                            + (y - y_shift)*(y - y_shift)
-                            + (z - z_shift)*(z - z_shift) );
-            
-                    for(int i=0; i<N_conf; i++){
-                        tmp =         potential[ xyzn(x,y,z,i) ]
-                                / Rcorr1->Rcorr[ xyzn(x,y,z,i) ];
+                for(int x=0; x<xyzSIZE; x++)
+                    for(int i=0; i<N_conf; i++)
+                        tmp =  potential[ xyzn(x,y,z,i) ]
+                             / Rcorr_ptr[ xyzn(x,y,z,i) ];
                         
-                        out_file << R << " " << tmp.real() << " " << tmp.imag()
-                                 << endl;
-                    }
-                }
+                        out_file.write( (char*)&tmp, sizeof(cdouble) );
         out_file.close();
     }else{
         error(1,"Have not calculated potential yet !");
@@ -70,7 +61,7 @@ void POTENTIAL::output_single_pot_err( const char* out_file_PATH ){
     func_name = "output_single_pot_err_";
     route( class_name, func_name, 1 );
     
-    if( new_flg_pot ){
+    if( potential != NULL ){
         int x_shift, y_shift, z_shift;
         double R;
         cdouble err, mean, sqr_mean;
@@ -83,6 +74,11 @@ void POTENTIAL::output_single_pot_err( const char* out_file_PATH ){
                  , potential_type.c_str(), time_slice );
         ofstream out_file( out_file_name, ios::out );
         
+        cdouble *Rcorr_ptr = NULL;
+        for( int ttt=0; ttt<3; ttt++ )
+            if( Rcorr_t[ttt] == time_slice )
+                Rcorr_ptr = Rcorr[ttt].Rcorr;
+        
         for(int z=0; z<xyzSIZE; z++)
             for(int y=0; y<xyzSIZE; y++)
                 for(int x=0; x<xyzSIZE; x++){
@@ -90,10 +86,10 @@ void POTENTIAL::output_single_pot_err( const char* out_file_PATH ){
                     sqr_mean = cdouble( 0.0, 0.0 );
                     
                     for(int i=0; i<N_conf; i++){
-                        mean     += (      potential[ xyzn(x,y,z,i) ]
-                                     / Rcorr1->Rcorr[ xyzn(x,y,z,i) ] );
-                        sqr_mean += cmp_sqr(      potential[ xyzn(x,y,z,i) ]
-                                            / Rcorr1->Rcorr[ xyzn(x,y,z,i) ] );
+                        mean     += (  potential[ xyzn(x,y,z,i) ]
+                                     / Rcorr_ptr[ xyzn(x,y,z,i) ] );
+                        sqr_mean += cmp_sqr(  potential[ xyzn(x,y,z,i) ]
+                                            / Rcorr_ptr[ xyzn(x,y,z,i) ] );
                     }
                     mean     /= double(N_conf);
                     sqr_mean /= double(N_conf);
@@ -131,18 +127,22 @@ void POTENTIAL::output_single_pot_fit( const char* out_file_PATH ){
     func_name = "output_single_pot_fit_";
     route( class_name, func_name, 1 );
     
-    if( new_flg_pot ){
+    if( potential != NULL ){
         double *err             = new double[xyzSIZE*xyzSIZE*xyzSIZE];
         double *potential_tmp   = new double[xyzSIZE*xyzSIZE*xyzSIZE * N_conf];
         double mean, sqr_mean;
         cdouble tmp;
+        cdouble *Rcorr_ptr = NULL;
+        for( int ttt=0; ttt<3; ttt++ )
+            if( Rcorr_t[ttt] == time_slice )
+                Rcorr_ptr = Rcorr[ttt].Rcorr;
         
         for(int z=0; z<xyzSIZE; z++)
             for(int y=0; y<xyzSIZE; y++)
                 for(int x=0; x<xyzSIZE; x++)
                     for(int i=0; i<N_conf; i++){
-                        tmp = potential[ xyzn(x,y,z,i) ]
-                        / Rcorr1->Rcorr[ xyzn(x,y,z,i) ];
+                        tmp =  potential[ xyzn(x,y,z,i) ]
+                             / Rcorr_ptr[ xyzn(x,y,z,i) ];
                         potential_tmp[ xyzn(x,y,z,i) ] = tmp.real();
                     }
         for(int z=0; z<xyzSIZE; z++)
@@ -203,7 +203,7 @@ void POTENTIAL::output_single_pot_fit( const char* out_file_PATH ){
                     }
                 }
             }
-            printf(" @ Data count = %d\n",data_count);   // <- For debug !
+            printf(" @@@ Data count = %d\n",data_count);   // <- For debug !
             out_file.write( (char*)&data_count, sizeof(int) );
             test1[i]=data_count;   // <- For debug !
         }
@@ -240,8 +240,41 @@ void POTENTIAL::output_single_pot_fit( const char* out_file_PATH ){
         int check_data=0;                                   // <- For debug !
         for( int i=0; i<N_conf; i++ )                       // <- For debug !
             if(test1[i]!=test2[i]) check_data++;            // <- For debug !
-        printf(" @@@@@@ DATA CHECKING : %d\n",check_data);  // <- For debug !
+        printf(" @@@ DATA CHECKING : %d\n",check_data);  // <- For debug !
         
+    }else{
+        error(1,"Have not calculated potential yet !");
+    }
+    route( class_name, func_name, 0 );
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief Function for output potentials data every gauge configurations (for CCP)
+ */
+//--------------------------------------------------------------------------
+
+void POTENTIAL::output_couple_pot_all( const char* out_file_PATH ){
+    
+    func_name = "output_single_pot_all_";
+    route( class_name, func_name, 1 );
+    
+    if( potential != NULL ){
+        string hadron_name = channel_to_name(channel);
+        char out_file_name[1024];
+        snprintf( out_file_name, sizeof(out_file_name),
+                 "%s/%s_%s_ccp_all_t%d"
+                 , out_file_PATH, hadron_name.c_str()
+                 , potential_type.c_str(), time_slice );
+        ofstream out_file( out_file_name, ios::out | ios::binary );
+        
+        for(int z=0; z<xyzSIZE; z++)
+            for(int y=0; y<xyzSIZE; y++)
+                for(int x=0; x<xyzSIZE; x++)
+                    for(int i=0; i<N_conf; i++)
+                        out_file.write( (char*)&potential[ xyzn(x,y,z,i) ]
+                                      , sizeof(cdouble) );
+        out_file.close();
     }else{
         error(1,"Have not calculated potential yet !");
     }
@@ -259,7 +292,7 @@ void POTENTIAL::output_couple_pot_err( const char* out_file_PATH ){
     func_name = "output_couple_pot_err_";
     route( class_name, func_name, 1 );
     
-    if( new_flg_pot ){
+    if( potential != NULL ){
         int x_shift, y_shift, z_shift;
         double R;
         cdouble err, mean, sqr_mean;
@@ -267,7 +300,7 @@ void POTENTIAL::output_couple_pot_err( const char* out_file_PATH ){
         string hadron_name = channel_to_name(channel);
         char out_file_name[1024];
         snprintf( out_file_name, sizeof(out_file_name),
-                 "%s/%s_%s_err_t%d"
+                 "%s/%s_%s_ccp_err_t%d"
                  , out_file_PATH, hadron_name.c_str()
                  , potential_type.c_str(), time_slice );
         ofstream out_file( out_file_name, ios::out );
@@ -316,10 +349,10 @@ void POTENTIAL::output_couple_pot_err( const char* out_file_PATH ){
 
 void POTENTIAL::output_couple_pot_fit( const char* out_file_PATH ){
     
-    func_name = "output_couple_pot_fit_";
+    func_name = "output_couple_ccp_pot_fit_";
     route( class_name, func_name, 1 );
     
-    if( new_flg_pot ){
+    if( potential != NULL ){
         double *err             = new double[xyzSIZE*xyzSIZE*xyzSIZE];
         double *potential_tmp   = new double[xyzSIZE*xyzSIZE*xyzSIZE * N_conf];
         double mean, sqr_mean;
@@ -389,7 +422,7 @@ void POTENTIAL::output_couple_pot_fit( const char* out_file_PATH ){
                     }
                 }
             }
-            printf(" @ Data count = %d\n",data_count);   // <- For debug !
+            printf(" @@@ Data count = %d\n",data_count);   // <- For debug !
             out_file.write( (char*)&data_count, sizeof(int) );
             test1[i]=data_count;   // <- For debug !
         }
@@ -426,7 +459,7 @@ void POTENTIAL::output_couple_pot_fit( const char* out_file_PATH ){
         int check_data=0;                                   // <- For debug !
         for( int i=0; i<N_conf; i++ )                       // <- For debug !
             if(test1[i]!=test2[i]) check_data++;            // <- For debug !
-        printf(" @@@@@@ DATA CHECKING : %d\n",check_data);  // <- For debug !
+        printf(" @@@ DATA CHECKING : %d\n",check_data);  // <- For debug !
         
     }else{
         error(1,"Have not calculated potential yet !");

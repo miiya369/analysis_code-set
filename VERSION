@@ -8,6 +8,18 @@
  ////////////////////////////////////////////////
 
 
+
+ @ version 1.1 : 2015/06/01 Completion
+
+	* Correct the error estimation for
+	  fit parameter and chi-square
+
+	* Reduction calculation time
+		- Potential
+
+	* Simplify output comments
+
+
  @ version 1.0 : 2015/05/27 Completion
 
 	* Calculate effective mass

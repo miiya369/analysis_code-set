@@ -15,7 +15,6 @@ void CORRELATOR::input_corr(){
     route( class_name, func_name, 1 );
     
     corr = new cdouble[ tSIZE * N_conf ];
-    new_flg_corr = true;
     
     int dummy_t;
     double tmp_r, tmp_i;
@@ -78,5 +77,6 @@ void CORRELATOR::input_corr(){
         time( &end_t );
         printf("  ( %d second )\n",(int)difftime(end_t,start_t));
     }
+    printf(" @ Finished input correlator       : %s\n", HAD_name.c_str());
     route( class_name, func_name, 0 );
 }

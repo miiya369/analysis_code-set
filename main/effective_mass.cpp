@@ -28,13 +28,14 @@ int main( int argc, char **argv ){
     const char* outfile_path = Argv[2];
     int   fit_range_min      = atoi(Argv[3]);
     int   fit_range_max      = atoi(Argv[4]);
+    double lat_space         = atof(Argv[13]);
     
     if(Argv[5][0] == 'y') calc_flg_fit = true;
     
-    int  n_had       =  atoi(Argv[13]);
+    int  n_had       =  atoi(Argv[14]);
     int *hadron_type = new int[n_had];
     for(int loop=0; loop<n_had; loop++)
-        hadron_type[loop] = name_to_hadron_type(Argv[loop+14]);
+        hadron_type[loop] = name_to_hadron_type(Argv[loop+15]);
     
     int n_conf = set_data_list( conf_list,  data_list );
     
@@ -49,7 +50,7 @@ int main( int argc, char **argv ){
     printf(" @ src rela   = %s\n",data_list[SRC_RELA]);
     printf(" @ #. hadron  = %d\n @ hadron     = { ",n_had);
     for(int loop=0; loop<n_had; loop++)
-        printf("%s, ",had_type_to_name(hadron_type[loop]).c_str());
+        printf("%s ",had_type_to_name(hadron_type[loop]).c_str());
     printf("}\n @ conf list  = %s\n",conf_list);
     printf(" @ infile     = %s\n",data_list[MAIN_PATH]);
     printf(" @ outfile    = %s\n @\n",outfile_path);
@@ -70,7 +71,7 @@ int main( int argc, char **argv ){
     
     double param_ini[2] = { 0.001, 1.0 };
     char fit_data_name[MAX_LEN_PATH];
-    double *eff_mass = new double[n_had*2];
+    double *eff_mass = new double[n_had*4];
     
     hadron->set_env( xyz_size, t_size, n_conf, data_list );
     
@@ -101,8 +102,10 @@ int main( int argc, char **argv ){
             fit->input_data( fit_data_name, false );
             fit->set_func( ONE_EXPONENTIAL, param_ini );
             fit->fit_data( fit_range_min, fit_range_max, 0.000001 );
-            eff_mass[0+2*had_loop] = fit->param_mean[1];
-            eff_mass[1+2*had_loop] = fit->param_err[1];
+            eff_mass[0+4*had_loop] = fit->param_mean[1];
+            eff_mass[1+4*had_loop] = fit->param_err[1];
+            eff_mass[2+4*had_loop] = fit->chisq_mean;
+            eff_mass[3+4*had_loop] = fit->chisq_err;
             fit->reset_func();
             fit->delete_data();
         }
@@ -113,14 +116,19 @@ int main( int argc, char **argv ){
     delete [] relativ_type;
     
     if( calc_flg_fit ){
-        printf("\n @ ============================================= @\n");
-        printf(" @ EFFECTIVE MASS FITTING RESULTS (Lattice Unit) @\n");
-        printf(" @ ============================================= @\n\n");
+        printf("\n @ =================================================== @\n");
+        printf(" @           EFFECTIVE MASS FITTING RESULTS            @\n");
+        printf(" @ =================================================== @\n\n");
         for( int had_loop = 0; had_loop < n_had; had_loop++ )
-            printf("     %s : %lf +/- %lf \n"
-                   , had_type_to_name(hadron_type[had_loop]).c_str(),
-                   eff_mass[0+2*had_loop], eff_mass[1+2*had_loop]);
-        printf("\n @ ============================================= @\n");
+            printf(" %9s : [Lattice Unit] %lf +/- %lf\n"
+                   "           : [   MeV/c2   ] %lf +/- %lf\n"
+                   "           : [ chisq/conf ] %lf +/- %lf\n\n"
+                   , had_type_to_name(hadron_type[had_loop]).c_str()
+                   , eff_mass[0+4*had_loop], eff_mass[1+4*had_loop]
+                   , eff_mass[0+4*had_loop]*197.327/lat_space
+                   , eff_mass[1+4*had_loop]*197.327/lat_space
+                   , eff_mass[2+4*had_loop], eff_mass[3+4*had_loop] );
+        printf(" @ =================================================== @\n");
     }
     delete [] hadron_type;
     delete [] eff_mass;

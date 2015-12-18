@@ -21,7 +21,7 @@ int main( int argc, char **argv ){
     time_t start_time, end_time, start_time2;
     time( &start_time );
     
-    bool endian_flg  = false, calc_fit_flg = false;
+    bool endian_flg  = false, calc_fit_flg = false, flg_for_miyamoto = false;
     int    channel[4];
     double mass[4];
     
@@ -41,6 +41,7 @@ int main( int argc, char **argv ){
     }
     if(Argv[21][0] == 'y') endian_flg    = true;
     if(Argv[22][0] == 'y') calc_fit_flg  = true;
+    if(Argv[25][0] == 'y') flg_for_miyamoto = true;
     
     int n_conf = set_data_list( conf_list,  data_list );
     
@@ -77,14 +78,30 @@ int main( int argc, char **argv ){
     
     POTENTIAL *pot = new POTENTIAL[4];
     int n_size = xyz_size * xyz_size * xyz_size * n_conf;
+    cdouble *R_corr_ptr[4];
     
     for(int C=0; C<2; C++) for(int R=0; R<2; R++){
         pot[idx(R,C)].set_env( xyz_size, t_size, n_conf, data_list );
-        pot[idx(R,C)].set_pot( channel[idx(R,C)], time_slice, endian_flg
-                        , spin, ang_mom, mass[idx(R,C)] );
         
-        pot[idx(R,C)].calc_pot_kernel();
-        pot[idx(R,C)].delete_pot_for_coupled();
+        if( !flg_for_miyamoto ){
+            pot[idx(R,C)].set_pot(  channel[idx(R,C)], time_slice, endian_flg
+                                  , spin, ang_mom, mass[idx(R,C)] );
+            pot[idx(R,C)].calc_pot_kernel();
+            
+            pot[idx(R,C)].Rcorr[1].output_Rcorr_all("./tmp");
+            pot[idx(R,C)].Rcorr[1].output_Rcorr_err("./tmp");
+            pot[idx(R,C)].output_single_pot_err("./tmp");
+            pot[idx(R,C)].output_couple_pot_all("./tmp");
+            R_corr_ptr[idx(R,C)] = pot[idx(R,C)].Rcorr[1].Rcorr;
+
+            pot[idx(R,C)].delete_pot_corr();
+            pot[idx(R,C)].Rcorr[0].delete_Rcorr();
+            pot[idx(R,C)].Rcorr[2].delete_Rcorr();
+        }else{
+            pot[idx(R,C)].set_pot_from_binary(  "./tmp", channel[idx(R,C)]
+                                              , time_slice, endian_flg );
+            R_corr_ptr[idx(R,C)] = pot[idx(R,C)].Rcorr->Rcorr;
+        }
     }
 
     cdouble *coupled_channel_pot = new cdouble[ n_size * 4 ];
@@ -95,15 +112,15 @@ int main( int argc, char **argv ){
     printf(" @ calculating coupled channel potental |   0%%");
     for(int loop=0; loop<n_size; loop++){
         
-        R_corr_det = (  pot[idx(0,0)].Rcorr1->Rcorr[loop]
-                      * pot[idx(1,1)].Rcorr1->Rcorr[loop]
-                      - pot[idx(0,1)].Rcorr1->Rcorr[loop]
-                      * pot[idx(1,0)].Rcorr1->Rcorr[loop] );
+        R_corr_det = (  R_corr_ptr[idx(0,0)][loop]
+                      * R_corr_ptr[idx(1,1)][loop]
+                      - R_corr_ptr[idx(0,1)][loop]
+                      * R_corr_ptr[idx(1,0)][loop] );
         
-        R_corr_inv[idx(0,0)] =  pot[idx(1,1)].Rcorr1->Rcorr[loop] / R_corr_det;
-        R_corr_inv[idx(1,0)] = -pot[idx(1,0)].Rcorr1->Rcorr[loop] / R_corr_det;
-        R_corr_inv[idx(0,1)] = -pot[idx(0,1)].Rcorr1->Rcorr[loop] / R_corr_det;
-        R_corr_inv[idx(1,1)] =  pot[idx(0,0)].Rcorr1->Rcorr[loop] / R_corr_det;
+        R_corr_inv[idx(0,0)] =  R_corr_ptr[idx(1,1)][loop] / R_corr_det;
+        R_corr_inv[idx(1,0)] = -R_corr_ptr[idx(1,0)][loop] / R_corr_det;
+        R_corr_inv[idx(0,1)] = -R_corr_ptr[idx(0,1)][loop] / R_corr_det;
+        R_corr_inv[idx(1,1)] =  R_corr_ptr[idx(0,0)][loop] / R_corr_det;
         
         for(int C=0; C<2; C++) for(int R=0; R<2; R++) for(int i=0; i<2; i++)
             coupled_channel_pot[loop + n_size * idx(R,C)]

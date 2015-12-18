@@ -20,23 +20,23 @@ void FITTING::set_func( int FUNC_TYPE, double *PARAM ){
         
         if( func_type == CONSTANT ){
             N_param = 1;
-            printf(" @ fit function = constant\n");
+            printf(" @ fit function     = constant\n");
             
         }else if( func_type == ONE_EXPONENTIAL ){
             N_param = 2;
-            printf(" @ fit function = one exponential\n");
+            printf(" @ fit function     = one exponential\n");
             
         }else if( func_type == TWO_GAUSSIAN ){
             N_param = 4;
-            printf(" @ fit function = two gaussians\n");
+            printf(" @ fit function     = two gaussians\n");
             
         }else if( func_type == THREE_GAUSSIAN ){
             N_param = 6;
-            printf(" @ fit function = two x-shifted gaussians\n");
+            printf(" @ fit function     = two x-shifted gaussians\n");
             
         }else if( func_type == TWO_SHIFTED_GAUSSIAN ){
             N_param = 6;
-            printf(" @ fit function = two x-shifted gaussians\n");
+            printf(" @ fit function     = two x-shifted gaussians\n");
         }
         
         param_ini   = new double[N_param];

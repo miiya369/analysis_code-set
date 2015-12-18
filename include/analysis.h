@@ -33,21 +33,21 @@ using namespace std;
 typedef complex<int> cint;
 typedef complex<double> cdouble;
 
-void    usage( int );
+void usage( int );
 
 //! Setting arguments, and return the number of arguments
-int     set_arg( int, int, char**, char argv_o[MAX_N_ARG][MAX_LEN_PATH]
-                , char list[MAX_N_DATA][MAX_LEN_PATH] );
+int set_arg(  int, int, char**, char argv_o[MAX_N_ARG][MAX_LEN_PATH]
+            , char list[MAX_N_DATA][MAX_LEN_PATH] );
 
 //! Setting path of data file from list-file, and return the number of confs.
-int     set_data_list( const char*, char list[MAX_N_DATA][MAX_LEN_PATH] );
+int set_data_list( const char*, char list[MAX_N_DATA][MAX_LEN_PATH] );
 
 //! Indicate the current class & function name
-void    route( string, string, int );
+void route( string, string, int );
 
-void    endian_convert( cdouble*, int );
-void    endian_convert( double*, int );
-void    endian_convert( int );
+void endian_convert( cdouble*, int );
+void endian_convert( double*, int );
+void endian_convert( int );
 
 //! Set the path of data file
 string  set_path( char data_list[MAX_N_DATA][MAX_LEN_PATH], int );
@@ -66,6 +66,6 @@ string had_type_to_name( int );
 int name_to_hadron_type( char* );
 
 //! Indicate some error, and kill the job
-void    error( int, const char* );
+void error( int, const char* );
 
 #endif

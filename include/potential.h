@@ -24,41 +24,36 @@ private:
     string class_name, func_name;
     
 protected:
-    R_CORRELATOR *Rcorr2;
-    R_CORRELATOR *Rcorr3;
     cdouble *corr1;
     cdouble *corr2;
     
     string potential_type;
     int HAD1_type, HAD2_type;
     int channel, time_slice, spin, ang_mom;
+    int Rcorr_t[3];
     double mass;
     
-    bool new_flg_pot, new_flg_Rcorr1, new_flg_Rcorr2,
-         new_flg_Rcorr3, new_flg_corr, endian_flg;
+    bool endian_flg, Rcorr_reread_flg[3], read_time_slice_flg[3];
     
 public:
     cdouble *potential;
-    R_CORRELATOR *Rcorr1;
+    R_CORRELATOR *Rcorr;
     
     POTENTIAL(){
         class_name = "POTENTIAL:ANALYSIS_BASE_________";
         func_name = "______________________";
         route( class_name, func_name, 1 );
         
-        new_flg_pot    = false;
-        new_flg_Rcorr1 = false;
-        new_flg_Rcorr2 = false;
-        new_flg_Rcorr3 = false;
-        new_flg_corr   = false;
+        potential = NULL;
+        Rcorr     = NULL;
+        corr1     = NULL;
+        corr2     = NULL;
     }
     
     ~POTENTIAL(){
-        if( new_flg_pot )    delete [] potential;
-        if( new_flg_Rcorr1 ) delete Rcorr1;
-        if( new_flg_Rcorr2 ) delete Rcorr2;
-        if( new_flg_Rcorr3 ) delete Rcorr3;
-        if( new_flg_corr ){
+        if( potential != NULL ) delete [] potential;
+        if( Rcorr     != NULL ) delete [] Rcorr;
+        if( corr1     != NULL ){
             delete [] corr1;
             delete [] corr2;
         }
@@ -79,8 +74,6 @@ public:
         ang_mom = ANGMOM;
         endian_flg = endian_FLG;
         mass = MASS;
-        
-        snprintf(data_list[N_TIME],sizeof(data_list[N_TIME]),"%d", time_slice);
         
         if( channel == PROTON_NEUTRON__PROTON_NEUTRON ){
             HAD1_type = PROTON;
@@ -106,6 +99,8 @@ public:
             HAD1_type = SIGMA;
             HAD2_type = PROTON;
         }
+        input_pot();
+        func_name = "set_pot_______________";
         route( class_name, func_name, 0 );
     }
     
@@ -114,42 +109,29 @@ public:
         func_name = "delete_pot____________";
         route( class_name, func_name, 1 );
         
-        if( new_flg_pot ){
-            delete [] potential;
-            new_flg_pot = false;
+        if( Rcorr != NULL ){
+            delete [] Rcorr;
+            Rcorr = NULL;
         }
-        if( new_flg_Rcorr1 ){
-            delete Rcorr1;
-            new_flg_Rcorr1 = false;
-        }
-        if( new_flg_Rcorr2 ){
-            delete Rcorr2;
-            new_flg_Rcorr2 = false;
-        }
-        if( new_flg_Rcorr3 ){
-            delete Rcorr3;
-            new_flg_Rcorr3 = false;
+        if( corr1 != NULL ){
+            delete [] corr1;
+            delete [] corr2;
+            corr1 = NULL;
+            corr2 = NULL;
         }
         route( class_name, func_name, 0 );
     }
     
-    void delete_pot_for_coupled(){
+    void delete_pot_corr(){
         
-        func_name = "delete_pot_for_coupled";
+        func_name = "delete_pot_corr_______";
         route( class_name, func_name, 1 );
         
-        if( new_flg_Rcorr2 ){
-            delete Rcorr2;
-            new_flg_Rcorr2 = false;
-        }
-        if( new_flg_Rcorr3 ){
-            delete Rcorr3;
-            new_flg_Rcorr3 = false;
-        }
-        if( new_flg_corr ){
+        if( corr1 != NULL ){
             delete [] corr1;
             delete [] corr2;
-            new_flg_corr = false;
+            corr1 = NULL;
+            corr2 = NULL;
         }
         route( class_name, func_name, 0 );
     }
@@ -158,9 +140,12 @@ public:
     void calc_1st_timediff();
     void calc_2nd_timediff();
     void calc_pot_kernel();
+    void input_pot();
+    void set_pot_from_binary( const char*, int, int, bool );
     void output_single_pot_all( const char* );
     void output_single_pot_err( const char* );
     void output_single_pot_fit( const char* );
+    void output_couple_pot_all( const char* );
     void output_couple_pot_err( const char* );
     void output_couple_pot_fit( const char* );
 };

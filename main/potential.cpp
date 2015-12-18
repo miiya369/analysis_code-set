@@ -82,8 +82,8 @@ int main( int argc, char **argv ){
     }
 //=======================================================================//
     
-    POTENTIAL *pot;
-    R_CORRELATOR *Rcorrelator;
+    POTENTIAL *pot = NULL;
+    R_CORRELATOR *Rcorrelator = NULL;
     
     if( calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2){
         
@@ -121,9 +121,6 @@ int main( int argc, char **argv ){
             pot->calc_2nd_timediff();
             pot->output_single_pot_err( outfile_path );
         }
-        
-        if( calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2)
-            pot->delete_pot();
         
         if( calc_flg_NBS ){
             

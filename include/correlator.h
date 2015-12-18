@@ -26,7 +26,7 @@ private:
 protected:
     string HAD_name;
     
-    bool fb_mean_flg, new_flg_corr;
+    bool fb_mean_flg;
     
 public:
     cdouble *corr;
@@ -36,12 +36,12 @@ public:
         func_name = "______________________";
         route( class_name, func_name, 1 );
         
+        corr = NULL;
         fb_mean_flg = false;
-        new_flg_corr = false;
     }
     
     ~CORRELATOR(){
-        if( new_flg_corr ) delete [] corr;
+        if( corr != NULL ) delete [] corr;
         
         func_name = "______________________";
         route( class_name, func_name, 0 );
@@ -62,7 +62,7 @@ public:
             HAD_name += data_list[SRC_RELA];
         }
         
-        if( new_flg_corr ) error(1,"correlator has already inputed !");
+        if( corr != NULL ) error(1,"correlator has already inputed !");
         else input_corr();
         func_name = "set_corr______________";
         route( class_name, func_name, 0 );
@@ -73,9 +73,9 @@ public:
         func_name = "delete_corr___________";
         route( class_name, func_name, 1 );
         
-        if( new_flg_corr ){
+        if( corr != NULL ){
             delete [] corr;
-            new_flg_corr = false;
+            corr = NULL;
         }
         route( class_name, func_name, 0 );
     }

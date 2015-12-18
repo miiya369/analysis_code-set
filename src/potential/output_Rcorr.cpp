@@ -20,32 +20,20 @@ void R_CORRELATOR::output_Rcorr_all( const char* out_file_PATH ){
     func_name = "output_Rcorr_all______";
     route( class_name, func_name, 1 );
 
-    if( new_flg_Rcorr ){
+    if( Rcorr != NULL ){
         string hadron_name = channel_to_name(channel);
         char out_file_name[1024];
         snprintf( out_file_name, sizeof(out_file_name),
                  "%s/%s_Rcorr_all_t%d"
                  , out_file_PATH, hadron_name.c_str(), time_slice );
-        ofstream out_file( out_file_name, ios::out );
+        ofstream out_file( out_file_name, ios::out | ios::binary );
     
-        double R, x_shift, y_shift, z_shift;
         for(int z=0; z<xyzSIZE; z++)
             for(int y=0; y<xyzSIZE; y++)
-                for(int x=0; x<xyzSIZE; x++){
-        
-                    x_shift = 0, y_shift = 0, z_shift = 0;
-                    if( x > xyzSIZE/2 ){ x_shift = xyzSIZE; }
-                    if( y > xyzSIZE/2 ){ y_shift = xyzSIZE; }
-                    if( z > xyzSIZE/2 ){ z_shift = xyzSIZE; }
-                    // make r for each coodinate with periodic boundary condition
-                    R = sqrt( (x - x_shift)*(x - x_shift)
-                            + (y - y_shift)*(y - y_shift)
-                            + (z - z_shift)*(z - z_shift) );
-        
+                for(int x=0; x<xyzSIZE; x++)
                     for(int i=0; i<N_conf; i++)
-                        out_file << R << " " << Rcorr[ xyzn(x,y,z,i) ].real()
-                        << " " << Rcorr[ xyzn(x,y,z,i) ].imag() << endl;
-                }
+                        out_file.write( (char*)&Rcorr[ xyzn(x,y,z,i) ]
+                                      , sizeof(cdouble) );
         out_file.close();
     }else{
         error(1,"Have not setted R correlator yet !");
@@ -64,7 +52,7 @@ void R_CORRELATOR::output_Rcorr_err( const char* out_file_PATH ){
     func_name = "output_Rcorr_err______";
     route( class_name, func_name, 1 );
 
-    if( new_flg_Rcorr ){
+    if( Rcorr != NULL ){
         int x_shift, y_shift, z_shift;
         double R;
         cdouble err, mean, sqr_mean;

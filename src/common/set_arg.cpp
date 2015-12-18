@@ -76,10 +76,10 @@ int set_arg( int usage_type, int argc, char **argv
                     snprintf(argv_o[2],sizeof(argv_o[2]),"%s",argv[loop+1]);
                     check++;   count1++;
                 }
-//                if(argv[loop][1]=='T'){
-//                    snprintf(argv_o[2],sizeof(argv_o[2]),"%s",argv[loop+1]);
-//                    check++;   count1++;
-//                }
+                if(argv[loop][1]=='^'){
+                    snprintf(argv_o[n_arg],sizeof(argv_o[n_arg]),"y");
+                    check++;   count1++;
+                }
                 //***************************************************//
                 if(argv[loop][1]=='f') check++;
                 if(check==0){
@@ -93,13 +93,13 @@ int set_arg( int usage_type, int argc, char **argv
 //====================== For effective mass calculation =====================//
 //===========================================================================//
     if( usage_type == EFFECTIVEMASS ){
-        n_arg = 14;   // <- If you change the number of args, change also here.
+        n_arg = 15;   // <- If you change the number of args, change also here.
         char option2[32][32]
         = {  "MAS_Size_of_time"   ,"MAS_Gauge_confs_list","MAS_Path_to_output_dir"
             ,"MAS_Fit_range_min"    ,"MAS_Fit_range_max" ,"MAS_Calc_fit_data"
             ,"MAS_Path_to_input_dir","MAS_T_shift"       ,"MAS_X_shift"
             ,"MAS_Y_shift"          ,"MAS_Z_shift"       ,"MAS_Snk_relativistic"
-            ,"MAS_Src_relativistic" ,"MAS_Calc_hadron_name" };
+            ,"MAS_Src_relativistic","MAS_Lattice_spacing","MAS_Calc_hadron_name"};
         // "MAS_Calc_hadron_name" must be put at the end of option2 !
         
         for( int loop=1; loop<argc; loop++ )
@@ -146,8 +146,8 @@ int set_arg( int usage_type, int argc, char **argv
             snprintf(list[N_X_SHIFT],sizeof(list[N_X_SHIFT]) ,"%s",argv_o[8]);
             snprintf(list[N_Y_SHIFT],sizeof(list[N_Y_SHIFT]) ,"%s",argv_o[9]);
             snprintf(list[N_Z_SHIFT],sizeof(list[N_Z_SHIFT]) ,"%s",argv_o[10]);
-            snprintf(list[SNK_RELA],sizeof(list[SNK_RELA]) ,"%s",argv_o[11]);
-            snprintf(list[SRC_RELA],sizeof(list[SRC_RELA]) ,"%s",argv_o[12]);
+            snprintf(list[SNK_RELA] ,sizeof(list[SNK_RELA])  ,"%s",argv_o[11]);
+            snprintf(list[SRC_RELA] ,sizeof(list[SRC_RELA])  ,"%s",argv_o[12]);
         }
         for( int loop=1; loop<argc; loop++ )
             if( argv[loop][0] == '-' ){

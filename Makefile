@@ -75,3 +75,6 @@ clean:
 .PHONY: test
 test:
 	@echo $(SRCS_pot) $(OBJS_pot)
+
+.PHONY: ALL
+ALL: $(TERGETS) $(FOR_MIYA)

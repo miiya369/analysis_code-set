@@ -22,7 +22,7 @@ void NBS_WAVE::spin_projection( int spin_flg ){
     func_name = "spin_projection_______";
     route( class_name, func_name, 1 );
     
-    if( new_flg_NBSwave ){
+    if( NBSwave != NULL ){
         if( spin_flg == 0 ){
             for( int conf=0; conf<N_conf; conf++ )
                 for(int z=0; z<xyzSIZE; z++)
@@ -101,7 +101,7 @@ void NBS_WAVE::ang_mom_projection( int mom_flg ){
     func_name = "ang_mom_projection____";
     route( class_name, func_name, 1 );
     
-    if( new_flg_NBSwave ){
+    if( NBSwave != NULL ){
     cdouble *tmp;   tmp = new cdouble[ NBS_size * N_conf ];
     set_rot_matrix();
 #ifdef _OPENMP
@@ -154,7 +154,7 @@ void NBS_WAVE::parity_projection(){
     func_name = "parity_projection_____";
     route( class_name, func_name, 1 );
 
-    if( new_flg_NBSwave ){
+    if( NBSwave != NULL ){
     cdouble *tmp;   tmp = new cdouble[ NBS_size * N_conf ];
     
     for( int conf=0; conf<N_conf; conf++ )

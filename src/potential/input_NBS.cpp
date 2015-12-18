@@ -15,7 +15,7 @@ void NBS_WAVE::input_NBS(){
     route( class_name, func_name, 1 );
     
     orgNBS =  new cdouble[ orgNBS_size * N_conf ];
-    new_flg_orgNBS = true;
+    NBSwave = new cdouble[ NBS_size    * N_conf ];
     
     snprintf(data_list[N_TIME],sizeof(data_list[N_TIME]), "%d", time_slice);
     if( channel != 0 && channel < BOUNDARY_PARTICLE_ISOSPIN ){
@@ -49,10 +49,10 @@ void NBS_WAVE::input_NBS(){
     } // conf
     time( &end_t );
     printf("  ( %d second )\n",(int)difftime(end_t,start_t));
+    printf(" @ Finished input NBS wave         : %s, t=%d\n"
+           , channel_to_name(channel).c_str(), time_slice);
     
     if( endian_flg ) endian_convert( orgNBS, orgNBS_size * N_conf );
     
-    NBSwave = new cdouble[ NBS_size * N_conf ];
-    new_flg_NBSwave = true;
     route( class_name, func_name, 0 );
 }

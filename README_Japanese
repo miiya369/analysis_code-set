@@ -17,7 +17,7 @@
  * potential		-> pot
  * effective mass	-> mas
  * fitting		-> fit
- * phase shift		-> phs
+ * observable		-> obs
 
 
  #########   How to use   #########
@@ -26,7 +26,7 @@
  編集する
  2) 各実行ファイルに -f オプションを用いてその
  arguments ファイルを指定し実行する
- 例 : ./pot -f ./arg/arguments.txt
+ 例 : ./pot -f ./arg/arguments_potential.txt
 
  また、各実行ファイルはオプション無しで実行すると
  その usage が表示されます。-f 以外のオプションは
@@ -37,7 +37,7 @@
 
  #######   Gauge configs list   #######
  pot, mas の実行の際には gauge configs の list
- を読み込ませる必要があります。sample が ./arg に
+ を読み込ませる必要があります。sample が ./arg/conf_list に
  ありますので、必要に応じて同様に作ってください。
  この際、gauge configs list の行数が #.confs 
  として読み込まれますので、余分な改行を入れないように
@@ -57,7 +57,7 @@
  -fopenmp を加えてからビルドしてください。
 
  @@@@@@@@@@@@@ COUTION @@@@@@@@@@@@@@@@
- 現 version では openMP を使うとバグが発生します
+ 現 version では OpenMP を使うとバグが発生します
  使わないでください。
  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -74,13 +74,12 @@
 
 
  ############ Debug の表示 ############
- Default では、どのクラス・関数に入ったか・出たか
- の情報が自動的に出力されるようになっています。
+ src/common/misc.cpp の中の関数 route() の 
+ return; をコメントアウトしてからビルドすれば、
+ デバッグモードでの出力になり、どのクラス・関数に
+ 入ったか・出たかの情報が出力されるようになりす。
  これにより、バグが発生した際にその地点をすぐに発見する
- ことができますが、邪魔な場合は src/common/misc.cpp
- の route() の中の return; のコメントアウトを
- 外してからビルドしてください。
-
+ ことができます。
 
  ######### Fit function の追加 #########
  1) analysis_const.h の enum に追加

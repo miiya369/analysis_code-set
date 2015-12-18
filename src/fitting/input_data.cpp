@@ -80,13 +80,13 @@ void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
         }
 //===========================================================================//
         else{
-            printf("\n @ fit type = %d\n", fit_type);
-            printf(" @ #.confs  = %d\n", N_conf);
+            printf("\n @ fit type         = %d\n", fit_type);
+            printf(" @ #.confs          = %d\n", N_conf);
             infile.close();
             error(3,"This file is not miyamoto-format fit data");
         }
-        printf("\n @ fit type = %d\n", fit_type);
-        printf(" @ #.confs  = %d\n", N_conf);
+        printf("\n @ fit type         = %d\n", fit_type);
+        printf(" @ #.confs          = %d\n", N_conf);
         infile.close();
     }
     route( class_name, func_name, 0 );

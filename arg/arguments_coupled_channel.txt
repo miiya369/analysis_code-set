@@ -1,0 +1,30 @@
+
+### For Coupled channel potential ###
+
+CCP_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+CCP_Path_to_input_dir	= /mnt/bblqcd00/miyamoto/results_kek/results_kek_cp-pacs+JLQCD_ens3/c_quark/t_shift_000
+CCP_Path_to_output_dir	= ./results
+CCP_Size_of_time	= 32
+CCP_Size_of_xyz		= 16
+CCP_calc_time_slice	= 8
+CCP_T_shift		= 0
+CCP_X_shift		= 0
+CCP_Y_shift		= 0
+CCP_Z_shift		= 0
+CCP_Snk_relativistic	= CG05
+CCP_Src_relativistic	= CG05
+
+CCP_Channel_00		= Nuc-Lam12_Nuc-Lam12
+CCP_Channel_10		= Nuc-Lam12_Nuc-Sig12
+CCP_Channel_01		= Nuc-Sig12_Nuc-Lam12
+CCP_Channel_11		= Nuc-Sig12_Nuc-Sig12
+CCP_Reduced_mass_00	= 0.415
+CCP_Reduced_mass_10	= 0.415
+CCP_Reduced_mass_01	= 0.422
+CCP_Reduced_mass_11	= 0.422
+CCP_Spin_projection	= 0
+CCP_Spin_z_component	= 0
+CCP_Ang_mom_projection	= 0
+
+CCP_Endian_convert	= yes
+CCP_Calc_fit_data	= yes

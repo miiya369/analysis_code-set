@@ -51,16 +51,6 @@ enum {
     N_SIGMA_32__N_SIGMA_32,     // = 17
 };
 
-//! enum for the gauge configurations name
-enum {
-    
-    CP_PACS_ENS1 = 11,
-    CP_PACS_ENS2 = 12,
-    CP_PACS_ENS3 = 13,
-    PACS_CS_ENS1 = 21,
-    PACS_CS_ENS2 = 22,
-};
-
 //! enum for the fit function type
 enum {
     
@@ -79,7 +69,6 @@ enum {
     
     COUPLED_CHANNEL_POT = 0,
     EFFECTIVEMASS,
-    NBS_WAVE_FUNC,
     CALC_POTENTIAL,
     FITTING_DATA,
     CALC_OBSERVABLE,

@@ -25,10 +25,7 @@ private:
     string class_name, func_name;
     
 protected:
-    string HAD1_name, HAD2_name;
     int    HAD1_type, HAD2_type;
-    
-    bool new_flg_Rcorr;
     
 public:
     cdouble *Rcorr;
@@ -38,11 +35,11 @@ public:
         func_name = "______________________";
         route( class_name, func_name, 1 );
         
-        new_flg_Rcorr = false;
+        Rcorr = NULL;
     }
     
     ~R_CORRELATOR(){
-        if( new_flg_Rcorr ) delete [] Rcorr;
+        if( Rcorr != NULL ) delete [] Rcorr;
         
         func_name = "______________________";
         route( class_name, func_name, 0 );
@@ -81,26 +78,11 @@ public:
             HAD1_type = SIGMA;
             HAD2_type = PROTON;
         }
-        HAD1_name = had_type_to_name(HAD1_type);
-        HAD2_name = had_type_to_name(HAD2_type);
-        if( HAD1_type > MESON_BARYON_BOUNDARY ){
-            HAD1_name += "_";
-            HAD1_name += data_list[SNK_RELA];
-            HAD1_name += "_";
-            HAD1_name += data_list[SRC_RELA];
-        }
-        if( HAD2_type > MESON_BARYON_BOUNDARY ){
-            HAD2_name += "_";
-            HAD2_name += data_list[SNK_RELA];
-            HAD2_name += "_";
-            HAD2_name += data_list[SRC_RELA];
-        }
         
-        fb_mean_flg = true;
         orgNBS_size = 4*4* xyzSIZE * xyzSIZE * xyzSIZE;
         NBS_size    = xyzSIZE * xyzSIZE * xyzSIZE;
         
-        if( new_flg_Rcorr ) error(1,"R correlator has already inputed !");
+        if( Rcorr != NULL ) error(1,"R correlator has already inputed !");
         else input_Rcorr( SPIN, ANGMOM );
         func_name = "set_Rcorr_____________";
         route( class_name, func_name, 0 );
@@ -116,11 +98,10 @@ public:
         time_slice = it;
         endian_flg = endian_FLG;
         
-        fb_mean_flg = true;
         orgNBS_size = 4*4* xyzSIZE * xyzSIZE * xyzSIZE;
         NBS_size    = xyzSIZE * xyzSIZE * xyzSIZE;
         
-        if( new_flg_Rcorr ) error(1,"R correlator has already inputed !");
+        if( Rcorr != NULL ) error(1,"R correlator has already inputed !");
         else input_Rcorr( SPIN, ANGMOM, corr1, corr2 );
         func_name = "set_Rcorr_____________";
         route( class_name, func_name, 0 );
@@ -131,12 +112,14 @@ public:
         func_name = "delete_Rcorr__________";
         route( class_name, func_name, 1 );
         
-        if( new_flg_Rcorr ){
+        if( Rcorr != NULL ){
             delete [] Rcorr;
-            new_flg_Rcorr = false;
+            Rcorr = NULL;
         }
         route( class_name, func_name, 0 );
     }
+    
+    int info_time(){ return time_slice; }
     
     void input_Rcorr( int, int );
     void input_Rcorr( int, int, cdouble*, cdouble* );

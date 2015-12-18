@@ -11,11 +11,9 @@
  3) error の際の終了を安全にできるようにする
 	（今は exit(1)）-> bblqcd ではできない？
  4) bin size 2 以上の jack-knife の作成
- 5) Potential の読み込みを、すでに読み込んである t の
-	R-corr を使い回すようにする
- 6) openMP を使った際のバグの修正
- 7) compress された NBSwave の読み込み
+ 5) openMP を使った際のバグの修正
+ 6) compress された NBSwave の読み込み
 	（コード中で解凍させる）
- 8) S wave 以外への projection の作成
- 9) phase shift 計算の高速化
+ 7) S wave 以外への projection の作成
+ 8) phase shift 計算の高速化
 

@@ -17,8 +17,7 @@ void FITTING::fit_data( int cood_min, int cood_max, double STP_CND ){
     if( !new_flg_data )         error(1,"Fit data has not inputed yet !");
     else if( !new_flg_param )   error(1,"Fit parameter has not setted yet !");
     else{
-        
-        printf(" @ Fitting |   0%%");
+        printf(" @ Fitting          |   0%%");
         stp_cnd = STP_CND;
         chisq_mean = 0.0;
         
@@ -102,7 +101,7 @@ void FITTING::fit_data( int cood_min, int cood_max, double STP_CND ){
             sqr_tmp         /= double(N_conf);
             
             param_err[loop]  = sqrt( (sqr_tmp - pow(param_mean[loop],2))
-                                    / double(N_conf-1) );
+                                    * double(N_conf-1) );
         }
         printf(" @ Finished fitting : chisq/confs = %lf +/- %lf\n",
                chisq_mean, chisq_err);

@@ -20,15 +20,14 @@ void CORRELATOR::output_corr_all( const char* out_file_PATH ){
     func_name = "output_corr_all_______";
     route( class_name, func_name, 1 );
     
-    if( new_flg_corr ){
+    if( corr != NULL ){
         char out_file_name[1024];
         snprintf( out_file_name, sizeof(out_file_name),
                  "%s/%s_corr_all", out_file_PATH, HAD_name.c_str() );
-        ofstream outFILE( out_file_name, ios::out );
+        ofstream outFILE( out_file_name, ios::out | ios::binary );
         
         for(int t=0; t < tSIZE; t++) for( int i=0; i<N_conf; i++)
-            outFILE << t << " " << corr[ nt(i,t) ].real() << " "
-                    << corr[ nt(i,t) ].imag() << endl;
+            outFILE.write( (char*)&corr[ nt(i,t) ], sizeof(cdouble) );
         
         outFILE.close();
     }else{
@@ -48,7 +47,7 @@ void CORRELATOR::output_corr_err( const char* out_file_PATH ){
     func_name = "output_corr_err_______";
     route( class_name, func_name, 1 );
     
-    if( new_flg_corr ){
+    if( corr != NULL ){
         cdouble err, mean, sqr_mean;
         
         char out_file_name[1024];
@@ -90,7 +89,7 @@ void CORRELATOR::output_corr_fit( const char* out_file_PATH ){
     func_name = "output_corr_fit_______";
     route( class_name, func_name, 1 );
     
-    if( new_flg_corr ){
+    if( corr != NULL ){
         double err, mean, sqr_mean;
         double *tmp_corr = new double[ tSIZE * N_conf ];
         for( int i=0; i<N_conf; i++) for( int t=0; t < tSIZE; t++)
@@ -141,7 +140,7 @@ void CORRELATOR::output_effmass_all( const char* out_file_PATH ){
     func_name = "output_effmass_all____";
     route( class_name, func_name, 1 );
 
-    if( new_flg_corr){
+    if( corr != NULL ){
         cdouble *eff_mass = new cdouble[ (tSIZE-1) * N_conf ];
         
         for( int t=0; t < tSIZE - 1; t++) for( int i=0; i<N_conf; i++)
@@ -150,11 +149,10 @@ void CORRELATOR::output_effmass_all( const char* out_file_PATH ){
         char out_file_name[1024];
         snprintf( out_file_name, sizeof(out_file_name),
                  "%s/%s_effmass_all", out_file_PATH, HAD_name.c_str() );
-        ofstream outFILE( out_file_name, ios::out );
+        ofstream outFILE( out_file_name, ios::out | ios::binary );
         
         for(int t=0; t < tSIZE-1; t++) for( int i=0; i<N_conf; i++)
-            outFILE << t << " " << eff_mass[ nt(i,t) ].real() << " "
-                    << eff_mass[ nt(i,t) ].imag() << endl;
+            outFILE.write( (char*)&eff_mass[ nt(i,t) ], sizeof(cdouble) );
         
         outFILE.close();
         delete [] eff_mass;
@@ -175,7 +173,7 @@ void CORRELATOR::output_effmass_err( const char* out_file_PATH ){
     func_name = "output_effmass_err____";
     route( class_name, func_name, 1 );
     
-    if( new_flg_corr ){
+    if( corr != NULL ){
         cdouble *eff_mass = new cdouble[ (tSIZE-1) * N_conf ];
         
         for( int t=0; t < tSIZE - 1; t++) for( int i=0; i<N_conf; i++)

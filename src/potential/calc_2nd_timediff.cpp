@@ -2,7 +2,7 @@
 /**
  * @file
  * @ingroup Potential
- * @brief   Calculate 2nd time-difference of R-correlator
+ * @brief   Calculate 2nd time-difference term of potential
  * @author  Takaya Miyamoto
  */
 //--------------------------------------------------------------------------
@@ -14,73 +14,31 @@ void POTENTIAL::calc_2nd_timediff(){
     func_name = "calc_2nd_timediff_____";
     route( class_name, func_name, 1 );
     
-    if( !new_flg_pot ){
-        potential = new cdouble[xyzSIZE* xyzSIZE* xyzSIZE* N_conf];
-        new_flg_pot = true;
-    }
-    if( !new_flg_corr ){
-        corr1 = new cdouble[ tSIZE * N_conf ];
-        corr2 = new cdouble[ tSIZE * N_conf ];
-        new_flg_corr = true;
-        
-        CORRELATOR *corr_org = new CORRELATOR;
-        corr_org->set_env( xyzSIZE, tSIZE, N_conf, data_list );
-        
-        if( HAD1_type == HAD2_type ){   // when used same baryon
-            corr_org->set_corr( HAD1_type );
-            corr_org->make_JK_sample_corr(1);
-            for(int it=0; it<tSIZE; it++) for(int conf=0; conf<N_conf; conf++){
-                corr1[ nt(conf,it) ] = corr_org->corr[ nt(conf,it) ];
-                corr2[ nt(conf,it) ] = corr_org->corr[ nt(conf,it) ];
-            }
-        }else{   // when used different baryon
-            corr_org->set_corr( HAD1_type );
-            corr_org->make_JK_sample_corr(1);
-            for(int it=0; it<tSIZE; it++) for(int conf=0; conf<N_conf; conf++)
-                corr1[ nt(conf,it) ] = corr_org->corr[ nt(conf,it) ];
-            corr_org->delete_corr();
-            corr_org->set_corr( HAD2_type );
-            corr_org->make_JK_sample_corr(1);
-            for(int it=0; it<tSIZE; it++) for(int conf=0; conf<N_conf; conf++)
-                corr2[ nt(conf,it) ] = corr_org->corr[ nt(conf,it) ];
-        }
-        delete corr_org;
-    }    
-    if( !new_flg_Rcorr1 ){
-        Rcorr1 = new R_CORRELATOR;
-        new_flg_Rcorr1 = true;
-        Rcorr1->set_env( xyzSIZE, tSIZE, N_conf, data_list );
-        Rcorr1->set_Rcorr(channel,time_slice,endian_flg
-                          ,spin,ang_mom,corr1,corr2);
-    }
-    if( !new_flg_Rcorr2 ){
-        Rcorr2 = new R_CORRELATOR;
-        new_flg_Rcorr2 = true;
-        Rcorr2->set_env( xyzSIZE, tSIZE, N_conf, data_list );
-        Rcorr2->set_Rcorr(channel,time_slice+1,endian_flg
-                          ,spin,ang_mom,corr1,corr2);
-    }
-    if( !new_flg_Rcorr3 ){
-        Rcorr3 = new R_CORRELATOR;
-        new_flg_Rcorr3 = true;
-        Rcorr3->set_env( xyzSIZE, tSIZE, N_conf, data_list );
-        Rcorr3->set_Rcorr(channel,time_slice-1,endian_flg
-                          ,spin,ang_mom,corr1,corr2);
+    cdouble *Rcorr_ptr1 = NULL;
+    cdouble *Rcorr_ptr2 = NULL;
+    cdouble *Rcorr_ptr3 = NULL;
+    
+    for( int ttt=0; ttt<3; ttt++ ){
+        if( Rcorr_t[ttt] == time_slice-1 )
+            Rcorr_ptr1 = Rcorr[ttt].Rcorr;
+        else if( Rcorr_t[ttt] == time_slice )
+            Rcorr_ptr2 = Rcorr[ttt].Rcorr;
+        else if( Rcorr_t[ttt] == time_slice+1 )
+            Rcorr_ptr3 = Rcorr[ttt].Rcorr;
     }
     
     for(int i=0; i<N_conf; i++)
         for(int z=0; z<xyzSIZE; z++)
             for(int y=0; y<xyzSIZE; y++)
-                for(int x=0; x<xyzSIZE; x++){
-            
-                    potential[ xyzn(x,y,z,i) ] = (Rcorr2->Rcorr[ xyzn(x,y,z,i) ]
-                                                + Rcorr3->Rcorr[ xyzn(x,y,z,i) ]
-                                                - Rcorr1->Rcorr[ xyzn(x,y,z,i) ]
-                                                  * 2.0) / ( 4.0* mass );
-    }
-    printf(" @ potential 2nd difference part ( t=%d ) has been calculated.\n"
-           , time_slice);
-    printf(" @ Channel = %s\n", channel_to_name(channel).c_str());
+                for(int x=0; x<xyzSIZE; x++)
+                    
+                    potential[ xyzn(x,y,z,i) ] = ( Rcorr_ptr1[ xyzn(x,y,z,i) ]
+                                                 + Rcorr_ptr3[ xyzn(x,y,z,i) ]
+                                                 - Rcorr_ptr2[ xyzn(x,y,z,i) ]
+                                                    * 2.0) / ( 4.0* mass );
+    
+    printf(" @ Finished calculate potential time 2nd difference part : %s, t=%d\n"
+           , channel_to_name(channel).c_str(), time_slice);
     potential_type = "potT2term";
     
     route( class_name, func_name, 0 );

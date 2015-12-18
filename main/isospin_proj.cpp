@@ -59,7 +59,7 @@ int main( int argc, char **argv ){
     string infile_name, outfile_name;
     int t1, t2, t3;
     
-    int conf_type = PACS_CS_ENS2;
+    int conf_type = 2;
     if( set_dir( data_list[MAIN_PATH], n_conf, conf_type ) == -1 ) return 0;
     
 #define idx(n,c) n+ n_size* c
@@ -171,9 +171,9 @@ int set_dir( char* PATH, int N_conf, int conf_type ){
     int num1, num2;
     string conf;
     
-    if(conf_type==CP_PACS_ENS3)
+    if(conf_type==1)
         conf = "RC16x32_B1830Kud013760Ks013710C1761";
-    else if(conf_type==PACS_CS_ENS2)
+    else if(conf_type==2)
         conf = "RC32x64_B1900Kud01372700Ks01364000C1715";
     else{
         printf(" @@@@@@ invalid conf type !\n\n");
@@ -188,13 +188,13 @@ int set_dir( char* PATH, int N_conf, int conf_type ){
 
         for( int conf_loop = 1; conf_loop <= N_conf; conf_loop++ ){
         
-            if(conf_type==CP_PACS_ENS3){
+            if(conf_type==1){
                 if( conf_loop <= 500 ){ num1 = 1;   num2 = conf_loop + 40; }
                 else if( conf_loop <= 600 ){ num1 = 2;   num2 = conf_loop - 450; }
                 else{ num1 = 3;   num2 = conf_loop - 560; }
                 snprintf( conf_name, sizeof(conf_name),
                          "%s-%1d-%05d", conf.c_str(), num1, num2);
-            }else if(conf_type==PACS_CS_ENS2){
+            }else if(conf_type==2){
                 snprintf( conf_name, sizeof(conf_name),
                          "%s-b-%05d", conf.c_str(), conf_loop+130);
             }

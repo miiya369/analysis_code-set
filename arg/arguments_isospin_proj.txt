@@ -1,0 +1,16 @@
+
+### For Isospin projection ###
+
+ISO_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+ISO_Path_to_directory	= ../test_data/cp-pacs_ens3_193conf
+ISO_Size_of_xyz		= 16
+ISO_T_shift		= 0
+ISO_X_shift		= 0
+ISO_Y_shift		= 0
+ISO_Z_shift		= 0
+ISO_Snk_relativistic	= CG05
+ISO_Src_relativistic	= CG05
+ISO_Min_time_slice	= 9
+ISO_Max_time_slice	= 9
+
+ISO_Endian_convert	= yes

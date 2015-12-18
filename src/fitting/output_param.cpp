@@ -22,7 +22,8 @@ void FITTING::output_param( const char* outFILE_name ){
         outfile.write( (char*)&N_param, sizeof(int) );   // write file header
         outfile.write( (char*)&func_type, sizeof(int) );
         
-        for( int loop=0; loop<N_param; loop++ ) for( int conf=0; conf<N_conf; conf++ )
+        for( int loop=0; loop<N_param; loop++ )
+            for( int conf=0; conf<N_conf; conf++ )
             outfile.write( (char*)&param_out[ idx(conf,loop) ], sizeof(double) );
         
         outfile.close();

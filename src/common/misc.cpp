@@ -11,7 +11,7 @@
 
 void route( string class_name, string func_name, int io ){
     
-    //    return;   // for no debug.
+        return;   // for no debug.
     
     time_t timer;
     time(&timer);
@@ -62,7 +62,7 @@ void endian_convert( cdouble *DATA, int DATA_size ){
         }
     }
     time( &end_t );
-    printf("Done         ( %d second )\n",(int)difftime(end_t,start_t));
+    printf("Done |       ( %d second )\n",(int)difftime(end_t,start_t));
 }
 
 void endian_convert( double *DATA, int DATA_size ){
@@ -81,7 +81,7 @@ void endian_convert( double *DATA, int DATA_size ){
         for(int j=0; j<8; j++) ((char*)&DATA[k])[j] = dummy[7-j];
     }
     time( &end_t );
-    printf("Done         ( %d second )\n",(int)difftime(end_t,start_t));
+    printf("Done |       ( %d second )\n",(int)difftime(end_t,start_t));
 }
 
 void endian_convert( int DATA ){
