@@ -1,0 +1,15 @@
+
+   ===  Changed items from default Doxyfile ===
+
+ * PROJECT_NAME : "My Project" -> “Analysis Code Set”
+
+ * PROJECT_NUMBER : Blank -> 1.0
+
+ * FILTER_PATTERNS : Blank -> *.h *.cpp
+
+ * RECURSIVE : NO -> YES
+
+ * HAVE_DOT : NO -> YES
+
+ * GENERATE_LATEX : YES -> NO
+

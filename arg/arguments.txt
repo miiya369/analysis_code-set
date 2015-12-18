@@ -1,0 +1,134 @@
+
+### For Effective mass ###
+
+MAS_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+MAS_Path_to_input_dir	= ../test_data/cp-pacs_ens3_193conf
+MAS_Path_to_output_dir	= ./results/
+MAS_Size_of_time	= 32
+MAS_T_shift		= 0
+MAS_X_shift		= 0
+MAS_Y_shift		= 0
+MAS_Z_shift		= 0
+MAS_Snk_relativistic	= CG05
+MAS_Src_relativistic	= CG05
+MAS_Calc_hadron_name	= { Lambda Sigma proton pion phi etaSS }
+
+MAS_Calc_fit_data	= no
+MAS_Fit_range_min	= 6
+MAS_Fit_range_max	= 12
+
+
+### For Potential ###
+
+POT_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+POT_Path_to_input_dir	= ../test_data/cp-pacs_ens3_193conf
+POT_Path_to_output_dir	= ./results/
+POT_Size_of_time	= 32
+POT_Size_of_xyz		= 16
+POT_T_shift		= 0
+POT_X_shift		= 0
+POT_Y_shift		= 0
+POT_Z_shift		= 0
+POT_Snk_relativistic	= CG05
+POT_Src_relativistic	= CG05
+POT_Min_time_slice	= 7
+POT_Max_time_slice	= 9
+POT_Reduced_mass	= 0.5
+POT_Channel		= Pro-Lam_Pro-Lam
+POT_Spin_projection	= 0
+POT_Spin_z_component	= 0
+POT_Ang_mom_projection	= 0
+
+POT_Endian_convert	= yes
+
+POT_Out_sum_pot		= yes
+POT_Out_laplacian	= no
+POT_Out_1st_t_diff	= no
+POT_Out_2nd_t_diff	= no
+
+POT_Out_fit_data	= no
+
+POT_Out_NBS_wave	= yes
+POT_Out_R_correlator	= yes
+
+
+### For Data fitting ###
+
+FIT_Fit_data_file_name	= ./results/Pro_Lam__Pro_Lam_potential_fitdata_t8
+FIT_Output_file_name	= ./results/fit_params
+FIT_Stopping_condition	= 0.000001
+FIT_Function_type	= 3G
+FIT_Fit_range_min	= 6
+FIT_Fit_range_max	= 12
+
+FIT_Endian_convert	= no
+
+FIT_Parameter		= { 1 2 3 4 5 6 }
+
+
+### For Phase shift calculation ###
+
+OBS_Parameter_list	= ./results/fit_params
+OBS_Output_file_name	= ./results/phase_shift_test_m963_E234_r1.5
+OBS_Lattice_spacing	= 0.0907
+OBS_Reduced_mass	= 901.378
+OBS_Angular_momentum	= 0
+OBS_Calc_energy_min	= 0
+OBS_Calc_energy_max	= 300
+OBS_Runge_kutta_delta	= 0.0005
+OBS_Runge_kutta_max_r	= 6
+
+OBS_Endian_convert	= no
+
+OBS_Calc_squ_wall_pot	= no
+OBS_Squ_wall_pot_V0	= -234
+OBS_Squ_wall_pot_r0	= 1.5
+
+OBS_Calc_scatt_length	= yes
+
+
+### For Isospin projection ###
+
+ISO_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+ISO_Path_to_directory	= ../test_data/cp-pacs_ens3_193conf
+ISO_Size_of_xyz		= 16
+ISO_T_shift		= 0
+ISO_X_shift		= 0
+ISO_Y_shift		= 0
+ISO_Z_shift		= 0
+ISO_Snk_relativistic	= CG05
+ISO_Src_relativistic	= CG05
+ISO_Min_time_slice	= 9
+ISO_Max_time_slice	= 9
+
+ISO_Endian_convert	= yes
+
+
+### For Coupled channel potential ###
+
+CCP_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+CCP_Path_to_input_dir	= /mnt/bblqcd00/miyamoto/results_kek/results_kek_cp-pacs+JLQCD_ens3/c_quark/t_shift_000
+CCP_Path_to_output_dir	= ./results
+CCP_Size_of_time	= 32
+CCP_Size_of_xyz		= 16
+CCP_calc_time_slice	= 8
+CCP_T_shift		= 0
+CCP_X_shift		= 0
+CCP_Y_shift		= 0
+CCP_Z_shift		= 0
+CCP_Snk_relativistic	= CG05
+CCP_Src_relativistic	= CG05
+CCP_Channel_00		= Nuc-Lam12_Nuc-Lam12
+CCP_Channel_10		= Nuc-Lam12_Nuc-Sig12
+CCP_Channel_01		= Nuc-Sig12_Nuc-Lam12
+CCP_Channel_11		= Nuc-Sig12_Nuc-Sig12
+CCP_Reduced_mass_00	= 0.415
+CCP_Reduced_mass_10	= 0.415
+CCP_Reduced_mass_01	= 0.422
+CCP_Reduced_mass_11	= 0.422
+CCP_Spin_projection	= 0
+CCP_Spin_z_component	= 0
+CCP_Ang_mom_projection	= 0
+
+CCP_Endian_convert	= yes
+CCP_Calc_fit_data	= yes

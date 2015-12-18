@@ -1,0 +1,92 @@
+
+ ////////////////////////////////////////////////
+ ///                                          ///
+            HAL QCD analysis code set 
+
+            Author : Takaya Miyamoto
+ ///                                          ///
+ ////////////////////////////////////////////////
+
+
+ ############   Build   ############
+ analysis_code_set のディレクトリ上で make と打てば
+ obj/ 内にオブジェクトファイルが自動的に生成され、
+ 各実行ファイルが生成されます。
+ 全てビルドする必要がない場合は、make に次のターゲットを
+ つけて実行してください。
+ * potential		-> pot
+ * effective mass	-> mas
+ * fitting		-> fit
+ * phase shift		-> phs
+
+
+ #########   How to use   #########
+ 各実行ファイルの基本的な使い方は次の通りです。
+ 1) ./arg の中の arguments ファイルを必要に応じて
+ 編集する
+ 2) 各実行ファイルに -f オプションを用いてその
+ arguments ファイルを指定し実行する
+ 例 : ./pot -f ./arg/arguments.txt
+
+ また、各実行ファイルはオプション無しで実行すると
+ その usage が表示されます。-f 以外のオプションは
+ 基本的には必要ないですが、arguments ファイルを
+ 編集するのが手間であるときに用いることで、オプション
+ で指定した引数が優先されて実行されます。
+
+
+ #######   Gauge configs list   #######
+ pot, mas の実行の際には gauge configs の list
+ を読み込ませる必要があります。sample が ./arg に
+ ありますので、必要に応じて同様に作ってください。
+ この際、gauge configs list の行数が #.confs 
+ として読み込まれますので、余分な改行を入れないように
+ してください。
+
+ なお、作成のための簡単な script を ./script に
+ 用意してあります (make_conf_list.sh)。
+ confs の ディレクトリが入っているディレクトリを
+ 指定することで、/ を抜いた形で表示されます。
+ sh make_conf_list.sh BBwave.dir.S0.00/ > list
+ のように使ってください。
+
+
+ ############   OpenMP   ############
+ Default では全て逐次処理となっています。
+ OpenMP を使う場合は、Makefile 内の CXXFLAGS に
+ -fopenmp を加えてからビルドしてください。
+
+ @@@@@@@@@@@@@ COUTION @@@@@@@@@@@@@@@@
+ 現 version では openMP を使うとバグが発生します
+ 使わないでください。
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+ OpenMP は以下の部分にのみ用いています。
+ * src/common/misc.cpp の endian_convert()
+ * src/potential/projection.cpp の
+	ang_mom_projection()
+
+
+ ############   doxygen   ############
+ analysis_code_set のディレクトリ上で doxygen
+ と打てば html/ の中にファイルが自動的に生成されます
+ ( ただし、doxygen のインストールが必要 )
+
+
+ ############ Debug の表示 ############
+ Default では、どのクラス・関数に入ったか・出たか
+ の情報が自動的に出力されるようになっています。
+ これにより、バグが発生した際にその地点をすぐに発見する
+ ことができますが、邪魔な場合は src/common/misc.cpp
+ の route() の中の return; のコメントアウトを
+ 外してからビルドしてください。
+
+
+ ######### Fit function の追加 #########
+ 1) analysis_const.h の enum に追加
+ 2) fitting/N_func_to_name.cpp に追加
+ 3) fitting/set_func.cpp に追加（パラメータ数）
+ 4) fitting/print_func_gnu.cpp に追加（関数形）
+ 5) fitting/fit_funcs.cpp に追加（関数の戻り値）
+ 6) include/phase_shift.h に追加（関数の定義）
+

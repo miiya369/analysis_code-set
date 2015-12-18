@@ -1,0 +1,36 @@
+
+ ////////////////////////////////////////////////
+ ///                                          ///
+                VERSION INFOMATION
+
+             Author : Takaya Miyamoto
+ ///                                          ///
+ ////////////////////////////////////////////////
+
+
+ @ version 1.0 : 2015/05/27 Completion
+
+	* Calculate effective mass
+		- Jack knife sampling 
+		   ( Only one bin-size )
+		- Fit the mass
+
+	* Calculate Potential
+		- S wave
+		- Spin singlet & triplet
+		- Jack knife sampling 
+		   ( Only one bin-size )
+		- output each term of 
+		   potential kernel
+
+	* Potential Fitting
+		- Fitting Functions are prepared 
+		   constant, one exponential,
+		   two gaussians,
+		   two x-shift gaussians,
+
+	* Calculate Observables
+		- Phase shift
+		- Scattering length
+
+
