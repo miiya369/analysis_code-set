@@ -30,18 +30,21 @@ protected:
     
 public:
     cdouble *corr;
+    cdouble *Z_factor;
     
     CORRELATOR(){
         class_name = "CORRELATOR:ANALYSIS_BASE________";
         func_name = "______________________";
         route( class_name, func_name, 1 );
         
-        corr = NULL;
+        corr     = NULL;
+        Z_factor = NULL;
         fb_mean_flg = false;
     }
     
     ~CORRELATOR(){
-        if( corr != NULL ) delete [] corr;
+        if( corr     != NULL ) delete [] corr;
+        if( Z_factor != NULL ) delete [] Z_factor;
         
         func_name = "______________________";
         route( class_name, func_name, 0 );
@@ -77,16 +80,23 @@ public:
             delete [] corr;
             corr = NULL;
         }
+        if( Z_factor != NULL ){
+            delete [] Z_factor;
+            Z_factor = NULL;
+        }
         route( class_name, func_name, 0 );
     }
     
     void input_corr();
     void make_JK_sample_corr( int );
+    void calc_z_factor();
     void output_corr_all( const char* );
     void output_corr_err( const char* );
     void output_corr_fit( const char* );
     void output_effmass_all( const char* );
     void output_effmass_err( const char* );
+    void output_z_factor_all( const char* );
+    void output_z_factor_err( const char* );
 };
 
 #endif

@@ -20,6 +20,79 @@ int set_arg( int usage_type, int argc, char **argv
     char tmp_c1[MAX_LEN_PATH], tmp_c2[MAX_LEN_PATH];
     
 //===========================================================================//
+//============================ For extract Z-factor =========================//
+//===========================================================================//
+    if( usage_type == EXTRACT_Z_FACTOR ){
+        n_arg = 11;   // <- If you change the number of args, change also here.
+        char option0[32][32]
+    ={ "ZFAC_Gauge_confs_list","ZFAC_Path_to_input_dir","ZFAC_Path_to_output_dir"
+      ,"ZFAC_Size_of_time"    ,"ZFAC_T_shift"          ,"ZFAC_X_shift"
+      ,"ZFAC_Y_shift"         ,"ZFAC_Z_shift"          ,"ZFAC_Snk_relativistic"
+      ,"ZFAC_Src_relativistic","ZFAC_Calc_hadron_name" };
+        // "ZFAC_Calc_hadron_name" must be put at the end of option0 !
+        
+        for( int loop=1; loop<argc; loop++ )
+            if( argv[loop][0] == '-' )
+                if(argv[loop][1]=='f'){
+                    snprintf(infile_name,sizeof(infile_name),"%s",argv[loop+1]);
+                    count1++;   infile_flg = true;
+                }
+        if( infile_flg ){
+            ifstream ifs(infile_name, ios::in );
+            if(!ifs){
+                printf("\n @@@@@@ the file \"%s\" is not exist\n\n", infile_name );
+                return -1;
+            }
+            while(ifs.getline(tmp_str[count2],sizeof(tmp_str[count2]))) count2++;
+            for( int loop1=0; loop1<count2; loop1++ ){
+                if(sscanf(tmp_str[loop1]," %s = %s ",tmp_c1,tmp_c2) != 2 )
+                    continue;
+                for( int loop2=0; loop2<n_arg-1; loop2++ )
+                    if( strcmp(tmp_c1,option0[loop2]) == 0 )
+                        snprintf(argv_o[loop2],sizeof(argv_o[loop2]),"%s",tmp_c2);
+                
+                if( strcmp(tmp_c1,option0[n_arg-1]) == 0 ){
+                    char *tmp_tok;
+                    int   count3 = 0;
+                    tmp_tok = strtok(tmp_str[loop1]," \t");
+                    for(int iii=0;iii<3;iii++) tmp_tok = strtok(NULL," \t");
+                    while( strcmp(tmp_tok,"}") != 0 ){
+                        snprintf(argv_o[count3+n_arg],sizeof(argv_o[count3+n_arg])
+                                 ,"%s",tmp_tok);
+                        if(name_to_hadron_type(argv_o[count3+n_arg]) == -1){
+                            printf("\n @@@@@@ invalid hadron name \" %s \"\n\n"
+                                   ,argv_o[count3+n_arg]);
+                            return -1;
+                        }
+                        count3++;
+                        tmp_tok = strtok(NULL," \t");
+                    }
+                    snprintf(argv_o[n_arg-1],sizeof(argv_o[n_arg-1]),"%d",count3);
+                }
+            }
+        }
+        for( int loop=1; loop<argc; loop++ )
+            if( argv[loop][0] == '-' ){
+                check = 0;
+                //****** You may set additional potion in here ******//
+                
+                //***************************************************//
+                if(argv[loop][1]=='f') check++;
+                if(check==0){
+                    printf("\n @@@@@@ invalid option -%c\n", argv[loop][1]);
+                    usage( usage_type );
+                    return -1;
+                }
+            }
+        snprintf(list[MAIN_PATH],sizeof(list[MAIN_PATH]) ,"%s",argv_o[1]);
+        snprintf(list[N_T_SHIFT],sizeof(list[N_T_SHIFT]) ,"%s",argv_o[4]);
+        snprintf(list[N_X_SHIFT],sizeof(list[N_X_SHIFT]) ,"%s",argv_o[5]);
+        snprintf(list[N_Y_SHIFT],sizeof(list[N_Y_SHIFT]) ,"%s",argv_o[6]);
+        snprintf(list[N_Z_SHIFT],sizeof(list[N_Z_SHIFT]) ,"%s",argv_o[7]);
+        snprintf(list[SNK_RELA],sizeof(list[SNK_RELA]) ,"%s",argv_o[8]);
+        snprintf(list[SRC_RELA],sizeof(list[SRC_RELA]) ,"%s",argv_o[9]);
+    }
+//===========================================================================//
 //================ For coupled channel potential calculation ================//
 //===========================================================================//
     if( usage_type == COUPLED_CHANNEL_POT ){
@@ -141,18 +214,19 @@ int set_arg( int usage_type, int argc, char **argv
                     snprintf(argv_o[n_arg-1],sizeof(argv_o[n_arg-1]),"%d",count3);
                 }
             }
-            snprintf(list[MAIN_PATH],sizeof(list[MAIN_PATH]) ,"%s",argv_o[6]);
-            snprintf(list[N_T_SHIFT],sizeof(list[N_T_SHIFT]) ,"%s",argv_o[7]);
-            snprintf(list[N_X_SHIFT],sizeof(list[N_X_SHIFT]) ,"%s",argv_o[8]);
-            snprintf(list[N_Y_SHIFT],sizeof(list[N_Y_SHIFT]) ,"%s",argv_o[9]);
-            snprintf(list[N_Z_SHIFT],sizeof(list[N_Z_SHIFT]) ,"%s",argv_o[10]);
-            snprintf(list[SNK_RELA] ,sizeof(list[SNK_RELA])  ,"%s",argv_o[11]);
-            snprintf(list[SRC_RELA] ,sizeof(list[SRC_RELA])  ,"%s",argv_o[12]);
         }
         for( int loop=1; loop<argc; loop++ )
             if( argv[loop][0] == '-' ){
                 check = 0;
                 //****** You may set additional potion in here ******//
+                if(argv[loop][1]=='i'){
+                    snprintf(argv_o[6],sizeof(argv_o[6]),"%s",argv[loop+1]);
+                    check++;   count1++;
+                }
+                if(argv[loop][1]=='o'){
+                    snprintf(argv_o[2],sizeof(argv_o[2]),"%s",argv[loop+1]);
+                    check++;   count1++;
+                }
                 if(argv[loop][1]=='m'){
                     snprintf(argv_o[5],sizeof(argv_o[5]),"yes");
                     check++;   count1++;
@@ -173,22 +247,30 @@ int set_arg( int usage_type, int argc, char **argv
                     return -1;
                 }
             }
+        snprintf(list[MAIN_PATH],sizeof(list[MAIN_PATH]) ,"%s",argv_o[6]);
+        snprintf(list[N_T_SHIFT],sizeof(list[N_T_SHIFT]) ,"%s",argv_o[7]);
+        snprintf(list[N_X_SHIFT],sizeof(list[N_X_SHIFT]) ,"%s",argv_o[8]);
+        snprintf(list[N_Y_SHIFT],sizeof(list[N_Y_SHIFT]) ,"%s",argv_o[9]);
+        snprintf(list[N_Z_SHIFT],sizeof(list[N_Z_SHIFT]) ,"%s",argv_o[10]);
+        snprintf(list[SNK_RELA] ,sizeof(list[SNK_RELA])  ,"%s",argv_o[11]);
+        snprintf(list[SRC_RELA] ,sizeof(list[SRC_RELA])  ,"%s",argv_o[12]);
     }
 //===========================================================================//
 //======================== For potential calculation ========================//
 //===========================================================================//
     if( usage_type == CALC_POTENTIAL ){
-        n_arg = 26;   // <- If you change the number of args, change also here.
+        n_arg = 28;   // <- If you change the number of args, change also here.
         char option3[32][32]
-        = {  "POT_Size_of_xyz"     ,"POT_Min_time_slice"    ,"POT_Max_time_slice"
-            ,"POT_Channel"         ,"POT_Reduced_mass"      ,"POT_Spin_projection"
-            ,"POT_Spin_z_component","POT_Ang_mom_projection","POT_Gauge_confs_list"
-            ,"POT_Path_to_output_dir","POT_Endian_convert"  ,"POT_Out_sum_pot"
-            ,"POT_Out_laplacian"   ,"POT_Out_1st_t_diff"    ,"POT_Out_2nd_t_diff"
-            ,"POT_Out_fit_data"    ,"POT_Path_to_input_dir" ,"POT_T_shift"
-            ,"POT_X_shift"         ,"POT_Y_shift"           ,"POT_Z_shift"
-            ,"POT_Size_of_time"    ,"POT_Snk_relativistic","POT_Src_relativistic"
-            ,"POT_Out_NBS_wave"    ,"POT_Out_R_correlator"};
+        = {  "POT_Size_of_xyz"     ,"POT_Min_time_slice"  ,"POT_Max_time_slice"
+            ,"POT_Channel"         ,"POT_Spin_projection" ,"POT_Spin_z_component"
+        ,"POT_Ang_mom_projection","POT_Gauge_confs_list"  ,"POT_Path_to_output_dir"
+            ,"POT_Endian_convert"  ,"POT_Out_sum_pot"     ,"POT_Out_laplacian"
+            ,"POT_Out_1st_t_diff"  ,"POT_Out_2nd_t_diff"  ,"POT_Out_fit_data"
+            ,"POT_Path_to_input_dir","POT_T_shift"        ,"POT_X_shift"
+            ,"POT_Y_shift"         ,"POT_Z_shift"         ,"POT_Size_of_time"
+            ,"POT_Snk_relativistic","POT_Src_relativistic","POT_Out_NBS_wave"
+            ,"POT_Out_R_correlator","POT_Rcorr_NBS/corr"  ,"POT_Had1_mass"
+            ,"POT_Had2_mass" };
         
         for( int loop=1; loop<argc; loop++ )
             if( argv[loop][0] == '-' )
@@ -210,13 +292,13 @@ int set_arg( int usage_type, int argc, char **argv
                     if( strcmp(tmp_c1,option3[loop2]) == 0 )
                         snprintf(argv_o[loop2],sizeof(argv_o[loop2]),"%s",tmp_c2);
             }
-            snprintf(list[MAIN_PATH],sizeof(list[MAIN_PATH]) ,"%s",argv_o[16]);
-            snprintf(list[N_T_SHIFT],sizeof(list[N_T_SHIFT]) ,"%s",argv_o[17]);
-            snprintf(list[N_X_SHIFT],sizeof(list[N_X_SHIFT]) ,"%s",argv_o[18]);
-            snprintf(list[N_Y_SHIFT],sizeof(list[N_Y_SHIFT]) ,"%s",argv_o[19]);
-            snprintf(list[N_Z_SHIFT],sizeof(list[N_Z_SHIFT]) ,"%s",argv_o[20]);
-            snprintf(list[SNK_RELA] ,sizeof(list[SNK_RELA])  ,"%s",argv_o[22]);
-            snprintf(list[SRC_RELA] ,sizeof(list[SRC_RELA])  ,"%s",argv_o[23]);
+            snprintf(list[MAIN_PATH],sizeof(list[MAIN_PATH]) ,"%s",argv_o[15]);
+            snprintf(list[N_T_SHIFT],sizeof(list[N_T_SHIFT]) ,"%s",argv_o[16]);
+            snprintf(list[N_X_SHIFT],sizeof(list[N_X_SHIFT]) ,"%s",argv_o[17]);
+            snprintf(list[N_Y_SHIFT],sizeof(list[N_Y_SHIFT]) ,"%s",argv_o[18]);
+            snprintf(list[N_Z_SHIFT],sizeof(list[N_Z_SHIFT]) ,"%s",argv_o[19]);
+            snprintf(list[SNK_RELA] ,sizeof(list[SNK_RELA])  ,"%s",argv_o[21]);
+            snprintf(list[SRC_RELA] ,sizeof(list[SRC_RELA])  ,"%s",argv_o[22]);
             if(name_to_channel(argv_o[3]) == -1){
                 printf("\n @@@@@@ invalid channel \" %s \"\n\n",argv_o[3]);
                 return -1;
@@ -247,11 +329,11 @@ int set_arg( int usage_type, int argc, char **argv
 //============================= For data fitting ============================//
 //===========================================================================//
     if( usage_type == FITTING_DATA ){
-        n_arg = 8;   // <- If you change the number of args, change also here.
+        n_arg = 9;   // <- If you change the number of args, change also here.
         char option4[32][32]
         = {  "FIT_Stopping_condition","FIT_Function_type"  ,"FIT_Fit_range_min"
-            ,"FIT_Fit_range_max" ,"FIT_Fit_data_file_name","FIT_Output_file_name"
-            ,"FIT_Endian_convert"    ,"FIT_Parameter" };
+            ,"FIT_Fit_range_max" ,"FIT_Fit_data_file_name" ,"FIT_Output_file_name"
+            ,"FIT_Endian_convert"    ,"FIT_lattice_spacing","FIT_Parameter" };
         // "FIT_Parameter" must be put at the end of option4 !
         
         for( int loop=1; loop<argc; loop++ )

@@ -47,7 +47,7 @@ void route( string, string, int );
 
 void endian_convert( cdouble*, int );
 void endian_convert( double*, int );
-void endian_convert( int );
+void endian_convert( int* );
 
 //! Set the path of data file
 string  set_path( char data_list[MAX_N_DATA][MAX_LEN_PATH], int );

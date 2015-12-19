@@ -35,7 +35,7 @@ void POTENTIAL::calc_2nd_timediff(){
                     potential[ xyzn(x,y,z,i) ] = ( Rcorr_ptr1[ xyzn(x,y,z,i) ]
                                                  + Rcorr_ptr3[ xyzn(x,y,z,i) ]
                                                  - Rcorr_ptr2[ xyzn(x,y,z,i) ]
-                                                    * 2.0) / ( 4.0* mass );
+                                                    * 2.0) / ( 4.0* reduced_mass );
     
     printf(" @ Finished calculate potential time 2nd difference part : %s, t=%d\n"
            , channel_to_name(channel).c_str(), time_slice);

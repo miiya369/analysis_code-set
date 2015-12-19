@@ -26,7 +26,8 @@ string set_path( char data_list[MAX_N_DATA][MAX_LEN_PATH], int num_conf ){
     char* src_rela =       data_list[SRC_RELA];
     
     if( time == -1 ){
-        snprintf( dir_name, sizeof(dir_name), "correlator.PS.dir");
+        snprintf( dir_name, sizeof(dir_name), "correlator.%s.dir"
+                 , data_list[CORR_DIRECTORY]);
         snprintf( header, sizeof(header),
                  "%s_correlator."
                  , data_list[HADRON_NAME] );

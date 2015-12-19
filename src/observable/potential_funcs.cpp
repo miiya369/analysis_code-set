@@ -17,6 +17,7 @@ double PHASE_SHIFT::V( double rr, int conf ){
          if( func_type == CONSTANT )                v = func_const (x,conf);
     else if( func_type == ONE_EXPONENTIAL )         v = func_exp   (x,conf);
     else if( func_type == TWO_GAUSSIAN )            v = func_gauss (x,conf);
+    else if( func_type == THREE_GAUSSIAN )          v = func_gauss (x,conf);
     else if( func_type == TWO_SHIFTED_GAUSSIAN )    v = func_sgauss(x,conf);
     else if( func_type == TEST )                    v = func_test  (x,conf);
     

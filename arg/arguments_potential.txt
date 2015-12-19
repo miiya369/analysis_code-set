@@ -1,9 +1,9 @@
 
 ### For Potential ###
 
-POT_Gauge_confs_list	= ./arg/conf_list/conf_list.cp-pacs_ens3_190confs
-POT_Path_to_input_dir	= ../test_data/cp-pacs_ens3_193conf
-POT_Path_to_output_dir	= ./results/
+POT_Gauge_confs_list	= ./arg/conf_list/conf_list.cp-pacs+JLQCD_ens3_190confs
+POT_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/cp-pacs+JLQCD_ens3_193conf
+POT_Path_to_output_dir	= ./results
 POT_Size_of_time	= 32
 POT_Size_of_xyz		= 16
 POT_T_shift		= 0
@@ -14,13 +14,15 @@ POT_Snk_relativistic	= CG05
 POT_Src_relativistic	= CG05
 POT_Min_time_slice	= 7
 POT_Max_time_slice	= 9
-POT_Reduced_mass	= 0.5
+POT_Had1_mass		= 1.132174
+POT_Had2_mass		= 1.113707
 POT_Channel		= Pro-Lam_Pro-Lam
 POT_Spin_projection	= 0
 POT_Spin_z_component	= 0
 POT_Ang_mom_projection	= 0
 
 POT_Endian_convert	= yes
+POT_Rcorr_NBS/corr	= yes
 
 POT_Out_sum_pot		= yes
 POT_Out_laplacian	= yes

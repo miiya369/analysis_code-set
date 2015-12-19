@@ -38,7 +38,7 @@ void POTENTIAL::calc_laplacian(){
                         + Rcorr_ptr[ xyzn(x,y-1+ySHIFT,z,i) ]
                         + Rcorr_ptr[ xyzn(x,y,(z+1)%xyzSIZE,i) ]
                         + Rcorr_ptr[ xyzn(x,y,z-1+zSHIFT,i) ]
-                        - Rcorr_ptr[ xyzn(x,y,z,i) ] * 6.0 ) / ( 2.0* mass );
+                        - Rcorr_ptr[ xyzn(x,y,z,i) ] * 6.0 ) / ( 2.0* reduced_mass );
                 }
     printf(" @ Finished calculate potential laplacian part           : %s, t=%d\n"
            , channel_to_name(channel).c_str(), time_slice);

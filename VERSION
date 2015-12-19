@@ -8,11 +8,23 @@
  ////////////////////////////////////////////////
 
 
+ @ version 1.2 : 2015/06/04 Completion
+
+	* Construct the selection of
+	        NBS wave / exp(-(m1+m2)t)
+	     or NBS wave / corr1*corr2
+	  for R-correlator calculation
+
+	* Add the option for “mas” execution
+
+	* Modified fitting outputs
+	   ( print “Lattice unit” & “MeV” )
+
 
  @ version 1.1 : 2015/06/01 Completion
 
 	* Correct the error estimation for
-	  fit parameter and chi-square
+	  fit parameters
 
 	* Reduction calculation time
 		- Potential

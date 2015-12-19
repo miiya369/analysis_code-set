@@ -24,26 +24,29 @@ int main( int argc, char **argv ){
     bool endian_flg   = false, calc_flg_pot = false, calc_flg_lap = false;
     bool calc_flg_t1  = false, calc_flg_t2  = false, calc_flg_fit = false;
     bool calc_flg_NBS = false, calc_flg_Rcorr = false;
-    int t_size               = atoi(Argv[21]);
+    bool Rcorr_NBS_dev_corr = false;
+    int t_size               = atoi(Argv[20]);
     int xyz_size             = atoi(Argv[0]);
     int time_min             = atoi(Argv[1]);
     int time_max             = atoi(Argv[2]);
     int channel              = name_to_channel(Argv[3]);
-    double mass              = atof(Argv[4]);
-    int spin                 = atoi(Argv[5]);
-    int spin_z               = atoi(Argv[6]);
-    int ang_mom              = atoi(Argv[7]);
-    const char* conf_list    = Argv[8];
-    const char* outfile_path = Argv[9];
+    int spin                 = atoi(Argv[4]);
+    int spin_z               = atoi(Argv[5]);
+    int ang_mom              = atoi(Argv[6]);
+    const char* conf_list    = Argv[7];
+    const char* outfile_path = Argv[8];
+    double HAD1_mass         = atof(Argv[26]);
+    double HAD2_mass         = atof(Argv[27]);
     
-    if(Argv[10][0] == 'y') endian_flg     = true;
-    if(Argv[11][0] == 'y') calc_flg_pot   = true;
-    if(Argv[12][0] == 'y') calc_flg_lap   = true;
-    if(Argv[13][0] == 'y') calc_flg_t1    = true;
-    if(Argv[14][0] == 'y') calc_flg_t2    = true;
-    if(Argv[15][0] == 'y') calc_flg_fit   = true;
-    if(Argv[24][0] == 'y') calc_flg_NBS   = true;
-    if(Argv[25][0] == 'y') calc_flg_Rcorr = true;
+    if(Argv[9][0] == 'y') endian_flg     = true;
+    if(Argv[10][0] == 'y') calc_flg_pot   = true;
+    if(Argv[11][0] == 'y') calc_flg_lap   = true;
+    if(Argv[12][0] == 'y') calc_flg_t1    = true;
+    if(Argv[13][0] == 'y') calc_flg_t2    = true;
+    if(Argv[14][0] == 'y') calc_flg_fit   = true;
+    if(Argv[23][0] == 'y') calc_flg_NBS   = true;
+    if(Argv[24][0] == 'y') calc_flg_Rcorr = true;
+    if(Argv[25][0] == 'y') Rcorr_NBS_dev_corr = true;
 
     int n_conf = set_data_list( conf_list,  data_list );
     
@@ -60,21 +63,23 @@ int main( int argc, char **argv ){
     printf(" @ time_min   = %d\n",time_min);
     printf(" @ time_max   = %d\n",time_max);
     printf(" @ channel    = %s\n",channel_to_name(channel).c_str());
-    printf(" @ mass       = %lf\n",mass);
+    printf(" @ HAD1 mass  = %lf\n",HAD1_mass);
+    printf(" @ HAD2 mass  = %lf\n",HAD2_mass);
     printf(" @ spin       = %d\n",spin);
     printf(" @ spin z cmp = %d\n",spin_z);
     printf(" @ ang mom    = %d\n",ang_mom);
     printf(" @ conf list  = %s\n",conf_list);
     printf(" @ infile     = %s\n",data_list[MAIN_PATH]);
     printf(" @ outfile    = %s\n",outfile_path);
-    printf(" @ endian cnv = %s\n",Argv[10]);
-    printf(" @ out pot    = %s\n",Argv[11]);
-    printf(" @ out lap    = %s\n",Argv[12]);
-    printf(" @ out t1 dif = %s\n",Argv[13]);
-    printf(" @ out t2 dif = %s\n",Argv[14]);
-    printf(" @ out fit    = %s\n",Argv[15]);
-    printf(" @ out NBS    = %s\n",Argv[24]);
-    printf(" @ out Rcorr  = %s\n\n",Argv[25]);
+    printf(" @ endian cnv = %s\n",Argv[9]);
+    printf(" @ dev corr   = %s\n",Argv[25]);
+    printf(" @ out pot    = %s\n",Argv[10]);
+    printf(" @ out lap    = %s\n",Argv[11]);
+    printf(" @ out t1 dif = %s\n",Argv[12]);
+    printf(" @ out t2 dif = %s\n",Argv[13]);
+    printf(" @ out fit    = %s\n",Argv[14]);
+    printf(" @ out NBS    = %s\n",Argv[23]);
+    printf(" @ out Rcorr  = %s\n\n",Argv[24]);
     fflush(stdout);
     if( n_conf == 0 ){
         printf(" @@@@@@ No gauge configurations !\n\n");
@@ -84,6 +89,7 @@ int main( int argc, char **argv ){
     
     POTENTIAL *pot = NULL;
     R_CORRELATOR *Rcorrelator = NULL;
+    double reduced_mass = HAD1_mass*HAD2_mass/(HAD1_mass+HAD2_mass);
     
     if( calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2){
         
@@ -98,8 +104,14 @@ int main( int argc, char **argv ){
     
     for( int it=time_min; it<=time_max; it++ ){
 
-        if( calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2)
-            pot->set_pot( channel, it, endian_flg, spin, ang_mom, mass );
+        if( calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2){
+            if( Rcorr_NBS_dev_corr )
+                pot->set_pot( channel, it, endian_flg, spin
+                             , ang_mom, reduced_mass );
+            else
+                pot->set_pot( channel, it, endian_flg, spin
+                             , ang_mom, HAD1_mass, HAD2_mass );
+        }
         
         if(calc_flg_fit){
             pot->calc_pot_kernel();

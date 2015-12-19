@@ -11,6 +11,11 @@
 
 void usage( int usage_type ){
     
+    if( usage_type == EXTRACT_Z_FACTOR ){
+        printf("\n ====== Calculation & Output Z-factor usage ======\n");
+        printf("\n");
+        printf("   -f [ Path of the input arguments file ] <- Must be required !\n\n");
+    }
     if( usage_type == COUPLED_CHANNEL_POT ){
         printf("\n ====== Calculation & Output coupled channel potential usage ======\n");
         printf("\n");
@@ -21,6 +26,8 @@ void usage( int usage_type ){
         printf("\n ====== Calculation & Output effective mass usage   ======\n");
         printf("\n");
         printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
+        printf("   -i [ Path of the input directory ]\n");
+        printf("   -o [ Path of the output directory ]\n");
         printf("   -m  Do fitting effective mass\n");
         printf("   -t [ Minimum range of fitting [t] ] : For effective mass fitting\n");
         printf("   -T [ Maximum range of fitting [t] ] : For effective mass fitting\n\n");

@@ -22,15 +22,15 @@ void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
         if( !infile ) error(2, INFILE_NAME);
         
         infile.read( (char*)&fit_type, sizeof(int) );   // read file header
-        if( endian_flg ) endian_convert(fit_type);
+        if( endian_flg ) endian_convert(&fit_type);
         infile.read( (char*)&N_conf, sizeof(int) );
-        if( endian_flg ) endian_convert(N_conf);
+        if( endian_flg ) endian_convert(&N_conf);
         
 //=========================== read corr-type data =========================//
         if( fit_type == 1 ){
             dataSIZE = new int[1];
             infile.read( (char*)&dataSIZE[0], sizeof(int) );
-            if( endian_flg ) endian_convert(dataSIZE[0]);
+            if( endian_flg ) endian_convert(&dataSIZE[0]);
             cood = new double[ dataSIZE[0] ];
             data = new double[ dataSIZE[0] * N_conf ];
             err  = new double[ dataSIZE[0] ];
@@ -45,6 +45,7 @@ void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
                 printf("\b\b\b\b%3.0lf%%",double(t+1)/double(dataSIZE[0])*100);
                 fflush(stdout);
             }
+            printf("\n");
             if( endian_flg ){
                 endian_convert( data, dataSIZE[0] * N_conf );
                 endian_convert( err,  dataSIZE[0] );
@@ -55,7 +56,7 @@ void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
             int tmp_dataSIZE = 0;
             for(int i=0; i<N_conf; i++){
                 infile.read( (char*)&dataSIZE[i], sizeof(int) );
-                if( endian_flg ) endian_convert(dataSIZE[i]);
+                if( endian_flg ) endian_convert(&dataSIZE[i]);
                 tmp_dataSIZE += dataSIZE[i];
             }
             cood = new double[ tmp_dataSIZE ];
@@ -72,6 +73,7 @@ void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
                 printf("\b\b\b\b%3.0lf%%",double(i+1)/double(N_conf)*100);
                 fflush(stdout);
             }
+            printf("\n");
             if( endian_flg ){
                 endian_convert( cood, tmp_dataSIZE );
                 endian_convert( data, tmp_dataSIZE );
@@ -85,7 +87,7 @@ void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
             infile.close();
             error(3,"This file is not miyamoto-format fit data");
         }
-        printf("\n @ fit type         = %d\n", fit_type);
+        printf(" @ fit type         = %d\n", fit_type);
         printf(" @ #.confs          = %d\n", N_conf);
         infile.close();
     }

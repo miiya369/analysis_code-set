@@ -32,7 +32,7 @@ void FITTING::set_func( int FUNC_TYPE, double *PARAM ){
             
         }else if( func_type == THREE_GAUSSIAN ){
             N_param = 6;
-            printf(" @ fit function     = two x-shifted gaussians\n");
+            printf(" @ fit function     = three gaussians\n");
             
         }else if( func_type == TWO_SHIFTED_GAUSSIAN ){
             N_param = 6;

@@ -28,24 +28,26 @@ int main( int argc, char **argv ){
     int    fit_range_max = atoi(Argv[3]);
     const char* infile   = Argv[4];
     const char* outfile  = Argv[5];
+    double lattice_spacing = atof(Argv[7]);
     
     if(Argv[6][0] == 'y') endian_flg = true;
     
-    int n_param = atoi(Argv[7]);
+    int n_param = atoi(Argv[8]);
     double *param_initial = new double[n_param];
     for(int loop=0; loop<n_param; loop++)
-        param_initial[loop] = atof(Argv[loop+8]);
+        param_initial[loop] = atof(Argv[loop+9]);
     
     printf("\n @ Arguments set :\n");
-    printf(" @ stop cond  = %lf\n",stp_cnd);
-    printf(" @ func type  = %s\n",N_func_to_name(func_type).c_str());
-    printf(" @ #. param   = %d\n @ param      = { ",n_param);
+    printf(" @ stop cond   = %lf\n",stp_cnd);
+    printf(" @ func type   = %s\n",N_func_to_name(func_type).c_str());
+    printf(" @ #. param    = %d\n @ param       = { ",n_param);
     for(int loop=0; loop<n_param; loop++) printf("%lf ",param_initial[loop]);
-    printf("}\n @ range min  = %d\n",fit_range_min);
-    printf(" @ range max  = %d\n",fit_range_max);
-    printf(" @ endian cnv = %s\n",Argv[6]);
-    printf(" @ infile     = %s\n",infile);
-    printf(" @ outfile    = %s\n\n",outfile);
+    printf("}\n @ range min   = %d\n",fit_range_min);
+    printf(" @ range max   = %d\n",fit_range_max);
+    printf(" @ lat spacing = %lf\n",lattice_spacing);
+    printf(" @ endian cnv  = %s\n",Argv[6]);
+    printf(" @ infile      = %s\n",infile);
+    printf(" @ outfile     = %s\n\n",outfile);
     fflush(stdout);
 //=======================================================================//
     
@@ -53,10 +55,10 @@ int main( int argc, char **argv ){
     
     fit->input_data( infile, endian_flg );
     fit->set_func( func_type, param_initial );
-    fit->print_func_gnu( true );
+    fit->print_func_gnu( true, lattice_spacing );
     fit->fit_data( fit_range_min, fit_range_max, stp_cnd );
     fit->print_param();
-    fit->print_func_gnu( false );
+    fit->print_func_gnu( false, lattice_spacing );
     fit->output_param( outfile );
 
     delete [] param_initial;

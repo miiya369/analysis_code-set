@@ -16,6 +16,7 @@ double FITTING::fit_functions(double x, double *a, double *dyda){
          if( func_type == CONSTANT )                y = func_const (x, a, dyda);
     else if( func_type == ONE_EXPONENTIAL )         y = func_exp   (x, a, dyda);
     else if( func_type == TWO_GAUSSIAN )            y = func_gauss (x, a, dyda);
+    else if( func_type == THREE_GAUSSIAN )          y = func_gauss (x, a, dyda);
     else if( func_type == TWO_SHIFTED_GAUSSIAN )    y = func_sgauss(x, a, dyda);
     
     return y;

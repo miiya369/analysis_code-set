@@ -47,7 +47,7 @@ public:
     
     void set_Rcorr( int CHANNEL, int it, bool endian_FLG, int SPIN, int ANGMOM ){
         
-        func_name = "set_Rcorr_____________";
+        func_name = "set_Rcorr_NBS/readcorr";
         route( class_name, func_name, 1 );
         
         channel = CHANNEL;
@@ -63,8 +63,8 @@ public:
                  channel == N_LAMBDA_12__N_LAMBDA_12      ||
                  channel == N_LAMBDA_12__N_SIGMA_12       ||
                  channel == N_LAMBDA_12__N_SIGMA_32 ){
-            HAD1_type = LAMBDA;
-            HAD2_type = PROTON;
+            HAD1_type = PROTON;
+            HAD2_type = LAMBDA;
         }else if( channel == PROTON_SIGMAZ__PROTON_LAMBDA  ||
                  channel == PROTON_SIGMAZ__PROTON_SIGMAZ   ||
                  channel == PROTON_SIGMAZ__NEUTRON_SIGMAP  ||
@@ -75,8 +75,8 @@ public:
                  channel == N_SIGMA_12__N_SIGMA_12         ||
                  channel == N_SIGMA_32__N_LAMBDA_12        ||
                  channel == N_SIGMA_32__N_SIGMA_32 ){
-            HAD1_type = SIGMA;
-            HAD2_type = PROTON;
+            HAD1_type = PROTON;
+            HAD2_type = SIGMA;
         }
         
         orgNBS_size = 4*4* xyzSIZE * xyzSIZE * xyzSIZE;
@@ -84,14 +84,14 @@ public:
         
         if( Rcorr != NULL ) error(1,"R correlator has already inputed !");
         else input_Rcorr( SPIN, ANGMOM );
-        func_name = "set_Rcorr_____________";
+        func_name = "set_Rcorr_NBS/readcorr";
         route( class_name, func_name, 0 );
     }
     
     void set_Rcorr( int CHANNEL, int it, bool endian_FLG, int SPIN, int ANGMOM,
                    cdouble *corr1, cdouble *corr2 ){
         
-        func_name = "set_Rcorr_____________";
+        func_name = "set_Rcorr_NBS/corr____";
         route( class_name, func_name, 1 );
         
         channel = CHANNEL;
@@ -103,7 +103,26 @@ public:
         
         if( Rcorr != NULL ) error(1,"R correlator has already inputed !");
         else input_Rcorr( SPIN, ANGMOM, corr1, corr2 );
-        func_name = "set_Rcorr_____________";
+        func_name = "set_Rcorr_NBS/corr____";
+        route( class_name, func_name, 0 );
+    }
+    
+    void set_Rcorr( int CHANNEL, int it, bool endian_FLG, int SPIN, int ANGMOM,
+                   double HAD1_mass, double HAD2_mass ){
+        
+        func_name = "set_Rcorr_NBS/mass____";
+        route( class_name, func_name, 1 );
+        
+        channel = CHANNEL;
+        time_slice = it;
+        endian_flg = endian_FLG;
+        
+        orgNBS_size = 4*4* xyzSIZE * xyzSIZE * xyzSIZE;
+        NBS_size    = xyzSIZE * xyzSIZE * xyzSIZE;
+        
+        if( Rcorr != NULL ) error(1,"R correlator has already inputed !");
+        else input_Rcorr( SPIN, ANGMOM, HAD1_mass, HAD2_mass );
+        func_name = "set_Rcorr_NBS/mass____";
         route( class_name, func_name, 0 );
     }
     
@@ -123,6 +142,7 @@ public:
     
     void input_Rcorr( int, int );
     void input_Rcorr( int, int, cdouble*, cdouble* );
+    void input_Rcorr( int, int, double, double );
     void output_Rcorr_all( const char* );
     void output_Rcorr_err( const char* );
 };

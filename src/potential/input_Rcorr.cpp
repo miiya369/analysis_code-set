@@ -17,7 +17,7 @@
 
 void R_CORRELATOR::input_Rcorr( int spin, int angmom ){
     
-    func_name = "input_Rcorr___________";
+    func_name = "input_Rcorr_NBS/corr_1";
     route( class_name, func_name, 1 );
     
     input_NBS();
@@ -71,7 +71,7 @@ void R_CORRELATOR::input_Rcorr( int spin, int angmom ){
 void R_CORRELATOR::input_Rcorr( int spin, int angmom
                                , cdouble *corr1, cdouble *corr2 ){
     
-    func_name = "input_Rcorr___________";
+    func_name = "input_Rcorr_NBS/corr_2";
     route( class_name, func_name, 1 );
     
     input_NBS();
@@ -87,6 +87,40 @@ void R_CORRELATOR::input_Rcorr( int spin, int angmom
                     Rcorr[ xyzn(x,y,z,conf) ] = NBSwave[ xyzn(x,y,z,conf) ]
                                                / ( corr1[ nt(conf,time_slice) ]
                                                   * corr2[ nt(conf,time_slice) ] );
+    delete_NBS();
+    
+    printf(" @ Finished construct R correlator : %s, t=%d\n"
+           , channel_to_name(channel).c_str(), time_slice);
+    
+    route( class_name, func_name, 0 );
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief Calculate R-correlator using prepared each hadron mass
+ */
+//--------------------------------------------------------------------------
+
+void R_CORRELATOR::input_Rcorr( int spin, int angmom
+                               , double HAD1_mass, double HAD2_mass ){
+    
+    func_name = "input_Rcorr_NBS/mass__";
+    route( class_name, func_name, 1 );
+    
+    input_NBS();
+    projection_NBS( spin, angmom );   // construct NBS wave
+    make_JK_sample_NBS(1);
+    
+    double dev_mass = exp( -(HAD1_mass+HAD2_mass) * time_slice );
+    
+    Rcorr = new cdouble[ NBS_size * N_conf ];
+    
+    for( int conf = 0; conf < N_conf; conf++ )
+        for(int z=0; z<xyzSIZE; z++)
+            for(int y=0; y<xyzSIZE; y++)
+                for(int x=0; x<xyzSIZE; x++)
+                    Rcorr[ xyzn(x,y,z,conf) ]
+                     = NBSwave[ xyzn(x,y,z,conf) ] / dev_mass;
     delete_NBS();
     
     printf(" @ Finished construct R correlator : %s, t=%d\n"

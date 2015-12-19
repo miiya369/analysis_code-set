@@ -35,6 +35,8 @@ protected:
     double *param_ini;
     double *param_out;
     double stp_cnd;
+    double lattice_spacing;
+    double hbar_c;
     
     bool endian_flg, new_flg_data, new_flg_param, fitting_flg;
     
@@ -48,6 +50,8 @@ public:
         class_name = "FITTING_________________________";
         func_name = "______________________";
         route( class_name, func_name, 1 );
+        
+        hbar_c = 197.327;   // MeV*fm
         
         endian_flg      = false;
         new_flg_data    = false;
@@ -123,7 +127,7 @@ public:
     void input_data     ( const char*, bool );
     void set_func       ( int, double* );
     void fit_data       ( int, int, double );
-    void print_func_gnu ( bool );
+    void print_func_gnu ( bool, double );
     void print_param    ();
     void output_param   ( const char* );
     

@@ -46,14 +46,14 @@ void POTENTIAL::calc_pot_kernel(){
             + Rcorr_ptr2[ xyzn(x,y-1+ySHIFT,z,i) ]
             + Rcorr_ptr2[ xyzn(x,y,(z+1)%xyzSIZE,i) ]
             + Rcorr_ptr2[ xyzn(x,y,z-1+zSHIFT,i) ]
-            - Rcorr_ptr2[ xyzn(x,y,z,i) ] * 6.0 ) / ( 2.0* mass )
+            - Rcorr_ptr2[ xyzn(x,y,z,i) ] * 6.0 ) / ( 2.0* reduced_mass )
             +
             ( Rcorr_ptr1[ xyzn(x,y,z,i) ]   /* time 1st difference part */
             - Rcorr_ptr3[ xyzn(x,y,z,i) ] ) * 0.5
             +
             ( Rcorr_ptr1[ xyzn(x,y,z,i) ]   /* time 2nd difference part */
             + Rcorr_ptr3[ xyzn(x,y,z,i) ]
-            - Rcorr_ptr2[ xyzn(x,y,z,i) ] * 2.0 ) / ( 4.0* mass );
+            - Rcorr_ptr2[ xyzn(x,y,z,i) ] * 2.0 ) / ( 4.0* reduced_mass );
                 }
     printf(" @ Finished calculate potential    : %s, t=%d\n"
            , channel_to_name(channel).c_str(), time_slice);

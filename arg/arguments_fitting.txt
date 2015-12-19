@@ -7,6 +7,7 @@ FIT_Stopping_condition	= 0.000001
 FIT_Function_type	= 3G
 FIT_Fit_range_min	= 6
 FIT_Fit_range_max	= 12
+FIT_lattice_spacing	= 0.0907
 
 FIT_Endian_convert	= no
 

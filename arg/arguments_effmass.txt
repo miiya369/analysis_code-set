@@ -1,8 +1,8 @@
 
 ### For Effective mass ###
 
-MAS_Gauge_confs_list	= ./arg/conf_list/conf_list.cp-pacs_ens3_190confs
-MAS_Path_to_input_dir	= ../test_data/cp-pacs_ens3_193conf
+MAS_Gauge_confs_list	= ./arg/conf_list/conf_list.cp-pacs+JLQCD_ens3_190confs
+MAS_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/cp-pacs+JLQCD_ens3_193conf
 MAS_Path_to_output_dir	= ./results/
 MAS_Size_of_time	= 32
 MAS_T_shift		= 0
@@ -13,7 +13,7 @@ MAS_Snk_relativistic	= CG05
 MAS_Src_relativistic	= CG05
 MAS_Calc_hadron_name	= { Lambda Sigma proton pion phi etaSS }
 
-MAS_Calc_fit_data	= no
+MAS_Calc_fit_data	= yes
 MAS_Fit_range_min	= 7
 MAS_Fit_range_max	= 12
 

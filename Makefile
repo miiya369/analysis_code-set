@@ -23,6 +23,8 @@ SRCS_obs = $(MAINDIR)/observable.cpp $(wildcard $(SRCDIR)/observable/*.cpp) $(SR
 SRCS_iso = $(MAINDIR)/isospin_proj.cpp $(SRCS_cmn)
 SRCS_ccp = $(MAINDIR)/coupled_channel_potential.cpp $(SRCS_cmn) \
 $(wildcard $(SRCDIR)/potential/*.cpp)
+SRCS_zfac= $(MAINDIR)/extract_Z-factor.cpp $(wildcard $(SRCDIR)/potential/*.cpp) \
+$(SRCS_cmn)
 
 OBJS_mas = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_mas:.cpp=.o)))
 OBJS_pot = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_pot:.cpp=.o)))
@@ -30,11 +32,12 @@ OBJS_fit = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_fit:.cpp=.o)))
 OBJS_obs = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_obs:.cpp=.o)))
 OBJS_iso = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_iso:.cpp=.o)))
 OBJS_ccp = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_ccp:.cpp=.o)))
+OBJS_zfac= $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_zfac:.cpp=.o)))
 
 INCLUDES = $(patsubst %,-I%,$(HEADERDIR))
 
 TERGETS		= mas pot fit obs
-FOR_MIYA	= iso ccp
+FOR_MIYA	= iso ccp zfac
 
 ### SRCDIR と MAINDIR 以下の全ての .cpp ファイルの依存関係を探す ###
 vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR)
@@ -59,6 +62,9 @@ iso: $(OBJS_iso)
 
 ccp: $(OBJS_ccp)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_ccp)
+
+zfac: $(OBJS_zfac)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_zfac)
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<

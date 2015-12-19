@@ -73,6 +73,7 @@ enum {
     FITTING_DATA,
     CALC_OBSERVABLE,
     ISOSPIN_PROJECTION,
+    EXTRACT_Z_FACTOR,
 };
 
 //! enum for the path setting
@@ -80,6 +81,7 @@ enum {
     
     MAIN_PATH = 0,
     NBS_DIRECTORY,
+    CORR_DIRECTORY,
     N_CHANNEL,
     N_TIME,
     HADRON_NAME,

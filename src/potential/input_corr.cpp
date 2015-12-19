@@ -22,6 +22,7 @@ void CORRELATOR::input_corr(){
     snprintf(data_list[N_TIME],sizeof(data_list[N_TIME]), "-1");
     snprintf(data_list[HADRON_NAME],sizeof(data_list[HADRON_NAME])
              ,"%s",HAD_name.c_str());
+    snprintf(data_list[CORR_DIRECTORY],sizeof(data_list[CORR_DIRECTORY]),"PS");
     
     time_t start_t, end_t;
     time( &start_t );
