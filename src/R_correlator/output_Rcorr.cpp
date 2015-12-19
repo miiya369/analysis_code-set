@@ -4,7 +4,7 @@
  * @ingroup R-correlator
  * @brief   Functions for output R-correlator data
  * @author  Takaya Miyamoto
- * @since   Tue Jul 21 00:30:10 JST 2015
+ * @since   Wed Jul 29 02:11:22 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -27,11 +27,17 @@ void R_CORRELATOR::output_Rcorr_all( const char* out_file_PATH ) {
    }
    char out_file_name[1024];
    snprintf(  out_file_name, sizeof(out_file_name)
-            , "%s/%s_Rcorr_all_t%d"
-            , out_file_PATH, channel.name.c_str(), time_slice );
+            , "%s/%s_Rcorr_S%dSz%d_all_t%d"
+            , out_file_PATH, channel.name.c_str(), spin, spin_z, time_slice );
    ofstream ofs( out_file_name, ios::out | ios::binary );
    
-   ofs.write( (char*)&Rcorr[0], sizeof(cdouble) * NBSwave::xyznSIZE);
+   cdouble tmp;
+   for (int n=0; n<NBSwave::xyznSIZE; n++) {
+      tmp = Rcorr[n];
+      if (!analysis::machine_is_little_endian())
+         analysis::endian_convert(&tmp, 1);
+      ofs.write((char*)&tmp, sizeof(double));
+   }
    ofs.close();
 
    analysis::route(class_name, func_name, 0);
@@ -40,9 +46,11 @@ void R_CORRELATOR::output_Rcorr_all( const char* out_file_PATH ) {
 //--------------------------------------------------------------------------
 /**
  * @brief Function for output mean of R-correlators data with error
+ * @brief ( with/without 1/48 data size reduction )
  */
 //--------------------------------------------------------------------------
-void R_CORRELATOR::output_Rcorr_err( const char* out_file_PATH ) {
+void R_CORRELATOR::output_Rcorr_err(  const char* out_file_PATH
+                                    , bool        reduction_flg ) {
     
    func_name = "output_Rcorr_err______";
    analysis::route(class_name, func_name, 1);
@@ -58,16 +66,19 @@ void R_CORRELATOR::output_Rcorr_err( const char* out_file_PATH ) {
    
    char out_file_name[1024];
    snprintf( out_file_name, sizeof(out_file_name),
-            "%s/%s_Rcorr_err_t%d"
-            , out_file_PATH, channel.name.c_str(), time_slice );
+            "%s/%s_Rcorr_S%dSz%d_err_t%d"
+            , out_file_PATH, channel.name.c_str(), spin, spin_z, time_slice );
    ofstream ofs( out_file_name, ios::out );
+   ofs << "#   x, y, z, r, mean.real, err.real, mean.imag, err.imag" << endl;
    
    for (      int z=0; z<analysis::zSIZE; z++)
       for (   int y=0; y<analysis::ySIZE; y++)
          for (int x=0; x<analysis::xSIZE; x++) {
+            if (reduction_flg)
+               if (x>analysis::xSIZE/2 || y>x || z>y) continue;
+            
             mean     = COMP_ZERO;
             sqr_mean = COMP_ZERO;
-            
             for (int i=0; i<analysis::Nconf; i++) {
                mean     +=          Rcorr[idx(x,y,z,i)];
                sqr_mean += cmp_sqr( Rcorr[idx(x,y,z,i)] );
@@ -86,8 +97,9 @@ void R_CORRELATOR::output_Rcorr_err( const char* out_file_PATH ) {
                      + (y - y_shift)*(y - y_shift)
                      + (z - z_shift)*(z - z_shift) );
             
-            ofs << R << " " << mean.real() << " " << err.real()
-                     << " " << mean.imag() << " " << err.imag() << endl;
+            ofs << x << " " << y << " " << z << " " << R
+                << " " << mean.real() << " " << err.real()
+                << " " << mean.imag() << " " << err.imag() << endl;
          }
    ofs.close();
 

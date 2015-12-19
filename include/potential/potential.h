@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Header file for potential class
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 11:59:40 JST 2015
+ * @since   Wed Jul 29 02:06:23 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ private:
    string class_name, func_name;
    
    string potential_type;
-   int time_slice, spin, ang_mom;
+   int time_slice, spin, spin_z, ang_mom;
    int Rcorr_t[3];
    double reduced_mass;
    HADRON_TYPE hadron1;
@@ -34,8 +34,8 @@ private:
    bool endian_flg, compress_flg;
    bool Rcorr_reread_flg[3], read_time_slice_flg[3];
    
-   cdouble      *corr1;
-   cdouble      *corr2;
+   cdouble *corr1;
+   cdouble *corr2;
    
 protected:
    
@@ -94,21 +94,20 @@ public:
    }
 //============================= For initialize ===========================//
    void set_pot(  CHANNEL_TYPE ch, int it, bool endian_FLG, bool compress_FLG
-                , int SPIN, int ANGMOM, double REDUCED_MASS ) {
+                , int SPIN, int SPIN_z, int ANGMOM, double REDUCED_MASS ) {
       
       func_name = "set_pot_Rcorr_NBS/corr";
       analysis::route(class_name, func_name, 1);
       
       NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::NBSSIZE  =  NBSwave::xyzSIZE * 4 * 4;
-      NBSwave::xyznSIZE =  NBSwave::xyzSIZE * analysis::Nconf;
-      NBSwave::NBSnSIZE =  NBSwave::NBSSIZE * analysis::Nconf;
+      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
       
       channel      = ch;
       hadron1      = channel.hadron1;
       hadron2      = channel.hadron2;
       time_slice   = it;
       spin         = SPIN;
+      spin_z       = SPIN_z;
       ang_mom      = ANGMOM;
       endian_flg   = endian_FLG;
       compress_flg = compress_FLG;
@@ -120,16 +119,21 @@ public:
    }
    
    void set_pot(  CHANNEL_TYPE ch, int it, bool endian_FLG, bool compress_FLG
-                , int SPIN, int ANGMOM, double HAD1_mass, double HAD2_mass ) {
+                , int SPIN, int SPIN_z, int ANGMOM
+                , double HAD1_mass, double HAD2_mass ) {
       
       func_name = "set_pot_Rcorr_NBS/mass";
       analysis::route(class_name, func_name, 1);
+      
+      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
       
       channel      = ch;
       hadron1      = channel.hadron1;
       hadron2      = channel.hadron2;
       time_slice   = it;
       spin         = SPIN;
+      spin_z       = SPIN_z;
       ang_mom      = ANGMOM;
       endian_flg   = endian_FLG;
       compress_flg = compress_FLG;
@@ -183,12 +187,11 @@ public:
    void input_pot();
    void input_pot( double, double );
    void set_pot_from_binary( const char* );
-   void output_single_pot_all( const char* );
-   void output_single_pot_err( const char* );
-   void output_single_pot_fit( const char* );
-   void output_single_pot_fit_old( const char* );
+   void output_pot_all( const char* );
+   void output_pot_err( const char*, bool );
+   void output_pot_fit( const char* );
    void output_couple_pot_all( const char* );
-   void output_couple_pot_err( const char* );
+   void output_couple_pot_err( const char*, bool );
    void output_couple_pot_fit( const char* );
 };
 

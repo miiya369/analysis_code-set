@@ -9,9 +9,7 @@ int analysis::zSIZE=16;
 int analysis::tSIZE=16;
 
 size_t NBSwave::xyzSIZE;
-size_t NBSwave::NBSSIZE;
 size_t NBSwave::xyznSIZE;
-size_t NBSwave::NBSnSIZE;
 
 char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
@@ -24,7 +22,7 @@ int main(int argc, char **argv) {
    
    CHANNEL_TYPE ch("Pro-Lam_Pro-Lam");
    POTENTIAL pot;
-   pot.set_pot(ch, 8, true, false, 0, 0, 0.5);
+   pot.set_pot(ch, 8, true, false, 0, 0, 0, 0.5);
    pot.calc_laplacian();
    
    int min_Ndata = 999999;
@@ -70,15 +68,22 @@ int main(int argc, char **argv) {
    printf(" @@@ Data count = %d / %d ### FOR DEBUG\n"
           , data_count, analysis::Nconf);
    data_count = 0;
-   for (size_t j=0; j<NBSwave::xyzSIZE; j++)
+   ofstream ofs1("./results/reduction_point", ios::out);
+   ofstream ofs2("./results/all_point", ios::out);
+   for (size_t j=0; j<NBSwave::xyzSIZE; j++){
+      int x, y, z;
+      analysis::convert_xyz(&x, &y, &z, j);
+      ofs2 << x << " " << y << " " << z << endl;
       if(data_checker[j]){
-         printf("%ld, ",j);
+         ofs1 << x << " " << y << " " << z << endl;
+         //         printf("%ld, ",j);
          data_count++;
       }
+   }
+   ofs1.close();
+   ofs2.close();
    printf("\n count = %d\n",data_count);
-   data_count = 0;
-   for (size_t j=0; j<NBSwave::data_reduction(-1); j++)
-      printf("%ld, ",NBSwave::data_reduction(j));
+   printf("reduced Ndata = %d, ",NBSwave::reduced_Ndata());
    
    return 0;
 }

@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Functions for output NBS wave function data
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 15:10:21 JST 2015
+ * @since   Wed Jul 29 02:09:26 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -20,23 +20,23 @@ void NBS_WAVE::output_NBS_all( const char* out_file_PATH ) {
    func_name = "output_NBS_all________";
    analysis::route(class_name, func_name, 1);
 
-   if (projNBS == NULL) {
-      analysis::error(1,"NBS wave function has not been projected yet !");
+   if (wave == NULL) {
+      analysis::error(1,"NBS wave function has not been set yet !");
       analysis::route(class_name, func_name, 0);
       return;
    }
    char out_file_name[1024];
    snprintf( out_file_name, sizeof(out_file_name)
-            , "%s/%s_NBS_all_t%d"
-            , out_file_PATH, channel.name.c_str(), time_slice );
+            , "%s/%s_NBS_S%dSz%d_all_t%d"
+            , out_file_PATH, channel.name.c_str(), spin, spin_z, time_slice );
    ofstream ofs( out_file_name, ios::out | ios::binary );
    
    cdouble tmp;
    for (int n=0; n<NBSwave::xyznSIZE; n++) {
-      tmp = projNBS[n];
+      tmp = wave[n];
       if (!analysis::machine_is_little_endian())
          analysis::endian_convert(&tmp, 1);
-      ofs.write((char*)&tmp, sizeof(double));
+      ofs.write((char*)&tmp, sizeof(cdouble));
    }
    ofs.close();
       
@@ -46,15 +46,16 @@ void NBS_WAVE::output_NBS_all( const char* out_file_PATH ) {
 //--------------------------------------------------------------------------
 /**
  * @brief Function for output mean of NBS wave functions data with error
+ * @brief ( with/without 1/48 data size reduction )
  */
 //--------------------------------------------------------------------------
-void NBS_WAVE::output_NBS_err( const char* out_file_PATH ) {
+void NBS_WAVE::output_NBS_err( const char* out_file_PATH, bool reduction_flg ) {
     
    func_name = "output_NBS_err________";
    analysis::route(class_name, func_name, 1);
    
-   if (projNBS == NULL) {
-      analysis::error(1,"NBS wave function has not been projected yet !");
+   if (wave == NULL) {
+      analysis::error(1,"NBS wave function has not been set yet !");
       analysis::route(class_name, func_name, 0);
       return;
    }
@@ -64,19 +65,22 @@ void NBS_WAVE::output_NBS_err( const char* out_file_PATH ) {
    
    char out_file_name[1024];
    snprintf( out_file_name, sizeof(out_file_name)
-            , "%s/%s_NBS_err_t%d"
-            , out_file_PATH, channel.name.c_str(), time_slice );
+            , "%s/%s_NBS_S%dSz%d_err_t%d"
+            , out_file_PATH, channel.name.c_str(), spin, spin_z, time_slice );
    ofstream ofs( out_file_name, ios::out );
-
+   ofs << "#   x, y, z, r, mean.real, err.real, mean.imag, err.imag" << endl;
+   
    for (      int z=0; z<analysis::zSIZE; z++)
       for (   int y=0; y<analysis::ySIZE; y++)
          for (int x=0; x<analysis::xSIZE; x++) {
+            if (reduction_flg)
+               if (x>analysis::xSIZE/2 || y>x || z>y) continue;
+            
             mean     = COMP_ZERO;
             sqr_mean = COMP_ZERO;
-                    
             for (int i=0; i<analysis::Nconf; i++) {
-               mean     +=          projNBS[idx(x,y,z,i)];
-               sqr_mean += cmp_sqr( projNBS[idx(x,y,z,i)] );
+               mean     +=          wave[idx(x,y,z,i)];
+               sqr_mean += cmp_sqr( wave[idx(x,y,z,i)] );
             }
             mean     /= double(analysis::Nconf);
             sqr_mean /= double(analysis::Nconf);
@@ -92,8 +96,9 @@ void NBS_WAVE::output_NBS_err( const char* out_file_PATH ) {
                      + (y - y_shift)*(y - y_shift)
                      + (z - z_shift)*(z - z_shift) );
                     
-            ofs << R << " " << mean.real() << " " << err.real()
-                     << " " << mean.imag() << " " << err.imag() << endl;
+            ofs << x << " " << y << " " << z << " " << R
+                << " " << mean.real() << " " << err.real()
+                << " " << mean.imag() << " " << err.imag() << endl;
          }
    ofs.close();
    

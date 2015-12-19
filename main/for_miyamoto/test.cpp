@@ -17,9 +17,7 @@ int analysis::zSIZE = 16;
 int analysis::tSIZE = 32;
 
 size_t NBSwave::xyzSIZE;
-size_t NBSwave::NBSSIZE;
 size_t NBSwave::xyznSIZE;
-size_t NBSwave::NBSnSIZE;
 
 char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 

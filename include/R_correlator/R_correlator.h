@@ -4,7 +4,7 @@
  * @ingroup R-correlator
  * @brief   Header file for R-correlator class
  * @author  Takaya Miyamoto
- * @since   Mon Jul 20 13:01:15 JST 2015
+ * @since   Wed Jul 29 02:09:59 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -67,15 +67,13 @@ public:
    }
 //============================= For initialize ===========================//
    void set_Rcorr(  CHANNEL_TYPE ch, int it, bool endian_FLG
-                  , int SPIN, int ANGMOM, bool compress_FLG ) {
+                  , int SPIN, int SPIN_z, int ANG_MOM, bool compress_FLG ) {
       
       func_name = "set_Rcorr_NBS/readcorr";
       analysis::route(class_name, func_name, 1);
       
       NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::NBSSIZE  =  NBSwave::xyzSIZE * 4 * 4;
-      NBSwave::xyznSIZE =  NBSwave::xyzSIZE * analysis::Nconf;
-      NBSwave::NBSnSIZE =  NBSwave::NBSSIZE * analysis::Nconf;
+      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
       
       channel      = ch;
       hadron1      = channel.hadron1;
@@ -83,22 +81,25 @@ public:
       time_slice   = it;
       endian_flg   = endian_FLG;
       compress_flg = compress_FLG;
+      spin         = SPIN;
+      spin_z       = SPIN_z;
+      ang_mom      = ANG_MOM;
+      if (spin == 0) spin_z = 0;
       
-      input_Rcorr( SPIN, ANGMOM );
+      input_Rcorr();
       func_name = "set_Rcorr_NBS/readcorr";
       analysis::route(class_name, func_name, 0);
    }
    
-   void set_Rcorr( CHANNEL_TYPE ch,int it,bool endian_FLG,int SPIN,int ANGMOM
-                  , cdouble *corr1, cdouble *corr2, bool compress_FLG ) {
+   void set_Rcorr(  CHANNEL_TYPE ch,int it,bool endian_FLG,int SPIN, int SPIN_z
+                  , int ANG_MOM, cdouble *corr1, cdouble *corr2
+                  , bool compress_FLG ) {
       
       func_name = "set_Rcorr_NBS/corr____";
       analysis::route(class_name, func_name, 1);
       
       NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::NBSSIZE  =  NBSwave::xyzSIZE * 4 * 4;
-      NBSwave::xyznSIZE =  NBSwave::xyzSIZE * analysis::Nconf;
-      NBSwave::NBSnSIZE =  NBSwave::NBSSIZE * analysis::Nconf;
+      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
       
       channel      = ch;
       hadron1      = channel.hadron1;
@@ -106,22 +107,25 @@ public:
       time_slice   = it;
       endian_flg   = endian_FLG;
       compress_flg = compress_FLG;
+      spin         = SPIN;
+      spin_z       = SPIN_z;
+      ang_mom      = ANG_MOM;
+      if (spin == 0) spin_z = 0;
       
-      input_Rcorr( SPIN, ANGMOM, corr1, corr2 );
+      input_Rcorr( corr1, corr2 );
       func_name = "set_Rcorr_NBS/corr____";
       analysis::route(class_name, func_name, 0);
    }
    
-   void set_Rcorr( CHANNEL_TYPE ch,int it,bool endian_FLG,int SPIN,int ANGMOM
-                  , double HAD1_mass, double HAD2_mass, bool compress_FLG ) {
+   void set_Rcorr(  CHANNEL_TYPE ch,int it,bool endian_FLG, int SPIN, int SPIN_z
+                  , int ANG_MOM, double HAD1_mass, double HAD2_mass
+                  , bool compress_FLG ) {
       
       func_name = "set_Rcorr_NBS/mass____";
       analysis::route(class_name, func_name, 1);
       
       NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::NBSSIZE  =  NBSwave::xyzSIZE * 4 * 4;
-      NBSwave::xyznSIZE =  NBSwave::xyzSIZE * analysis::Nconf;
-      NBSwave::NBSnSIZE =  NBSwave::NBSSIZE * analysis::Nconf;
+      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
       
       channel      = ch;
       hadron1      = channel.hadron1;
@@ -129,8 +133,12 @@ public:
       time_slice   = it;
       endian_flg   = endian_FLG;
       compress_flg = compress_FLG;
+      spin         = SPIN;
+      spin_z       = SPIN_z;
+      ang_mom      = ANG_MOM;
+      if (spin == 0) spin_z = 0;
       
-      input_Rcorr( SPIN, ANGMOM, HAD1_mass, HAD2_mass );
+      input_Rcorr( HAD1_mass, HAD2_mass );
       func_name = "set_Rcorr_NBS/mass____";
       analysis::route(class_name, func_name, 0);
    }
@@ -152,11 +160,11 @@ public:
 //=========================== Several functions ==========================//
    int  info_time(){ return time_slice; }
    
-   void input_Rcorr( int, int );
-   void input_Rcorr( int, int, cdouble*, cdouble* );
-   void input_Rcorr( int, int, double, double );
+   void input_Rcorr();
+   void input_Rcorr( cdouble*, cdouble* );
+   void input_Rcorr( double, double );
    void output_Rcorr_all( const char* );
-   void output_Rcorr_err( const char* );
+   void output_Rcorr_err( const char*, bool );
 };
 
 #endif

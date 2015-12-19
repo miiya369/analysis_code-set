@@ -4,7 +4,7 @@
  * @ingroup Correlator
  * @brief   Functions for output correlator / effective mass data
  * @author  Takaya Miyamoto
- * @since   Mon Jul 20 12:12:25 JST 2015
+ * @since   Wed Jul 29 00:14:11 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -30,8 +30,13 @@ void CORRELATOR::output_corr_all( const char* out_file_PATH ) {
             , "%s/%s_corr_all", out_file_PATH, hadron.name.c_str() );
    ofstream ofs( out_file_name, ios::out | ios::binary );
    
-   ofs.write( (char*)&corr[0]
-             , sizeof(cdouble) * analysis::tSIZE*analysis::Nconf );
+   cdouble tmp;
+   for (int n=0; n<analysis::tSIZE*analysis::Nconf; n++) {
+      tmp = corr[n];
+      if (!analysis::machine_is_little_endian())
+         analysis::endian_convert(&tmp, 1);
+      ofs.write((char*)&tmp, sizeof(cdouble));
+   }
    ofs.close();
    
    analysis::route(class_name, func_name, 0);
@@ -95,40 +100,50 @@ void CORRELATOR::output_corr_fit( const char* out_file_PATH ) {
       analysis::route(class_name, func_name, 0);
       return;
    }
-   double err, mean, sqr_mean;
-   double *tmp_corr = new double[analysis::tSIZE*analysis::Nconf];
-   for(size_t i=0; i<analysis::tSIZE*analysis::Nconf; i++)
-      tmp_corr[i] = corr[i].real();
+   double err, mean, sqr_mean, tmp_corr;
    
-   int  fit_type = 1;
    char out_file_name[1024];
    snprintf(  out_file_name, sizeof(out_file_name)
             , "%s/%s_corr_fitdata", out_file_PATH, hadron.name.c_str() );
    ofstream ofs( out_file_name, ios::out | ios::binary );
    
-   ofs.write((char*)&fit_type,        sizeof(int));
-   ofs.write((char*)&analysis::Nconf, sizeof(int));
-   ofs.write((char*)&analysis::tSIZE, sizeof(int));   // write file header
+   int fit_type  = 1;   // write file header
+   int tmp_Nconf = analysis::Nconf;
+   int tmp_Ndata = analysis::tSIZE;
+   
+   if (!analysis::machine_is_little_endian()) {
+      analysis::endian_convert(&fit_type, 1);
+      analysis::endian_convert(&tmp_Nconf,1);
+      analysis::endian_convert(&tmp_Ndata,1);
+   }
+   ofs.write((char*)&fit_type,  sizeof(int));
+   ofs.write((char*)&tmp_Nconf, sizeof(int));
+   ofs.write((char*)&tmp_Ndata, sizeof(int));
    
    for(int t=0; t<analysis::tSIZE; t++) {
       mean     = 0.0;
       sqr_mean = 0.0;
       
       for(int i=0; i<analysis::Nconf; i++) {
-         mean     += tmp_corr[nt(i,t)];
-         sqr_mean += pow(tmp_corr[nt(i,t)],2);
+         mean     += corr[nt(i,t)].real();
+         sqr_mean += pow(corr[nt(i,t)].real(),2);
       }
       mean     /= double(analysis::Nconf);
       sqr_mean /= double(analysis::Nconf);
+      err       = sqrt(double(analysis::Nconf-1) * (sqr_mean - pow(mean,2)));
       
-      err = sqrt((sqr_mean - mean*mean) * double(analysis::Nconf-1));
-      
+      if (!analysis::machine_is_little_endian())
+         analysis::endian_convert(&err, 1);
       ofs.write((char*)&err, sizeof(double));   // write fit data
-      for( int i=0; i<analysis::Nconf; i++)
-         ofs.write((char*)&tmp_corr[nt(i,t)], sizeof(double));
+      
+      for( int i=0; i<analysis::Nconf; i++) {
+         tmp_corr = corr[nt(i,t)].real();
+         if (!analysis::machine_is_little_endian())
+            analysis::endian_convert(&tmp_corr,1);
+         ofs.write((char*)&tmp_corr, sizeof(double));
+      }
    }
    ofs.close();
-   delete [] tmp_corr;
 
    analysis::route(class_name, func_name, 0);
 }
@@ -158,8 +173,13 @@ void CORRELATOR::output_effmass_all( const char* out_file_PATH ) {
             , "%s/%s_effmass_all", out_file_PATH, hadron.name.c_str() );
    ofstream ofs( out_file_name, ios::out | ios::binary );
    
-   ofs.write(  (char*)&eff_mass[0]
-             , sizeof(cdouble)*(analysis::tSIZE-1)*analysis::Nconf );
+   cdouble tmp;
+   for (int n=0; n<(analysis::tSIZE-1)*analysis::Nconf; n++) {
+      tmp = eff_mass[n];
+      if (!analysis::machine_is_little_endian())
+         analysis::endian_convert(&tmp, 1);
+      ofs.write((char*)&tmp, sizeof(cdouble));
+   }
    ofs.close();
    delete [] eff_mass;
    

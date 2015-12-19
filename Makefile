@@ -1,6 +1,6 @@
 
 #  Make file of the Analysis code set
-# Since : Thu Jul 23 21:28:58 JST 2015
+# Since : Tue Jul 28 21:59:24 JST 2015
 
 # You may change this for your environment
 
@@ -18,7 +18,7 @@ HEADERDIR = ./include ./include/extern
 INCLUDES    = $(patsubst %,-I%,$(HEADERDIR))
 
 SRCS_COMMON = $(wildcard $(SRCDIR)/common/*.cpp)
-SRCS_NBS    = $(wildcard $(SRCDIR)/NBSwave/*.cpp) $(wildcard $(SRCDIR)/data_reduction/*.cpp)
+SRCS_NBS    = $(wildcard $(SRCDIR)/NBSwave/*.cpp)
 SRCS_CORR   = $(wildcard $(SRCDIR)/correlator/*.cpp)
 SRCS_RCORR  = $(wildcard $(SRCDIR)/R_correlator/*.cpp)
 SRCS_POT    = $(wildcard $(SRCDIR)/potential/*.cpp)

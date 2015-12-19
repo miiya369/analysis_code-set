@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for potential calculation
  * @author  Takaya Miyamoto
- * @since   Fri Jul 24 00:30:00 JST 2015
+ * @since   Wed Jul 29 02:20:20 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -20,9 +20,7 @@ int  analysis::tSIZE;
 char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 size_t NBSwave::xyzSIZE;
-size_t NBSwave::NBSSIZE;
 size_t NBSwave::xyznSIZE;
-size_t NBSwave::NBSnSIZE;
 
 CHANNEL_TYPE channel;
 int time_min;
@@ -38,6 +36,7 @@ char outfile_path[MAX_LEN_PATH];
 
 bool endian_flg, calc_flg_pot, calc_flg_lap, calc_flg_t1, calc_flg_t2;
 bool calc_flg_fit, calc_flg_NBS, calc_flg_Rcorr, dev_corr_flg, compress_flg;
+bool out_data_reduction_flg;
 
 bool arguments_check = false;
 int  set_args(int, char**);
@@ -65,45 +64,46 @@ int main(int argc, char **argv) {
       if (calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2) {
          if (dev_corr_flg)
             pot->set_pot(  channel, it, endian_flg, compress_flg
-                         , spin, ang_mom, reduced_mass);
+                         , spin, spin_z, ang_mom, reduced_mass);
          else
             pot->set_pot(  channel, it, endian_flg, compress_flg
-                         , spin, ang_mom, HAD1_mass, HAD2_mass );
+                         , spin, spin_z, ang_mom, HAD1_mass, HAD2_mass );
       }
       if (calc_flg_fit) {
          pot->calc_pot_kernel();
-         pot->output_single_pot_fit( outfile_path );
+         pot->output_pot_fit( outfile_path );
       }
       if (calc_flg_pot) {
          if (!calc_flg_fit) pot->calc_pot_kernel();
-         pot->output_single_pot_err( outfile_path );
+         pot->output_pot_err( outfile_path, out_data_reduction_flg );
       }
       if (calc_flg_lap) {
          pot->calc_laplacian();
-         pot->output_single_pot_err( outfile_path );
+         pot->output_pot_err( outfile_path, out_data_reduction_flg );
       }
       if (calc_flg_t1) {
          pot->calc_1st_timediff();
-         pot->output_single_pot_err( outfile_path );
+         pot->output_pot_err( outfile_path, out_data_reduction_flg );
       }
       if (calc_flg_t2) {
          pot->calc_2nd_timediff();
-         pot->output_single_pot_err( outfile_path );
+         pot->output_pot_err( outfile_path, out_data_reduction_flg );
       }
       
       if (calc_flg_NBS) {
          
-         Rcorrelator->set_NBS( channel, it, endian_flg, compress_flg );
-         Rcorrelator->projection( spin, ang_mom );
-         Rcorrelator->make_JK_sample_projNBS(1);
-         Rcorrelator->output_NBS_err( outfile_path );
+         Rcorrelator->set_NBS(  channel, it, endian_flg
+                              , spin, spin_z, ang_mom, compress_flg );
+         Rcorrelator->projection();
+         Rcorrelator->make_JK_sample_NBS(1);
+         Rcorrelator->output_NBS_err( outfile_path, out_data_reduction_flg );
          Rcorrelator->delete_NBS();
       }
       if (calc_flg_Rcorr) {
          
          Rcorrelator->set_Rcorr(  channel, it, endian_flg
-                                , spin, ang_mom, compress_flg );
-         Rcorrelator->output_Rcorr_err( outfile_path );
+                                , spin, spin_z, ang_mom, compress_flg );
+         Rcorrelator->output_Rcorr_err( outfile_path, out_data_reduction_flg );
          Rcorrelator->delete_Rcorr();
       }
    }
@@ -195,7 +195,9 @@ int set_args(int argc, char** argv) {
    printf(" @ out t2 dif = %s\n",analysis::bool_to_str(calc_flg_t2).c_str());
    printf(" @ out fit    = %s\n",analysis::bool_to_str(calc_flg_fit).c_str());
    printf(" @ out NBS    = %s\n",analysis::bool_to_str(calc_flg_NBS).c_str());
-   printf(" @ out Rcorr  = %s\n\n",analysis::bool_to_str(calc_flg_Rcorr).c_str());
+   printf(" @ out Rcorr  = %s\n",analysis::bool_to_str(calc_flg_Rcorr).c_str());
+   printf(" @ data red.  = %s\n\n"
+          ,analysis::bool_to_str(out_data_reduction_flg).c_str());
    fflush(stdout);
    
    if (arguments_check) return 1;
@@ -252,6 +254,8 @@ int set_args_from_file(char* file_name) {
          calc_flg_t2 = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Out_fit_data"      )==0)
          calc_flg_fit = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"POT_Out_reduced_data"  )==0)
+         out_data_reduction_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Path_to_input_dir" )==0)
          snprintf(         analysis::data_list[MAIN_PATH]
                   , sizeof(analysis::data_list[MAIN_PATH])

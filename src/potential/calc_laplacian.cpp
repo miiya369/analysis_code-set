@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Calculate laplacian term of potential
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 05:35:04 JST 2015
+ * @since   Wed Jul 29 01:43:38 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -49,8 +49,9 @@ void POTENTIAL::calc_laplacian() {
                 - Rcorr_ptr[idx(x, y, z, i)] * 6.0 )
                / (2.0 * reduced_mass);
             }
-   printf(" @ Finished calculate potential laplacian part           : %s, t=%d\n"
-          , channel.name.c_str(), time_slice);
+   printf(" @ Finished calculate potential laplacian part             : "
+          "%s, spin=%d, spin_z=%d, t=%d\n"
+          , channel.name.c_str(), spin, spin_z, time_slice);
    potential_type = "potLapterm";
    
    analysis::route(class_name, func_name, 0);

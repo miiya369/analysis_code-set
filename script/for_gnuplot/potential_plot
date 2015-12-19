@@ -1,0 +1,19 @@
+
+if(!exist("first_setting")) first_setting=0; \
+\
+convfm=0.0907; \
+convMeV=197.327/0.0907; \
+\
+set term x11 font "arial,18,bold"; \
+set key left top; \
+set ylabel "[MeV]"; \
+set xlabel "[fm]"; \
+set xr[0:2.5]; \
+
+set yr[$0:$1]
+
+if ("$4"!=0) \
+p "$2" u ($$4)*convfm:($$5)*convMeV:($$6)*convMeV w yer title "$3"; \
+rep 0 w l lc "black" notitle; \
+else \
+rep "$2" u ($$4)*convfm:($$5)*convMeV:($$6)*convMeV w yer title "$3"

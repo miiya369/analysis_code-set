@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Function for Input NBS wave function files
  * @author  Takaya Miyamoto
- * @since   Fri Jul 24 00:36:43 JST 2015
+ * @since   Wed Jul 29 02:32:15 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -20,11 +20,12 @@ typedef four_point<Core>    Four_Point;
 typedef compress48<Core>    Compress48;
 
 void NBS_WAVE::input_NBS() {
-    
-   func_name = "input_NBS_____________";
+   
+   func_name = "input_NBS_&_spin_proj_";
    analysis::route(class_name, func_name, 1);
     
-   if (orgNBS == NULL) orgNBS = new cdouble[NBSwave::NBSnSIZE];
+   if (wave == NULL) wave = new cdouble[NBSwave::xyznSIZE];
+   cdouble *tmp = new cdouble[NBSwave::xyzSIZE * 4 * 4];
     
    snprintf(         analysis::data_list[N_TIME]
             , sizeof(analysis::data_list[N_TIME])
@@ -38,27 +39,28 @@ void NBS_WAVE::input_NBS() {
    
    time_t start_t, end_t;
    time( &start_t );
-   printf(" @ NBSwave reading         |   0%%");
+   printf(" @ NBSwave read & spin prj |   0%%");
    for (int conf=0; conf<analysis::Nconf; conf++) {   // Read NBS wave files
             
       string NBSfile_name = analysis::set_path( conf );
       ifstream ifs(NBSfile_name.c_str(), ios::in | ios::binary);
       if (!ifs) analysis::error(2, NBSfile_name.c_str());
       
-      ifs.read( (char*)&orgNBS[NBSwave::NBSSIZE * conf]
-                   , sizeof(cdouble) * NBSwave::NBSSIZE );
+      ifs.read( (char*)&tmp[0], sizeof(cdouble) * NBSwave::xyzSIZE * 4 * 4 );
       ifs.close();
+      
+      if (endian_flg) analysis::endian_convert(tmp, NBSwave::xyzSIZE * 4 * 4);
+      spin_projection(tmp, conf);   // spin projection
         
       printf("\b\b\b\b%3.0lf%%",double(conf+1)/double(analysis::Nconf)*100);
       fflush(stdout);
    } // conf
    time( &end_t );
    printf("  ( %d second )\n",(int)difftime(end_t,start_t));
-   printf(" @ Finished input NBS wave         : %s, t=%d\n"
-          , channel.name.c_str(), time_slice);
-    
-   if (endian_flg) analysis::endian_convert(orgNBS, NBSwave::NBSnSIZE);
-    
+   printf(" @ Finished input NBS & spin proj. : %s, spin=%d, spin_z=%d, t=%d\n"
+          , channel.name.c_str(), spin, spin_z, time_slice);
+   delete [] tmp;
+   
    analysis::route(class_name, func_name, 0);
 }
 
@@ -70,10 +72,11 @@ void NBS_WAVE::input_NBS() {
 //--------------------------------------------------------------------------
 void NBS_WAVE::input_compressed_NBS() {
 
-   func_name = "input_compressed_NBS__";
+   func_name = "input_compNBS_&SpinPrj";
    analysis::route(class_name, func_name, 1);
     
-   if (orgNBS == NULL) orgNBS = new cdouble[NBSwave::NBSnSIZE];
+   if (wave == NULL) wave = new cdouble[NBSwave::xyznSIZE];
+   cdouble *tmp = new cdouble[NBSwave::xyzSIZE * 4 * 4];
    
    snprintf(         analysis::data_list[N_TIME]
             , sizeof(analysis::data_list[N_TIME])
@@ -92,7 +95,7 @@ void NBS_WAVE::input_compressed_NBS() {
    }
    time_t start_t, end_t;
    time( &start_t );
-   printf(" @ NBSwave reading         |   0%%");
+   printf(" @ NBSwave read & spin prj |   0%%");
    for (int conf = 0; conf < analysis::Nconf; conf++) {   // Read NBS wave files
         
       string NBSfile_name = analysis::set_path( conf );
@@ -117,17 +120,20 @@ void NBS_WAVE::input_compressed_NBS() {
                   for(      int ix    =0; ix    <Xsites;  ix++)
                      for(   int beta  =0; beta  <2;       beta++)
                         for(int alpha =0; alpha <2;       alpha++)
-#define IDX(x,y,z,a,b,n) a+4*(x+Xsites*(y+Ysites*(z+Zsites*(b+4*n))))
-                           orgNBS[IDX(ix,iy,iz,alpha+2*beta,alphaP+2*betaP,conf)]
+#define IDX(x,y,z,a,b) a+4*(x+Xsites*(y+Ysites*(z+Zsites*b)))
+                           tmp[IDX(ix,iy,iz,alpha+2*beta,alphaP+2*betaP)]
                             = four(ix,iy,iz,sign)(alpha,beta,alphaP,betaP);
 #undef IDX
+      spin_projection(tmp, conf);   // spin projection
+      
       printf("\b\b\b\b%3.0lf%%",double(conf+1)/double(analysis::Nconf)*100);
       fflush(stdout);
    } // conf
    time( &end_t );
    printf("  ( %d second )\n",(int)difftime(end_t,start_t));
-   printf(" @ Finished input NBS wave         : %s, t=%d\n"
-          , channel.name.c_str(), time_slice);
+   printf(" @ Finished input NBS & spin proj. : %s, spin=%d, spin_z=%d, t=%d\n"
+          , channel.name.c_str(), spin, spin_z, time_slice);
+   delete [] tmp;
     
    analysis::route(class_name, func_name, 0);
 }

@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Calculate potential kernel
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 05:35:46 JST 2015
+ * @since   Wed Jul 29 01:40:23 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -61,8 +61,8 @@ void POTENTIAL::calc_pot_kernel() {
                 + Rcorr_ptr3[idx(x,y,z,i)]
                 - Rcorr_ptr2[idx(x,y,z,i)] * 2.0 ) / (4.0 * reduced_mass);
             }
-   printf(" @ Finished calculate potential    : %s, t=%d\n"
-          , channel.name.c_str(), time_slice);
+   printf(" @ Finished calculate potential    : %s, spin=%d, spin_z=%d, t=%d\n"
+          , channel.name.c_str(), spin, spin_z, time_slice);
    potential_type = "potential";
    
    analysis::route(class_name, func_name, 0);

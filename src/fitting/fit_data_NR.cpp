@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Function for data fitting, according to Numerical Recipe
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 19:39:30 JST 2015
+ * @since   Thu Jul 30 05:19:37 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ void FIT::fit_data_NR( int cood_min, int cood_max, double STP_CND ) {
       param_err[loop] = sqrt( (sqr_tmp - pow(param_mean[loop], 2))
                              * double(analysis::Nconf-1) );
    }
-   printf(" @ Finished fitting : chisq/confs = %lf +/- %lf\n",
+   printf(" @ Finished fitting : chisq/dof = %lf +/- %lf\n",
           chisq_mean, chisq_err);
    
    analysis::route(class_name, func_name, 0);

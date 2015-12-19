@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Calculate 1st time-difference term of potential
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 05:33:57 JST 2015
+ * @since   Wed Jul 29 01:43:38 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -34,8 +34,9 @@ void POTENTIAL::calc_1st_timediff() {
    for (int n=0; n<NBSwave::xyznSIZE; n++)
       potential[n] = (Rcorr_ptr1[n] - Rcorr_ptr2[n]) * 0.5;
    
-   printf(" @ Finished calculate potential time 1st difference part : %s, t=%d\n"
-          , channel.name.c_str(), time_slice);
+   printf(" @ Finished calculate potential time 1st differential part : "
+          "%s, spin=%d, spin_z=%d, t=%d\n"
+          , channel.name.c_str(), spin, spin_z, time_slice);
    potential_type = "potT1term";
    
    analysis::route(class_name, func_name, 0);

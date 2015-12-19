@@ -16,9 +16,7 @@ void POTENTIAL::set_pot_from_binary(const char* infile_name ) {
    analysis::route(class_name, func_name, 1);
    
    NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-   NBSwave::NBSSIZE  =  NBSwave::xyzSIZE * 4 * 4;
-   NBSwave::xyznSIZE =  NBSwave::xyzSIZE * analysis::Nconf;
-   NBSwave::NBSnSIZE =  NBSwave::NBSSIZE * analysis::Nconf;
+   NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
    
    if (potential == NULL) potential = new cdouble[NBSwave::xyznSIZE];
    if (Rcorr     != NULL) delete_pot();
@@ -27,7 +25,6 @@ void POTENTIAL::set_pot_from_binary(const char* infile_name ) {
    if (!ifs) analysis::error(2, infile_name);
    
    ifs.read((char*)&potential[0], sizeof(cdouble) * NBSwave::xyznSIZE);
-   
    ifs.close();
    
    if (!analysis::machine_is_little_endian())

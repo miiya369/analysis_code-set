@@ -8,6 +8,26 @@
  ////////////////////////////////////////////////
 
 
+ @ version 2.2 : 2015/07/28 Completion
+
+	* Modify the output file name 
+	   (add spin informations)
+
+	* Modify the form of output file
+	   for gnu-plot (add x,y,z index)
+
+	* Modify the output data points reduction 
+	   for S-wave potential (1/48)
+
+	* Delete the org. NBS array 
+	   for memory saving
+		- Reading NBS & spin projection
+		   will do simultaneously 
+
+	* Set the endian of binary-output datas
+	   always LITTLE endian
+
+
  @ version 2.1 : 2015/07/24 Completion
 
 	* Major upgrade ! 
@@ -33,6 +53,9 @@
 	* Add to read compressed NBS wave function
 
 	* Correct the value of chisq/DoF for fit
+
+	* Reduce the output data size for
+	   S-wave (1/48 reduction)
 
 	* Add the hadron type & channel type
 	   for S=-1, -2, -3, -4 Octet Baryon

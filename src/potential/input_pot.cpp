@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Functions for input for potential
  * @author  Takaya Miyamoto
- * @since   Tue Jul 21 01:39:25 JST 2015
+ * @since   Wed Jul 29 00:31:31 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ void POTENTIAL::input_pot() {
       Rcorr = new R_CORRELATOR[3];
       for (int ttt=0; ttt<3; ttt++) {
          Rcorr[ttt].set_Rcorr( channel,time_slice+(ttt-1),endian_flg
-                              ,spin,ang_mom,corr1,corr2,compress_flg);
+                              ,spin,spin_z,ang_mom,corr1,corr2,compress_flg);
          Rcorr_t[ttt] = Rcorr[ttt].info_time();
       }
    }
@@ -69,7 +69,7 @@ void POTENTIAL::input_pot() {
             if (Rcorr_reread_flg[tt]) {
                Rcorr[tt].delete_Rcorr();
                Rcorr[tt].set_Rcorr( channel,time_slice+(ttt-1),endian_flg
-                                   ,spin,ang_mom,corr1,corr2,compress_flg);
+                                   ,spin,spin_z,ang_mom,corr1,corr2,compress_flg);
                Rcorr_t[tt] = Rcorr[tt].info_time();
                Rcorr_reread_flg[tt] = false;
             }
@@ -87,7 +87,8 @@ void POTENTIAL::input_pot( double HAD1_mass, double HAD2_mass ) {
       Rcorr = new R_CORRELATOR[3];
       for(int ttt=0; ttt<3; ttt++) {
          Rcorr[ttt].set_Rcorr( channel,time_slice+(ttt-1),endian_flg
-                              ,spin,ang_mom,HAD1_mass,HAD2_mass,compress_flg);
+                              ,spin,spin_z,ang_mom,HAD1_mass,HAD2_mass
+                              ,compress_flg);
          Rcorr_t[ttt] = Rcorr[ttt].info_time();
       }
    }
@@ -110,7 +111,8 @@ void POTENTIAL::input_pot( double HAD1_mass, double HAD2_mass ) {
             if (Rcorr_reread_flg[tt]) {
                Rcorr[tt].delete_Rcorr();
                Rcorr[tt].set_Rcorr( channel,time_slice+(ttt-1),endian_flg
-                                   ,spin,ang_mom,HAD1_mass,HAD2_mass,compress_flg);
+                                   ,spin,spin_z,ang_mom,HAD1_mass,HAD2_mass
+                                   ,compress_flg);
                Rcorr_t[tt] = Rcorr[tt].info_time();
                Rcorr_reread_flg[tt] = false;
             }

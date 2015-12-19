@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for calculate coupled channel potential
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 23:09:41 JST 2015
+ * @since   Wed Jul 29 02:21:49 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -22,9 +22,7 @@ int  analysis::tSIZE;
 char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 size_t NBSwave::xyzSIZE;
-size_t NBSwave::NBSSIZE;
 size_t NBSwave::xyznSIZE;
-size_t NBSwave::NBSnSIZE;
 
 CHANNEL_TYPE channel[4];
 int    time_slice;
@@ -56,12 +54,12 @@ int main(int argc, char **argv) {
       
       if (!read_from_bin_flg) {
          pot[i].set_pot(  channel[i], time_slice, endian_flg
-                        , false, spin, ang_mom, mass[i] );
+                        , false, spin, spin_z, ang_mom, mass[i] );
          pot[i].calc_pot_kernel();
          
          pot[i].Rcorr[1].output_Rcorr_all("./tmp");
-         pot[i].Rcorr[1].output_Rcorr_err("./tmp");
-         pot[i].output_single_pot_err("./tmp");
+         pot[i].Rcorr[1].output_Rcorr_err("./tmp",false);
+         pot[i].output_pot_err("./tmp", true);
          pot[i].output_couple_pot_all("./tmp");
          R_corr_ptr[i] = pot[i].Rcorr[1].Rcorr;
          
@@ -112,7 +110,7 @@ int main(int argc, char **argv) {
    delete [] coupled_channel_pot;
    
    for (int i=0; i<4; i++) {
-      pot[i].output_couple_pot_err( outfile_path );
+      pot[i].output_couple_pot_err( outfile_path, false );
       if (calc_fit_flg)
          pot[i].output_couple_pot_fit( outfile_path );
    }

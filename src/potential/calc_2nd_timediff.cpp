@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Calculate 2nd time-difference term of potential
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 05:34:15 JST 2015
+ * @since   Wed Jul 29 01:43:38 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -38,8 +38,9 @@ void POTENTIAL::calc_2nd_timediff() {
       potential[n] =  (Rcorr_ptr1[n] + Rcorr_ptr3[n] - Rcorr_ptr2[n] * 2.0)
                     / (4.0 * reduced_mass);
    
-   printf(" @ Finished calculate potential time 2nd difference part : %s, t=%d\n"
-          , channel.name.c_str(), time_slice);
+   printf(" @ Finished calculate potential time 2nd differential part : "
+          "%s, spin=%d, spin_z=%d, t=%d\n"
+          , channel.name.c_str(), spin, spin_z, time_slice);
    potential_type = "potT2term";
    
    analysis::route(class_name, func_name, 0);

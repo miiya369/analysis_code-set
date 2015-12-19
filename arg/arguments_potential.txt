@@ -17,15 +17,16 @@ POT_Max_time_slice	= 8
 POT_Had1_mass		= 1.132174
 POT_Had2_mass		= 1.113707
 POT_Channel_name	= Pro-Lam_Pro-Lam
-POT_Spin_projection	= 0
-POT_Spin_z_component	= 0
+POT_Spin_projection	= 1
+POT_Spin_z_component	= 999
 POT_Ang_mom_projection	= 0
 
 POT_Endian_convert	= yes
 POT_read_compress_NBS	= no
 POT_Rcorr_NBS/corr	= yes
+POT_Out_reduced_data	= yes
 
-POT_Out_sum_pot		= no
+POT_Out_sum_pot		= yes
 POT_Out_laplacian	= no
 POT_Out_1st_t_diff	= no
 POT_Out_2nd_t_diff	= no
@@ -33,4 +34,4 @@ POT_Out_2nd_t_diff	= no
 POT_Out_fit_data	= no
 
 POT_Out_NBS_wave	= yes
-POT_Out_R_correlator	= no
+POT_Out_R_correlator	= yes
