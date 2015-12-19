@@ -101,8 +101,8 @@ int set_arg( int usage_type, int argc, char **argv
         = {  "CCP_Size_of_time"    ,"CCP_Size_of_xyz"     ,"CCP_calc_time_slice"
             ,"CCP_Spin_projection" ,"CCP_Spin_z_component","CCP_Ang_mom_projection"
             ,"CCP_Gauge_confs_list","CCP_Path_to_output_dir","CCP_Channel_00"
-            ,"CCP_Channel_10"      ,"CCP_Channel_01"      ,"CCP_Channel_11"
-            ,"CCP_Reduced_mass_00" ,"CCP_Reduced_mass_10" ,"CCP_Reduced_mass_01"
+            ,"CCP_Channel_01"      ,"CCP_Channel_10"      ,"CCP_Channel_11"
+            ,"CCP_Reduced_mass_00" ,"CCP_Reduced_mass_01" ,"CCP_Reduced_mass_10"
             ,"CCP_Reduced_mass_11" ,"CCP_Path_to_input_dir","CCP_T_shift"
             ,"CCP_X_shift"         ,"CCP_Y_shift"         ,"CCP_Z_shift"
             ,"CCP_Endian_convert"  ,"CCP_Calc_fit_data"   ,"CCP_Snk_relativistic"
@@ -314,6 +314,18 @@ int set_arg( int usage_type, int argc, char **argv
                 }
                 if(argv[loop][1]=='T'){
                     snprintf(argv_o[2],sizeof(argv_o[2]),"%s",argv[loop+1]);
+                    check++;   count1++;
+                }
+                if(argv[loop][1]=='c'){
+                    snprintf(argv_o[3],sizeof(argv_o[3]),"%s",argv[loop+1]);
+                    check++;   count1++;
+                }
+                if(argv[loop][1]=='m'){
+                    snprintf(argv_o[26],sizeof(argv_o[26]),"%s",argv[loop+1]);
+                    check++;   count1++;
+                }
+                if(argv[loop][1]=='M'){
+                    snprintf(argv_o[27],sizeof(argv_o[27]),"%s",argv[loop+1]);
                     check++;   count1++;
                 }
                 //***************************************************//

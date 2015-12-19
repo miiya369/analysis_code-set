@@ -42,10 +42,6 @@ void error( int error_type, const char* error_comments ){
 void endian_convert( cdouble *DATA, int DATA_size ){
     
     char dummy_R[8], dummy_I[8];
-    time_t start_t, end_t;
-    time( &start_t );
-    printf(" @ Convert endian ... ");
-    fflush(stdout);
     
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -61,17 +57,11 @@ void endian_convert( cdouble *DATA, int DATA_size ){
             ((char*)&DATA[k])[j+8] = dummy_I[7-j];
         }
     }
-    time( &end_t );
-    printf("Done |       ( %d second )\n",(int)difftime(end_t,start_t));
 }
 
 void endian_convert( double *DATA, int DATA_size ){
     
     char dummy[8];
-    time_t start_t, end_t;
-    time( &start_t );
-    printf(" @ Convert endian ... ");
-    fflush(stdout);
     
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -80,8 +70,6 @@ void endian_convert( double *DATA, int DATA_size ){
         for(int j=0; j<8; j++) dummy[j] = ((char*)&DATA[k])[j];
         for(int j=0; j<8; j++) ((char*)&DATA[k])[j] = dummy[7-j];
     }
-    time( &end_t );
-    printf("Done |       ( %d second )\n",(int)difftime(end_t,start_t));
 }
 
 void endian_convert( int* DATA ){

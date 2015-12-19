@@ -34,8 +34,8 @@ int main( int argc, char **argv ){
     const char* conf_list    = Argv[6];
     const char* outfile_path = Argv[7];
     
-#define idx(Row,Colomn) (Row+ 2* Colomn)
-    for(int C=0; C<2; C++) for(int R=0; R<2; R++){
+#define idx(Row,Colomn) (Colomn+ 2* Row)
+    for(int R=0; R<2; R++) for(int C=0; C<2; C++){
         channel[idx(R,C)] = name_to_channel(Argv[8+idx(R,C)]);
         mass[idx(R,C)]    = atof(Argv[12+idx(R,C)]);
     }
@@ -58,7 +58,7 @@ int main( int argc, char **argv ){
     printf(" @ spin       = %d\n",spin);
     printf(" @ spin z cmp = %d\n",spin_z);
     printf(" @ ang mom    = %d\n",ang_mom);
-    for(int C=0; C<2; C++) for(int R=0; R<2; R++){
+    for(int R=0; R<2; R++) for(int C=0; C<2; C++){
         printf(" @ channel %d%d  = %s\n"
                ,R,C,channel_to_name(channel[idx(R,C)]).c_str());
         printf(" @ mass    %d%d  = %lf\n"
@@ -80,27 +80,28 @@ int main( int argc, char **argv ){
     int n_size = xyz_size * xyz_size * xyz_size * n_conf;
     cdouble *R_corr_ptr[4];
     
-    for(int C=0; C<2; C++) for(int R=0; R<2; R++){
-        pot[idx(R,C)].set_env( xyz_size, t_size, n_conf, data_list );
+    for(int i=0; i<4; i++){
+        pot[i].set_env( xyz_size, t_size, n_conf, data_list );
         
         if( !flg_for_miyamoto ){
-            pot[idx(R,C)].set_pot(  channel[idx(R,C)], time_slice, endian_flg
-                                  , spin, ang_mom, mass[idx(R,C)] );
-            pot[idx(R,C)].calc_pot_kernel();
+            pot[i].set_pot(  channel[i], time_slice
+                                      , endian_flg, spin, ang_mom
+                                      , mass[i] );
+            pot[i].calc_pot_kernel();
             
-            pot[idx(R,C)].Rcorr[1].output_Rcorr_all("./tmp");
-            pot[idx(R,C)].Rcorr[1].output_Rcorr_err("./tmp");
-            pot[idx(R,C)].output_single_pot_err("./tmp");
-            pot[idx(R,C)].output_couple_pot_all("./tmp");
-            R_corr_ptr[idx(R,C)] = pot[idx(R,C)].Rcorr[1].Rcorr;
+            pot[i].Rcorr[1].output_Rcorr_all("./tmp");
+            pot[i].Rcorr[1].output_Rcorr_err("./tmp");
+            pot[i].output_single_pot_err("./tmp");
+            pot[i].output_couple_pot_all("./tmp");
+            R_corr_ptr[i] = pot[i].Rcorr[1].Rcorr;
 
-            pot[idx(R,C)].delete_pot_corr();
-            pot[idx(R,C)].Rcorr[0].delete_Rcorr();
-            pot[idx(R,C)].Rcorr[2].delete_Rcorr();
+            pot[i].delete_pot_corr();
+            pot[i].Rcorr[0].delete_Rcorr();
+            pot[i].Rcorr[2].delete_Rcorr();
         }else{
-            pot[idx(R,C)].set_pot_from_binary(  "./tmp", channel[idx(R,C)]
+            pot[i].set_pot_from_binary(  "./tmp", channel[i]
                                               , time_slice, endian_flg );
-            R_corr_ptr[idx(R,C)] = pot[idx(R,C)].Rcorr->Rcorr;
+            R_corr_ptr[i] = pot[i].Rcorr->Rcorr;
         }
     }
 
@@ -122,10 +123,10 @@ int main( int argc, char **argv ){
         R_corr_inv[idx(0,1)] = -R_corr_ptr[idx(0,1)][loop] / R_corr_det;
         R_corr_inv[idx(1,1)] =  R_corr_ptr[idx(0,0)][loop] / R_corr_det;
         
-        for(int C=0; C<2; C++) for(int R=0; R<2; R++) for(int i=0; i<2; i++)
+        for(int R=0; R<2; R++) for(int C=0; C<2; C++) for(int k=0; k<2; k++)
             coupled_channel_pot[loop + n_size * idx(R,C)]
-             += pot[idx(R,i)].potential[loop] * R_corr_inv[idx(i,C)];
-        
+             += pot[idx(R,k)].potential[loop] * R_corr_inv[idx(k,C)];
+#undef idx
         printf("\b\b\b\b%3.0lf%%",double(loop+1)/double(n_size)*100);
         fflush(stdout);
     }
@@ -135,20 +136,17 @@ int main( int argc, char **argv ){
     " @ Coupled channel potential has been calculated : ELAPSED TIME [s] = %d\n"
            ,(int)difftime(end_time,start_time2) );
     
-    for(int C=0; C<2; C++)
-        for(int R=0; R<2; R++)
+    for(int i=0; i<4; i++)
             for(int loop=0; loop<n_size; loop++)
-                pot[idx(R,C)].potential[loop]
-                    = coupled_channel_pot[loop + n_size * idx(R,C)];
-    
+                pot[i].potential[loop]
+                    = coupled_channel_pot[loop + n_size * i];
     delete [] coupled_channel_pot;
     
     for(int i=0; i<4; i++){
         pot[i].output_couple_pot_err( outfile_path );
-        if( calc_fit_flg ) pot[i].output_couple_pot_fit( outfile_path );
+        if( calc_fit_flg )
+            pot[i].output_couple_pot_fit( outfile_path );
     }
-
-#undef idx
     delete [] pot;
     
     time( &end_time );

@@ -23,13 +23,13 @@ string channel_to_name( int N_channel ){
     else if( N_channel == PROTON_LAMBDA__NEUTRON_SIGMAP )
         hadron_name = "Pro-Lam_Neu-Sig+";
     else if( N_channel == PROTON_SIGMAZ__PROTON_LAMBDA )
-        hadron_name = "Pro-Sig0_Pro-lam";
+        hadron_name = "Pro-Sig0_Pro-Lam";
     else if( N_channel == PROTON_SIGMAZ__PROTON_SIGMAZ )
         hadron_name = "Pro-Sig0_Pro-Sig0";
     else if( N_channel == PROTON_SIGMAZ__NEUTRON_SIGMAP )
         hadron_name = "Pro-Sig0_Neu-Sig+";
     else if( N_channel == NEUTRON_SIGMAP__PROTON_LAMBDA )
-        hadron_name = "Neu-Sig+_Pro-lam";
+        hadron_name = "Neu-Sig+_Pro-Lam";
     else if( N_channel == NEUTRON_SIGMAP__PROTON_SIGMAZ )
         hadron_name = "Neu-Sig+_Pro-Sig0";
     else if( N_channel == NEUTRON_SIGMAP__NEUTRON_SIGMAP )

@@ -37,7 +37,10 @@ void usage( int usage_type ){
         printf("\n");
         printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
         printf("   -t [ Minimum value of time slice ]\n");
-        printf("   -T [ Maximum value of time slice ]\n\n");
+        printf("   -T [ Maximum value of time slice ]\n");
+        printf("   -c [ Channel name to calculate ]\n");
+        printf("   -m [ Mass of hadron 1 ]\n");
+        printf("   -M [ Mass of hadron 2 ]\n\n");
     }
     if( usage_type == FITTING_DATA ){
         printf("\n ======   Data fitting usage   ======\n");

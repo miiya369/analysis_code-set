@@ -3,7 +3,7 @@
 # You may change this for your environment
 
 CXX	  = g++
-CXXFLAGS  = -Wall -O2 -g
+CXXFLAGS  = -Wall -O3 -g
 
 MAINDIR   = ./main
 SRCDIR	  = ./src
@@ -36,8 +36,8 @@ OBJS_zfac= $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_zfac:.cpp=.o)))
 
 INCLUDES = $(patsubst %,-I%,$(HEADERDIR))
 
-TERGETS		= mas pot fit obs
-FOR_MIYA	= iso ccp zfac
+TERGETS		= mas pot fit obs iso
+FOR_MIYA	= ccp zfac
 
 ### SRCDIR と MAINDIR 以下の全ての .cpp ファイルの依存関係を探す ###
 vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR)
@@ -71,16 +71,18 @@ $(OBJDIR)/%.o: %.cpp
 
 .PHONY: clean
 clean:
-	rm -f $(TERGETS) $(FOR_MIYA) obj/*.o
+	rm -f $(TERGETS) $(FOR_MIYA) test obj/*.o
 
 #===================================================================================#
 #===================================================================================#
 #===================================================================================#
 
 ###### FOR TEST ######
+SRCS_test= $(MAINDIR)/test.cpp
+OBJS_test= $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_test:.cpp=.o)))
 .PHONY: test
-test:
-	@echo $(SRCS_pot) $(OBJS_pot)
+test: $(OBJS_test)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_test)
 
 .PHONY: ALL
 ALL: $(TERGETS) $(FOR_MIYA)

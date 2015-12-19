@@ -18,6 +18,7 @@
  * effective mass	-> mas
  * fitting		-> fit
  * observable		-> obs
+ * isospin projection	-> iso
 
 
  #########   How to use   #########
@@ -80,6 +81,7 @@
  入ったか・出たかの情報が出力されるようになりす。
  これにより、バグが発生した際にその地点をすぐに発見する
  ことができます。
+
 
  ######### Fit function の追加 #########
  1) analysis_const.h の enum に追加
