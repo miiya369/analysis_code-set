@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for potential calculation
  * @author  Takaya Miyamoto
- * @since   Wed Jul 29 02:20:20 JST 2015
+ * @since   Mon Sep  7 16:57:28 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -17,10 +17,6 @@ int  analysis::xSIZE;
 int  analysis::ySIZE;
 int  analysis::zSIZE;
 int  analysis::tSIZE;
-char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
-
-size_t NBSwave::xyzSIZE;
-size_t NBSwave::xyznSIZE;
 
 CHANNEL_TYPE channel;
 int time_min;
@@ -34,9 +30,8 @@ double HAD2_mass;
 char conf_list[MAX_LEN_PATH];
 char outfile_path[MAX_LEN_PATH];
 
-bool endian_flg, calc_flg_pot, calc_flg_lap, calc_flg_t1, calc_flg_t2;
-bool calc_flg_fit, calc_flg_NBS, calc_flg_Rcorr, dev_corr_flg, compress_flg;
-bool out_data_reduction_flg;
+bool endian_flg, dev_corr_flg, read_cmp_flg;
+bool calc_flg_fit, calc_flg_pot, calc_flg_lap, calc_flg_t1, calc_flg_t2;
 
 bool arguments_check = false;
 int  set_args(int, char**);
@@ -49,68 +44,136 @@ int main(int argc, char **argv) {
    time_t start_time, end_time;
    time( &start_time );
    
-   POTENTIAL    *pot         = NULL;
-   R_CORRELATOR *Rcorrelator = NULL;
-   double       reduced_mass = HAD1_mass*HAD2_mass / (HAD1_mass+HAD2_mass);
+   NBSwave::rot_matrix_init();
    
-   if (calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2)
-      pot = new POTENTIAL;
+   NBS_WAVE_ORG         *Wave_org  = new NBS_WAVE_ORG;
+   CONFIG<NBS_WAVE>     *Wave      = new CONFIG<NBS_WAVE>;
+   CONFIG<CORRELATOR>   *Corr1     = new CONFIG<CORRELATOR>;
+   CONFIG<CORRELATOR>   *Corr2     = new CONFIG<CORRELATOR>;
+   CONFIG<R_CORRELATOR> *Rcorr     = new CONFIG<R_CORRELATOR>[3];
    
-   if (calc_flg_NBS || calc_flg_Rcorr)
-      Rcorrelator = new R_CORRELATOR;
+   CONFIG<R_CORRELATOR> *K_Rcorr   = new CONFIG<R_CORRELATOR>;
+   CONFIG<POTENTIAL>    *potential = new CONFIG<POTENTIAL>;
+   
+   double reduced_mass = HAD1_mass*HAD2_mass / (HAD1_mass+HAD2_mass);
+   string pot_type;
+   char   outfile_name[1024];
+   
+   int count = 0;
+   for (int it=time_min-1; it<=time_min; it++) {
+      
+      for (int conf=0; conf<analysis::Nconf; conf++) {
+         Wave_org->set( channel, it, conf, endian_flg, read_cmp_flg );
+         (*Wave)(conf).set( *Wave_org, spin, spin_z );
+         (*Wave)(conf).projection( ang_mom );
+         
+         if (it==time_min-1) {
+            (*Corr1)(conf).set(channel.hadron1, conf, "PS");
+            (*Corr2)(conf).set(channel.hadron2, conf, "PS");
+            (*K_Rcorr)(conf).mem_alloc();
+         }
+      } // conf
+      
+      Wave->make_JK_sample();
+      
+      if (it==time_min-1) {
+         Corr1->make_JK_sample();
+         Corr2->make_JK_sample();
+      }
+      for (int conf=0; conf<analysis::Nconf; conf++)
+         Rcorr[count](conf).set((*Wave)(conf),(*Corr1)(conf),(*Corr2)(conf), it);
+      count++;
+      
+   } // it
    
    for (int it=time_min; it<=time_max; it++) {
       
-      if (calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2) {
-         if (dev_corr_flg)
-            pot->set_pot(  channel, it, endian_flg, compress_flg
-                         , spin, spin_z, ang_mom, reduced_mass);
-         else
-            pot->set_pot(  channel, it, endian_flg, compress_flg
-                         , spin, spin_z, ang_mom, HAD1_mass, HAD2_mass );
-      }
-      if (calc_flg_fit) {
-         pot->calc_pot_kernel();
-         pot->output_pot_fit( outfile_path );
-      }
-      if (calc_flg_pot) {
-         if (!calc_flg_fit) pot->calc_pot_kernel();
-         pot->output_pot_err( outfile_path, out_data_reduction_flg );
-      }
+      for (int conf=0; conf<analysis::Nconf; conf++) {
+         Wave_org->set( channel, it+1, conf, endian_flg, read_cmp_flg );
+         (*Wave)(conf).set( *Wave_org, spin, spin_z );
+         (*Wave)(conf).projection( ang_mom );
+      } // conf
+      
+      Wave->make_JK_sample();
+      
+      for (int conf=0; conf<analysis::Nconf; conf++)
+       Rcorr[count%3](conf).set((*Wave)(conf),(*Corr1)(conf),(*Corr2)(conf),it+1);
+//-------------------- Selection of output potential type --------------------//
       if (calc_flg_lap) {
-         pot->calc_laplacian();
-         pot->output_pot_err( outfile_path, out_data_reduction_flg );
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            pot_type = potential::laplacian(  (*K_Rcorr)(conf)
+                                            , Rcorr[(count+2)%3](conf)
+                                            , reduced_mass );
+            (*potential)(conf).set( (*K_Rcorr)(conf), Rcorr[(count+2)%3](conf) );
+         }
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_%s_S%dSz%d_err_t%d"
+                  , outfile_path, channel.name.c_str()
+                  , pot_type.c_str(), spin, spin_z, it );
+         analysis::output_data_err( *potential, outfile_name );
       }
       if (calc_flg_t1) {
-         pot->calc_1st_timediff();
-         pot->output_pot_err( outfile_path, out_data_reduction_flg );
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            pot_type = potential::first_time_diff(  (*K_Rcorr)(conf)
+                                                  , Rcorr[(count+1)%3](conf)
+                                                  , Rcorr[(count+3)%3](conf) );
+            (*potential)(conf).set( (*K_Rcorr)(conf), Rcorr[(count+2)%3](conf) );
+         }
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_%s_S%dSz%d_err_t%d"
+                  , outfile_path, channel.name.c_str()
+                  , pot_type.c_str(), spin, spin_z, it );
+         analysis::output_data_err( *potential, outfile_name );
       }
       if (calc_flg_t2) {
-         pot->calc_2nd_timediff();
-         pot->output_pot_err( outfile_path, out_data_reduction_flg );
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            pot_type = potential::second_time_diff(  (*K_Rcorr)(conf)
+                                                   , Rcorr[(count+1)%3](conf)
+                                                   , Rcorr[(count+2)%3](conf)
+                                                   , Rcorr[(count+3)%3](conf)
+                                                   , reduced_mass );
+            (*potential)(conf).set( (*K_Rcorr)(conf), Rcorr[(count+2)%3](conf) );
+         }
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_%s_S%dSz%d_err_t%d"
+                  , outfile_path, channel.name.c_str()
+                  , pot_type.c_str(), spin, spin_z, it );
+         analysis::output_data_err( *potential, outfile_name );
       }
+      if (calc_flg_pot) {
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            pot_type = potential::kernel(  (*K_Rcorr)(conf)
+                                         , Rcorr[(count+1)%3](conf)
+                                         , Rcorr[(count+2)%3](conf)
+                                         , Rcorr[(count+3)%3](conf)
+                                         , reduced_mass );
+            (*potential)(conf).set( (*K_Rcorr)(conf), Rcorr[(count+2)%3](conf) );
+         }
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_%s_S%dSz%d_err_t%d"
+                  , outfile_path, channel.name.c_str()
+                  , pot_type.c_str(), spin, spin_z, it );
+         analysis::output_data_err( *potential, outfile_name );
+      }
+      if (calc_flg_fit) {
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            pot_type = potential::kernel(  (*K_Rcorr)(conf)
+                                         , Rcorr[(count+1)%3](conf)
+                                         , Rcorr[(count+2)%3](conf)
+                                         , Rcorr[(count+3)%3](conf)
+                                         , reduced_mass );
+            (*potential)(conf).set( (*K_Rcorr)(conf), Rcorr[(count+2)%3](conf) );
+         }
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_%s_S%dSz%d_fit_t%d"
+                  , outfile_path, channel.name.c_str()
+                  , pot_type.c_str(), spin, spin_z, it );
+         analysis::output_data_fit( *potential, outfile_name );
+      }
+//----------------------------------------------------------------------------//
+      count++;
       
-      if (calc_flg_NBS) {
-         
-         Rcorrelator->set_NBS(  channel, it, endian_flg
-                              , spin, spin_z, ang_mom, compress_flg );
-         Rcorrelator->projection();
-         Rcorrelator->make_JK_sample_NBS(1);
-         Rcorrelator->output_NBS_err( outfile_path, out_data_reduction_flg );
-         Rcorrelator->delete_NBS();
-      }
-      if (calc_flg_Rcorr) {
-         
-         Rcorrelator->set_Rcorr(  channel, it, endian_flg
-                                , spin, spin_z, ang_mom, compress_flg );
-         Rcorrelator->output_Rcorr_err( outfile_path, out_data_reduction_flg );
-         Rcorrelator->delete_Rcorr();
-      }
-   }
-   if (calc_flg_fit||calc_flg_pot||calc_flg_lap||calc_flg_t1||calc_flg_t2)
-      delete pot;
-   if (calc_flg_NBS || calc_flg_Rcorr)
-      delete Rcorrelator;
+   } // it
    
    time( &end_time );
    printf("\n @ JOB END : ELAPSED TIME [s] = %d\n\n"
@@ -152,7 +215,7 @@ int set_args(int argc, char** argv) {
          else if (strcmp(argv[loop],"-mass_had2")==0)
             HAD2_mass = atof(argv[loop+1]);
          else if (strcmp(argv[loop],"-comp"     )==0)
-            compress_flg = true;
+            read_cmp_flg = true;
          else if (strcmp(argv[loop],"-check"    )==0)
             arguments_check = true;
          //***************************************************//
@@ -167,8 +230,8 @@ int set_args(int argc, char** argv) {
    
    printf("\n @ Arguments set :\n");
    printf(" @ #. conf    = %d\n",analysis::Nconf);
-   printf(" @ t size     = %d\n",analysis::tSIZE);
-   printf(" @ x,y,z size = %d\n",analysis::xSIZE);
+   printf(" @ time size  = %d\n",analysis::tSIZE);
+   printf(" @ space size = %d\n",analysis::xSIZE);
    printf(" @ t shift    = %s\n",analysis::data_list[N_T_SHIFT]);
    printf(" @ x shift    = %s\n",analysis::data_list[N_X_SHIFT]);
    printf(" @ y shift    = %s\n",analysis::data_list[N_Y_SHIFT]);
@@ -188,16 +251,12 @@ int set_args(int argc, char** argv) {
    printf(" @ outfile    = %s\n",outfile_path);
    printf(" @ endian cnv = %s\n",analysis::bool_to_str(endian_flg).c_str());
    printf(" @ dev corr   = %s\n",analysis::bool_to_str(dev_corr_flg).c_str());
-   printf(" @ read comp  = %s\n",analysis::bool_to_str(compress_flg).c_str());
+   printf(" @ read comp  = %s\n",analysis::bool_to_str(read_cmp_flg).c_str());
    printf(" @ out pot    = %s\n",analysis::bool_to_str(calc_flg_pot).c_str());
    printf(" @ out lap    = %s\n",analysis::bool_to_str(calc_flg_lap).c_str());
    printf(" @ out t1 dif = %s\n",analysis::bool_to_str(calc_flg_t1).c_str());
    printf(" @ out t2 dif = %s\n",analysis::bool_to_str(calc_flg_t2).c_str());
-   printf(" @ out fit    = %s\n",analysis::bool_to_str(calc_flg_fit).c_str());
-   printf(" @ out NBS    = %s\n",analysis::bool_to_str(calc_flg_NBS).c_str());
-   printf(" @ out Rcorr  = %s\n",analysis::bool_to_str(calc_flg_Rcorr).c_str());
-   printf(" @ data red.  = %s\n\n"
-          ,analysis::bool_to_str(out_data_reduction_flg).c_str());
+   printf(" @ out fit    = %s\n\n",analysis::bool_to_str(calc_flg_fit).c_str());
    fflush(stdout);
    
    if (arguments_check) return 1;
@@ -254,8 +313,6 @@ int set_args_from_file(char* file_name) {
          calc_flg_t2 = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Out_fit_data"      )==0)
          calc_flg_fit = analysis::str_to_bool(tmp_c2);
-      else if (strcmp(tmp_c1,"POT_Out_reduced_data"  )==0)
-         out_data_reduction_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Path_to_input_dir" )==0)
          snprintf(         analysis::data_list[MAIN_PATH]
                   , sizeof(analysis::data_list[MAIN_PATH])
@@ -286,14 +343,10 @@ int set_args_from_file(char* file_name) {
          snprintf(         analysis::data_list[SRC_RELA]
                   , sizeof(analysis::data_list[SRC_RELA])
                   , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"POT_Out_NBS_wave"      )==0)
-         calc_flg_NBS = analysis::str_to_bool(tmp_c2);
-      else if (strcmp(tmp_c1,"POT_Out_R_correlator"  )==0)
-         calc_flg_Rcorr = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Rcorr_NBS/corr"    )==0)
          dev_corr_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_read_compress_NBS" )==0)
-         compress_flg = analysis::str_to_bool(tmp_c2);
+         read_cmp_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Had1_mass"         )==0)
          HAD1_mass = atof(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Had2_mass"         )==0)

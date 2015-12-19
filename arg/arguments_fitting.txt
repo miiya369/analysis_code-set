@@ -1,11 +1,11 @@
 
 ### For Data fitting ###
 
-FIT_Fit_data_file_name	= ./results/Pro_Lam__Pro_Lam_potential_fitdata_t8
+FIT_Fit_data_file_name	= ./results/Pro-Lam_Pro-Lam_potential_S0Sz0_fit_t8
 FIT_Output_file_name	= ./results/fit_params
 FIT_Stopping_condition	= 0.000001
 FIT_Function_name	= 3G
 FIT_Fit_range_min	= 6
 FIT_Fit_range_max	= 12
 
-FIT_Parameter		= { 2 3 4 6 }
+FIT_Parameter		= { 2 3 4 6 1 2 }

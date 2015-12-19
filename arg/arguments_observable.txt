@@ -2,12 +2,13 @@
 ### For observable calculation ###
 
 OBS_Parameter_list	= ./results/fit_params
-OBS_Output_file_name	= ./results/phase_shift_test_m963_E234_r1.5
+OBS_Output_file_name	= ./results/phase_shift
 OBS_Lattice_spacing	= 0.0907
 OBS_Reduced_mass	= 901.378
 OBS_Angular_momentum	= 0
-OBS_Calc_energy_min	= 0
-OBS_Calc_energy_max	= 300
+OBS_Calc_energy_min	= 0.9
+OBS_Calc_energy_max	= 1.1
+OBS_Calc_energy_dev	= 0.01
 OBS_Runge_kutta_delta	= 0.0005
 OBS_Runge_kutta_max_r	= 6
 

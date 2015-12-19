@@ -1,16 +1,16 @@
 //--------------------------------------------------------------------------
 /**
  * @file
- * @ingroup NBS wave function
+ * @ingroup All
  * @brief   Definition of number of reduced data points
  * @author  Takaya Miyamoto
- * @since   Wed Jul 29 01:18:47 JST 2015
+ * @since   Thu Sep  3 01:26:45 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#include <NBSwave/NBSwave.h>
+#include <common/analysis.h>
 
-int NBSwave::reduced_Ndata() {
+int analysis::reduced_Ndata() {
    
    int ret;
    

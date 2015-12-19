@@ -4,23 +4,36 @@
  * @ingroup All
  * @brief   Header File for definition of several enum
  * @author  Takaya Miyamoto
- * @since   Mon Jul 20 08:46:10 JST 2015
+ * @since   Mon Sep  7 02:20:13 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #ifndef ANALYSIS_CONST_H
 #define ANALYSIS_CONST_H
 
+//! enum for the class name
+enum {
+   
+   CLASS_CORRELATOR = 0,
+   CLASS_NBS_WAVE_ORG,
+   CLASS_NBS_WAVE,
+   CLASS_R_CORRELATOR,
+   CLASS_POTENTIAL,
+   CLASS_FITTING,
+   CLASS_PHASE_SHIFT,
+};
+
 //! enum for the main project name
 enum {
     
    COUPLED_CHANNEL_POT = 0,
+   CALC_WAVE_FUNCTION,
    EFFECTIVEMASS,
    CALC_POTENTIAL,
    FITTING_DATA,
    CALC_OBSERVABLE,
-   ISOSPIN_PROJECTION,
    EXTRACT_Z_FACTOR,
+   AVERAGE_COMPRESS,
 };
 
 //! enum for the path setting

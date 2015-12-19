@@ -1,106 +1,111 @@
 //--------------------------------------------------------------------------
 /**
  * @file
- * @ingroup Correlator
- * @brief   Header file for correlator class
+ * @ingroup All
+ * @brief   Common header file for configuration template class
  * @author  Takaya Miyamoto
- * @since   Fri Sep  4 17:21:25 JST 2015
+ * @since   Wed Sep  2 22:28:05 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#ifndef CORRELATOR_H
-#define CORRELATOR_H
+#ifndef CONFIG_TMP_H
+#define CONFIG_TMP_H
 
 #include <common/analysis.h>
 
 //--------------------------------------------------------------------------
 /**
- * @brief The class for correlator
+ * @brief The template class for configuration
  */
 //--------------------------------------------------------------------------
-class CORRELATOR {
+template <class X> class CONFIG {
    
 private:
    string class_name, func_name;
    
-   cdouble *corr;
+   int num_conf;
+   
+   X *data;
    
 protected:
    
 public:
 //============================ For inner index ===========================//
-
+   
 //============================== For writing =============================//
-   cdouble& operator()(size_t index) {
-      return corr[index];
-   }
+   X& operator()(size_t index) { return data[index]; }
 //============================== For reading =============================//
-   const cdouble& operator()(size_t index) const {
-      return corr[index];
-   }
+   const X& operator()(size_t index) const { return data[index]; }
 //======================== Constructor & Destructor ======================//
-   CORRELATOR() {
-      class_name = "CORRELATOR______________________";
+   CONFIG() {
+      class_name = "CONFIG_TMP______________________";
       func_name  = "______________________";
       analysis::route(class_name, func_name, 1);
       
-      corr             = NULL;
+      data       = NULL;
+      
+      mem_alloc();
    }
-   CORRELATOR( HADRON_TYPE HADRON, int iconf, const char* FILE_TYPE ) {
-      class_name = "CORRELATOR______________________";
+   CONFIG(int NUM_CONF) {
+      class_name = "CONFIG_TMP______________________";
       func_name  = "______________________";
       analysis::route(class_name, func_name, 1);
       
-      corr             = NULL;
+      data       = NULL;
       
-      set( HADRON, iconf, FILE_TYPE );
+      mem_alloc(NUM_CONF);
    }
-   ~CORRELATOR() {
-      if (corr     != NULL) delete [] corr;
+   ~CONFIG() {
+      if (data != NULL) delete [] data;
       
       func_name = "______________________";
-      analysis::route(class_name, func_name, 0);
+      analysis::route( class_name, func_name, 0 );
    }
 //============================= For initialize ===========================//
    void mem_alloc() {
       
-      func_name = "mem_alloc_corr________";
+      func_name = "mem_alloc_CONFIG______";
       analysis::route( class_name, func_name, 1 );
       
-      if (corr == NULL) corr = new cdouble[analysis::tSIZE];
-      
+      if (data == NULL) {
+         num_conf = analysis::Nconf;
+         data = new X[num_conf];
+      }
       analysis::route(class_name, func_name, 0);
    }
-   void set( HADRON_TYPE HADRON, int iconf, const char* FILE_TYPE ) {
+   void mem_alloc(int NUM_CONF) {
       
-      func_name = "set_corr______________";
-      analysis::route(class_name, func_name, 1);
+      func_name = "mem_alloc_CONFIG______";
+      analysis::route( class_name, func_name, 1 );
       
-      mem_alloc();
-      input(HADRON, iconf, FILE_TYPE);
-      
-      func_name = "set_corr______________";
+      if (data == NULL) {
+         num_conf = NUM_CONF;
+         data = new X[num_conf];
+      }
       analysis::route(class_name, func_name, 0);
    }
    void mem_del() {
       
-      func_name = "mem_delete_corr_______";
+      func_name = "mem_delete_CONFIG_____";
       analysis::route(class_name, func_name, 1);
       
-      if (corr != NULL) {
-         delete [] corr;   corr = NULL;
+      if (data != NULL) {
+         delete [] data;   data = NULL;
       }
-      analysis::route(class_name, func_name, 0);
+      analysis::route( class_name, func_name, 0 );
    }
 //============================ Operator define ===========================//
    
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   int         info_class()     { return CLASS_CORRELATOR; }
-   size_t      info_data_size() { return analysis::tSIZE; }
+   int  info_conf(){ return num_conf; }
    
-   void input(HADRON_TYPE, int, const char*);
+   void make_JK_sample();
+   void make_mean_err( double*, double*, bool );
+   void make_mean_err( cdouble*, cdouble*, bool );
 };
+
+#include <common/make_jack_knife_sample.h>
 
 #endif

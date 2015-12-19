@@ -4,12 +4,11 @@
  * @ingroup observable
  * @brief   Main part for observable
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 18:04:09 JST 2015
+ * @since   Mon Sep  7 17:32:12 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <observable/phase_shift.h>
-#include <observable/scattering_length.h>
 
 #define PROJECT CALC_OBSERVABLE   // <- Project name
 
@@ -18,13 +17,13 @@ int  analysis::xSIZE;
 int  analysis::ySIZE;
 int  analysis::zSIZE;
 int  analysis::tSIZE;
-char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 double lattice_space;
 double mass;
 double ang_mom;
-int    E_min;
-int    E_max;
+double E_min;
+double E_max;
+double E_dev;
 double delta;
 double max_r;
 double V_0;
@@ -47,31 +46,65 @@ int main(int argc, char **argv) {
    time_t start_time, end_time;
    time( &start_time );
    
-   PHASE_SHIFT       *phase = new PHASE_SHIFT;
-   SCATTERING_LENGTH *scatt = NULL;
    char scatt_length_filename[1024];
+   snprintf(scatt_length_filename, sizeof(scatt_length_filename)
+            ,"%s_scattering_length",outfile_path);
    
-   if (calc_scatt_len_flg) scatt = new SCATTERING_LENGTH;
-   
-   if (test_flg)
-      phase->calc_phase_shift_test( r_0, V_0, mass, delta, max_r, E_min, E_max );
+   if (test_flg) {
+      CONFIG<PHASE_SHIFT> test(1);
+      double param[2] = { r_0, V_0 };
+      lattice_space   = 1;
+      
+      test(0).mem_alloc( E_min, E_max, E_dev );
+      
+      printf(" @ phase shift calculating ... ");
+      observable::calc_phase_shift(  test(0), param, 2, 0, lattice_space
+                                   , mass, ang_mom, delta, max_r );
+      printf("DONE\n");
+      
+      observable::output_phase_shift_err( outfile_path, test );
+      
+      if (calc_scatt_len_flg)
+         observable::output_scatt_length( scatt_length_filename, test, mass );
+   }
    else {
-      phase->input_param( infile_path );
-      phase->calc_phase_shift(  lattice_space, mass, ang_mom, delta
-                              , max_r, E_min, E_max );
+      int Nparam, func_type;
+      observable::input_param( infile_path, analysis::Nconf, Nparam, func_type );
+      
+      double *param = new double[analysis::Nconf * Nparam];
+      observable::input_param( infile_path, param );
+      
+      CONFIG<PHASE_SHIFT> phase(analysis::Nconf);
+      
+      int counter = 0;
+      printf(" @ phase shift calculating |   0%%");
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+      for (int conf=0; conf<analysis::Nconf; conf++) {
+         double *param_tmp = new double[Nparam];
+         
+         phase(conf).mem_alloc( E_min, E_max, E_dev );
+         
+         for (int loop=0; loop<Nparam; loop++)
+            param_tmp[loop] = param[conf+analysis::Nconf*loop];
+            
+         observable::calc_phase_shift(  phase(conf), param_tmp, Nparam, func_type
+                                      , lattice_space
+                                      , mass, ang_mom, delta, max_r );
+         delete [] param_tmp;
+         counter++;
+         printf("\b\b\b\b%3.0lf%%",double(counter)/double(analysis::Nconf)*100);
+         fflush(stdout);
+      } // conf
+      printf("\n");
+      
+      observable::output_phase_shift_err( outfile_path, phase );
+      
+      if (calc_scatt_len_flg)
+         observable::output_scatt_length( scatt_length_filename, phase, mass );
+      delete [] param;
    }
-   phase->output_phase_shift_err( outfile_path );
-   
-   if (calc_scatt_len_flg) {
-      snprintf(scatt_length_filename, sizeof(scatt_length_filename)
-               ,"%s_scattering_length",outfile_path);
-      scatt->input_phase_shift( phase->phase_shift, mass, E_min, E_max );
-      scatt->calc_scatt_len();
-      scatt->output_scatt_len_err( scatt_length_filename );
-   }
-   delete phase;
-   if (calc_scatt_len_flg) delete scatt;
-   
    time( &end_time );
    printf("\n @ JOB END : ELAPSED TIME [s] = %d\n\n"
           ,(int)difftime(end_time,start_time) );
@@ -128,8 +161,9 @@ int set_args(int argc, char** argv) {
    printf(" @ lat space  = %lf\n",lattice_space);
    printf(" @ mass       = %lf\n",mass);
    printf(" @ ang mom    = %lf\n",ang_mom);
-   printf(" @ E min      = %d\n",E_min);
-   printf(" @ E max      = %d\n",E_max);
+   printf(" @ E min      = %lf\n",E_min);
+   printf(" @ E max      = %lf\n",E_max);
+   printf(" @ E dev      = %lf\n",E_dev);
    printf(" @ delta      = %lf\n",delta);
    printf(" @ max_r      = %lf\n",max_r);
    printf(" @ infile     = %s\n",infile_path);
@@ -173,9 +207,11 @@ int set_args_from_file(char* file_name) {
       else if (strcmp(tmp_c1,"OBS_Angular_momentum")==0)
          ang_mom = atof(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_Calc_energy_min"  )==0)
-         E_min = atoi(tmp_c2);
+         E_min = atof(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_Calc_energy_max")==0     )
-         E_max = atoi(tmp_c2);
+         E_max = atof(tmp_c2);
+      else if (strcmp(tmp_c1,"OBS_Calc_energy_dev")==0     )
+         E_dev = atof(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_Runge_kutta_delta"     )==0)
          delta = atof(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_Runge_kutta_max_r"     )==0)

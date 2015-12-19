@@ -4,40 +4,24 @@
  * @ingroup Potential
  * @brief   Calculate 1st time-difference term of potential
  * @author  Takaya Miyamoto
- * @since   Wed Jul 29 01:43:38 JST 2015
+ * @since   Mon Aug 31 18:44:39 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <potential/potential.h>
 
-void POTENTIAL::calc_1st_timediff() {
+string potential::first_time_diff(  R_CORRELATOR &K_Rcorr
+                                  , R_CORRELATOR &Rcorr1
+                                  , R_CORRELATOR &Rcorr3 ) {
    
-   func_name = "calc_1st_timediff_____";
-   analysis::route(class_name, func_name, 1);
+   for (      int z=0; z<analysis::zSIZE; z++)
+      for (   int y=0; y<analysis::ySIZE; y++)
+         for (int x=0; x<analysis::xSIZE; x++) {
+            K_Rcorr(x,y,z) =
+            
+            (  Rcorr1(x,y,z)               /* time 1st difference part */
+             - Rcorr3(x,y,z) ) * 0.5;
+         }
    
-   if (Rcorr == NULL) {
-      analysis::error(1,"Potential has not set yet !");
-      analysis::route(class_name, func_name, 0);
-      return;
-   }
-   cdouble *Rcorr_ptr1 = NULL;
-   cdouble *Rcorr_ptr2 = NULL;
-   
-   for (int ttt=0; ttt<3; ttt++) {
-      if (     Rcorr_t[ttt] == time_slice-1)
-         Rcorr_ptr1 = Rcorr[ttt].Rcorr;
-      else if (Rcorr_t[ttt] == time_slice+1)
-         Rcorr_ptr2 = Rcorr[ttt].Rcorr;
-   }
-   
-      /* time 1st difference part */
-   for (int n=0; n<NBSwave::xyznSIZE; n++)
-      potential[n] = (Rcorr_ptr1[n] - Rcorr_ptr2[n]) * 0.5;
-   
-   printf(" @ Finished calculate potential time 1st differential part : "
-          "%s, spin=%d, spin_z=%d, t=%d\n"
-          , channel.name.c_str(), spin, spin_z, time_slice);
-   potential_type = "potT1term";
-   
-   analysis::route(class_name, func_name, 0);
+   return "potT1term";
 }

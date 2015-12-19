@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Function for data list setting, data_list is used on set_path
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 04:02:42 JST 2015
+ * @since   Fri Sep  4 18:58:26 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -96,4 +96,17 @@ int analysis::set_data_list(  const char* main_path
    ifs.close();
    
    return i;
+}
+
+void analysis::set_data_list( int SET_INDEX, const char* format, ... ) {
+   
+   char tmp_c[MAX_LEN_PATH];
+   va_list args;
+   va_start(args,  format);
+   vsprintf(tmp_c, format, args);
+   
+   snprintf(        analysis::data_list[SET_INDEX]
+            ,sizeof(analysis::data_list[SET_INDEX]), tmp_c );
+   
+   va_end(args);
 }

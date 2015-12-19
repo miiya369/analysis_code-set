@@ -1,0 +1,17 @@
+
+### For Coupled channel potential ###
+
+AVE_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2
+AVE_Path_to_working_dir	= /Users/miiya/Desktop/work_kyoto/test_data/cp-pacs+JLQCD_ens3_193conf
+AVE_Size_of_time	= 64
+AVE_Size_of_space	= 32
+AVE_Min_time_slice	= 5
+AVE_Max_time_slice	= 25
+AVE_X_shift		= 0
+AVE_Y_shift		= 0
+AVE_Z_shift		= 0
+AVE_Snk_relativistic	= CG05
+AVE_Src_relativistic	= CG05
+AVE_T_shift_list	= { 0 16 32 48 }
+AVE_Calc_hadron_name	= { pion proton Lambda Sigma }
+AVE_Calc_channel_name	= { }

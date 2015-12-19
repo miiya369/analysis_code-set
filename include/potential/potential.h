@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Header file for potential class
  * @author  Takaya Miyamoto
- * @since   Wed Jul 29 02:06:23 JST 2015
+ * @since   Mon Aug 31 18:50:09 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,6 +12,31 @@
 #define POTENTIAL_H
 
 #include <R_correlator/R_correlator.h>
+
+//--------------------------------------------------------------------------
+/**
+ * @brief The namespace for potential calculation
+ */
+//--------------------------------------------------------------------------
+namespace potential {
+   
+   string kernel(  R_CORRELATOR&
+                 , R_CORRELATOR&
+                 , R_CORRELATOR&
+                 , R_CORRELATOR&, double );
+   
+   string laplacian(  R_CORRELATOR&
+                    , R_CORRELATOR&, double );
+   
+   string first_time_diff(  R_CORRELATOR&
+                          , R_CORRELATOR&
+                          , R_CORRELATOR& );
+   
+   string second_time_diff(  R_CORRELATOR&
+                           , R_CORRELATOR&
+                           , R_CORRELATOR&
+                           , R_CORRELATOR&, double );
+}
 
 //--------------------------------------------------------------------------
 /**
@@ -23,49 +48,25 @@ class POTENTIAL {
 private:
    string class_name, func_name;
    
-   string potential_type;
-   int time_slice, spin, spin_z, ang_mom;
-   int Rcorr_t[3];
-   double reduced_mass;
-   HADRON_TYPE hadron1;
-   HADRON_TYPE hadron2;
-   CHANNEL_TYPE channel;
-   
-   bool endian_flg, compress_flg;
-   bool Rcorr_reread_flg[3], read_time_slice_flg[3];
-   
-   cdouble *corr1;
-   cdouble *corr2;
+   cdouble *potential;
    
 protected:
    
 public:
-   R_CORRELATOR *Rcorr;
-   cdouble      *potential;
 //============================ For inner index ===========================//
-   size_t idx(int x,int y,int z,int n) {
-      return    x + analysis::xSIZE
-             *( y + analysis::ySIZE
-             *( z + analysis::zSIZE * n ));
-   }
-   size_t xyz(int x,int y,int z) {
-      return    x + analysis::xSIZE
-             *( y + analysis::ySIZE * z );
+   size_t idx(int x,int y,int z) {
+      return x + analysis::xSIZE *( y + analysis::ySIZE * z );
    }
 //============================== For writing =============================//
-   cdouble& operator()(int x, int y, int z, int conf) {
-      return potential[   x + analysis::xSIZE
-                       *( y + analysis::ySIZE
-                       *( z + analysis::zSIZE * conf ))];
+   cdouble& operator()(int x, int y, int z) {
+      return potential[x + analysis::xSIZE *( y + analysis::ySIZE * z )];
    }
    cdouble& operator()(size_t index) {
       return potential[index];
    }
 //============================== For reading =============================//
-   const cdouble& operator()(int x, int y, int z, int conf) const {
-      return potential[   x + analysis::xSIZE
-                       *( y + analysis::ySIZE
-                       *( z + analysis::zSIZE * conf ))];
+   const cdouble& operator()(int x, int y, int z) const {
+      return potential[x + analysis::xSIZE *( y + analysis::ySIZE * z )];
    }
    const cdouble& operator()(size_t index) const {
       return potential[index];
@@ -75,103 +76,57 @@ public:
       class_name = "POTENTIAL_______________________";
       func_name = "______________________";
       analysis::route(class_name, func_name, 1);
-      
-      endian_flg = false;
-      potential  = NULL;
-      Rcorr      = NULL;
-      corr1      = NULL;
-      corr2      = NULL;
+
+      potential    = NULL;
    }
    ~POTENTIAL() {
       if (potential != NULL) delete [] potential;
-      if (Rcorr     != NULL) delete [] Rcorr;
-      if (corr1     != NULL) {
-         delete [] corr1;
-         delete [] corr2;
-      }
+      
       func_name = "______________________";
       analysis::route(class_name, func_name, 0);
    }
 //============================= For initialize ===========================//
-   void set_pot(  CHANNEL_TYPE ch, int it, bool endian_FLG, bool compress_FLG
-                , int SPIN, int SPIN_z, int ANGMOM, double REDUCED_MASS ) {
+   void mem_alloc() {
       
-      func_name = "set_pot_Rcorr_NBS/corr";
-      analysis::route(class_name, func_name, 1);
+      func_name = "mem_alloc_potential___";
+      analysis::route( class_name, func_name, 1 );
       
-      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
-      
-      channel      = ch;
-      hadron1      = channel.hadron1;
-      hadron2      = channel.hadron2;
-      time_slice   = it;
-      spin         = SPIN;
-      spin_z       = SPIN_z;
-      ang_mom      = ANGMOM;
-      endian_flg   = endian_FLG;
-      compress_flg = compress_FLG;
-      reduced_mass = REDUCED_MASS;
-      
-      input_pot();
-      func_name = "set_pot_Rcorr_NBS/corr";
-      analysis::route(class_name, func_name, 0);
-   }
-   
-   void set_pot(  CHANNEL_TYPE ch, int it, bool endian_FLG, bool compress_FLG
-                , int SPIN, int SPIN_z, int ANGMOM
-                , double HAD1_mass, double HAD2_mass ) {
-      
-      func_name = "set_pot_Rcorr_NBS/mass";
-      analysis::route(class_name, func_name, 1);
-      
-      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
-      
-      channel      = ch;
-      hadron1      = channel.hadron1;
-      hadron2      = channel.hadron2;
-      time_slice   = it;
-      spin         = SPIN;
-      spin_z       = SPIN_z;
-      ang_mom      = ANGMOM;
-      endian_flg   = endian_FLG;
-      compress_flg = compress_FLG;
-      reduced_mass = HAD1_mass*HAD2_mass / (HAD1_mass+HAD2_mass);
-      
-      input_pot(HAD1_mass, HAD2_mass);
-      func_name = "set_pot_Rcorr_NBS/mass";
-      analysis::route(class_name, func_name, 0);
-   }
-   
-   void delete_pot() {
-      
-      func_name = "delete_pot____________";
-      analysis::route(class_name, func_name, 1);
-      
-      if (Rcorr != NULL) {
-         delete [] Rcorr;
-         Rcorr = NULL;
-      }
-      if (corr1 != NULL) {
-         delete [] corr1;
-         delete [] corr2;
-         corr1 = NULL;
-         corr2 = NULL;
+      if (potential == NULL) {
+         size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+         potential = new cdouble[xyzSIZE];
       }
       analysis::route(class_name, func_name, 0);
    }
-   
-   void delete_pot_corr() {
+   void set(R_CORRELATOR &K_Rcorr, R_CORRELATOR &Rcorr) {
       
-      func_name = "delete_pot_corr_______";
+      func_name = "set_pot_K_R_/_R_______";
       analysis::route(class_name, func_name, 1);
       
-      if (corr1 != NULL) {
-         delete [] corr1;
-         delete [] corr2;
-         corr1 = NULL;
-         corr2 = NULL;
+      mem_alloc();
+      input(K_Rcorr, Rcorr);
+      
+      func_name = "set_pot_K_R_/_R_______";
+      analysis::route(class_name, func_name, 0);
+   }
+   void set(R_CORRELATOR &Rcorr) {
+      
+      func_name = "set_pot_R_____________";
+      analysis::route(class_name, func_name, 1);
+      
+      mem_alloc();
+      input(Rcorr);
+      
+      func_name = "set_pot_R_____________";
+      analysis::route(class_name, func_name, 0);
+   }
+   void mem_del() {
+      
+      func_name = "mem_delete_pot________";
+      analysis::route(class_name, func_name, 1);
+      
+      if (potential != NULL) {
+         delete [] potential;
+         potential = NULL;
       }
       analysis::route(class_name, func_name, 0);
    }
@@ -180,19 +135,14 @@ public:
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   void calc_laplacian();
-   void calc_1st_timediff();
-   void calc_2nd_timediff();
-   void calc_pot_kernel();
-   void input_pot();
-   void input_pot( double, double );
-   void set_pot_from_binary( const char* );
-   void output_pot_all( const char* );
-   void output_pot_err( const char*, bool );
-   void output_pot_fit( const char* );
-   void output_couple_pot_all( const char* );
-   void output_couple_pot_err( const char*, bool );
-   void output_couple_pot_fit( const char* );
+   int          info_class()    { return CLASS_POTENTIAL; }
+   size_t       info_data_size(){
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   }
+   
+   void input( R_CORRELATOR&, R_CORRELATOR& );
+   void input( R_CORRELATOR& );
+   void set_from_binary( const char* );
 };
 
 #endif

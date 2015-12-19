@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Header File for definition of fit function type
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 14:16:34 JST 2015
+ * @since   Thu Sep  3 02:43:09 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -74,16 +74,16 @@ public:
       }
       else if (func_name == "2G" || func_name == "4") {
          name         = "two gaussians";
-         gnuplot_form = "%lf*exp(-(x/(%lf))**2)"
-                        "+(%lf)*exp(-(x/(%lf))**2)";
+         gnuplot_form  = "%lf*exp(-(x/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-(x/(%lf))**2)";
          number       = 4;
          Nparam       = 4;
       }
       else if (func_name == "3G" || func_name == "5") {
          name         = "three gaussians";
-         gnuplot_form = "%lf*exp(-(x/(%lf))**2)"
-                        "+(%lf)*exp(-(x/(%lf))**2)"
-                        "+(%lf)*exp(-(x/(%lf))**2)";
+         gnuplot_form  = "%lf*exp(-(x/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-(x/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-(x/(%lf))**2)";
          number       = 5;
          Nparam       = 6;
       }
@@ -95,8 +95,8 @@ public:
       }
       else if (func_name == "2SG" || func_name == "7") {
          name         = "two x-shifted gaussians";
-         gnuplot_form = "%lf*exp(-((x-(%lf))/(%lf))**2)"
-                        "+(%lf)*exp(-((x-(%lf))/(%lf))**2)";
+         gnuplot_form  = "%lf*exp(-((x-(%lf))/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-((x-(%lf))/(%lf))**2)";
          number       = 7;
          Nparam       = 6;
       }

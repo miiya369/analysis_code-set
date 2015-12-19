@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Main part for fitting analysis
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 12:47:13 JST 2015
+ * @since   Mon Sep  7 17:32:01 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -17,10 +17,9 @@ int  analysis::xSIZE;
 int  analysis::ySIZE;
 int  analysis::zSIZE;
 int  analysis::tSIZE;
-char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 int     n_param;
-double* param_initial;
+double* param_initial = NULL;
 double  stp_cnd;
 string  fit_func_name;
 int     fit_range_min;
@@ -40,18 +39,64 @@ int main(int argc, char **argv) {
    time_t start_time, end_time;
    time( &start_time );
    
-   FIT *fit = new FIT;
+   int  Ndata;
+   FIT *tmp = new FIT;
+   tmp->set_func( fit_func_name.c_str(), param_initial );
+   tmp->print_func_gnu();
    
-   fit->input_data    ( infile_path );
-   fit->set_func      ( fit_func_name.c_str(), param_initial, n_param );
-   fit->print_func_gnu( true );
-   fit->fit_data_NR   ( fit_range_min, fit_range_max, stp_cnd );
-   fit->print_param   ( );
-   fit->print_func_gnu( false );
-   fit->output_param  ( outfile_path );
+   fitting::input_data_binary( infile_path, analysis::Nconf, Ndata );
+   
+   double *data_all = new double[Ndata * analysis::Nconf];
+   double *cood     = new double[Ndata];
+   double *err      = new double[Ndata];
+   
+   fitting::input_data_binary( infile_path, cood, data_all, err );
+   
+   CONFIG<FIT> *fit   = new CONFIG<FIT>;
+   double      *chisq = new double[analysis::Nconf];
+   double      *param = new double[analysis::Nconf * n_param];
+   
+//#pragma omp parallel for
+   for (int conf=0; conf<analysis::Nconf; conf++) {
+      
+      double *data = new double[Ndata];
+      for (int loop=0; loop<Ndata; loop++)
+         data[loop] = data_all[conf+analysis::Nconf*loop];
+      
+      (*fit)(conf).set_func( fit_func_name.c_str(), param_initial );
+      chisq[conf] = (*fit)(conf).fit_data_NR( cood, data, err, Ndata, 0.000001 );
+      
+      for (int loop=0; loop<n_param; loop++)
+         param[conf+analysis::Nconf*loop] = (*fit)(conf)(loop);
+      
+      delete [] data;
+      
+   } // conf
+   
+   double param_mean, param_err, chisq_mean, chisq_err;
+   analysis::make_mean_err( chisq, chisq_mean, chisq_err, false );
+   printf(" @ Finished fitting : chisq/dof = %lf +/- %lf\n",chisq_mean,chisq_err);
+   
+   for (int loop=0; loop<n_param; loop++) {
+      analysis::make_mean_err(  &param[analysis::Nconf*loop]
+                              , param_mean, param_err, false );
+      printf(" @                  : param[%1d]  = %lf +/- %lf\n"
+             , loop, param_mean, param_err);
+      
+      (*tmp)(loop) = param_mean;
+   }
+   tmp->print_param();
+   tmp->print_func_gnu();
    
    delete [] param_initial;
+   delete [] data_all;
+   delete [] cood;
+   delete [] err;
+   
+   fitting::output_param( *fit, outfile_path );
+   
    delete fit;
+   delete tmp;
    
    time( &end_time );
    printf("\n @ JOB END : ELAPSED TIME [s] = %d\n\n"
@@ -102,6 +147,7 @@ int set_args(int argc, char** argv) {
                count_tmp++;
             } while (strcmp(argv[loop+count_tmp],"@") != 0);
             n_param = count_tmp-1;
+            if (param_initial != NULL) delete [] param_initial;
             param_initial = new double[n_param];
             for (int n=0; n<n_param; n++){
                loop++;

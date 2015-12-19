@@ -12,7 +12,7 @@
 
 void analysis::route( string class_name, string func_name, int io ) {
    
-//   return;   // for no debug.
+   return;   // for no debug.
    
    time_t timer;
    time(&timer);

@@ -4,11 +4,13 @@
  * @ingroup All
  * @brief   Setting path of the gauge confs.
  * @author  Takaya Miyamoto
- * @since   Mon Jul 20 09:21:34 JST 2015
+ * @since   Mon Sep  7 03:01:31 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <common/analysis.h>
+
+char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 string analysis::set_path( int num_conf ) {
    
@@ -41,7 +43,7 @@ string analysis::set_path( int num_conf ) {
             "%s/%s/%s/%s+%03d.%03d.%03d.%03d.%s%s",
             data_list[MAIN_PATH], dir_name
             , data_list[num_conf+MAX_PATH_ARG]
-            , header, x_shift, y_shift, z_shift, t_shift
+            , header, t_shift, x_shift, y_shift, z_shift
             , data_list[num_conf+MAX_PATH_ARG], footer );
    
    string FILE_NAME( file_name );

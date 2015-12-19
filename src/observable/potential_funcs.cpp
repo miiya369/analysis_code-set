@@ -1,80 +1,79 @@
 //--------------------------------------------------------------------------
 /**
  * @file
- * @ingroup phase shift
+ * @ingroup observable
  * @brief   Definition for potentail using calculate schrodinger equation
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 15:00:00 JST 2015
+ * @since   Fri Sep  4 04:20:49 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <observable/phase_shift.h>
 
-double PHASE_SHIFT::V( double rr, int conf ) {
+double observable::V( double x, double* param, int Nparam, int func_num ) {
    
-   double x = rr / lattice_space;
    double v = 0.0;
    
-        if( func_type.number == 1 )   v = func_const (x,conf);
-   else if( func_type.number == 2 )   v = func_exp   (x,conf);
-   else if( func_type.number == 3 ||
-            func_type.number == 4 ||
-            func_type.number == 5 )   v = func_gauss (x,conf);
-   else if( func_type.number == 6 ||
-            func_type.number == 7 )   v = func_sgauss(x,conf);
-   else if( func_type.number == 0 )   v = func_test  (x);
+        if( func_num == 1 )   v = func_const (x, param, Nparam);
+   else if( func_num == 2 )   v = func_exp   (x, param, Nparam);
+   else if( func_num == 3 ||
+            func_num == 4 ||
+            func_num == 5 )   v = func_gauss (x, param, Nparam);
+   else if( func_num == 6 ||
+            func_num == 7 )   v = func_sgauss(x, param, Nparam);
+   else if( func_num == 0 )   v = func_test  (x, param, Nparam);
    
-   return v*hbar_c/lattice_space;
+   return v;
 }
 
-double PHASE_SHIFT::func_const( double x, int conf ) {
+double observable::func_const( double x, double* param, int Nparam ) {
    
-   return param[idx(conf,0)];
+   return param[0];
 }
 
-double PHASE_SHIFT::func_exp( double x, int conf ) {
+double observable::func_exp( double x, double* param, int Nparam ) {
    
    double ex;
    double y=0.0;
    
-   for (int i=0; i<func_type.Nparam-1; i+=2) {
-      ex = exp(-param[idx(conf,i+1)]*x);
-      y += param[idx(conf,i)]*ex;
+   for (int i=0; i<Nparam; i+=2) {
+      ex = exp(-param[i+1]*x);
+      y += param[i]*ex;
    }
    return y;
 }
 
-double PHASE_SHIFT::func_gauss( double x, int conf ) {
+double observable::func_gauss( double x, double* param, int Nparam ) {
    
    double ex,arg;
    double y=0.0;
    
-   for(int i=0; i<func_type.Nparam-1; i+=2) {
-      arg= x/param[idx(conf,i+1)];
+   for(int i=0; i<Nparam; i+=2) {
+      arg= x/param[i+1];
       ex = exp(-(arg*arg));
-      y += param[idx(conf,i)]*ex;
+      y += param[i]*ex;
    }
    return y;
 }
 
-double PHASE_SHIFT::func_sgauss( double x, int conf ) {
+double observable::func_sgauss( double x, double* param, int Nparam ) {
    
    double ex,arg;
    double y=0.0;
    
-   for(int i=0; i<func_type.Nparam-1; i+=3) {
-      arg= (x-param[idx(conf,i+1)])/param[idx(conf,i+2)];
+   for(int i=0; i<Nparam; i+=3) {
+      arg= (x-param[i+1])/param[i+2];
       ex = exp(-(arg*arg));
-      y += param[idx(conf,i)]*ex;
+      y += param[i]*ex;
    }
    return y;
 }
 
-double PHASE_SHIFT::func_test( double x ) {
+double observable::func_test( double x, double* param, int Nparam ) {
    
    double y=0.0;
    
-   if (x <= test_r_0) y=test_V_0/hbar_c;
+   if (x <= param[0]) y=-param[1] / 197.327053;
    
    return y;
 }

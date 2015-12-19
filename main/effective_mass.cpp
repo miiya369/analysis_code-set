@@ -1,10 +1,10 @@
 //--------------------------------------------------------------------------
 /**
  * @file
- * @ingroup potential
+ * @ingroup correlator
  * @brief   Main part for effective mass calculation
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 13:32:48 JST 2015
+ * @since   Mon Sep  7 17:31:47 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@ int  analysis::xSIZE;
 int  analysis::ySIZE;
 int  analysis::zSIZE;
 int  analysis::tSIZE;
-char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 int          Nhad;
 HADRON_TYPE *hadron_type = NULL;
@@ -42,40 +41,67 @@ int main(int argc, char **argv) {
    time_t start_time, end_time;
    time( &start_time );
 
-   CORRELATOR *hadron = new CORRELATOR;
-   FIT        *fit    = new FIT;
+   CONFIG<CORRELATOR> *Corr     = new CONFIG<CORRELATOR>;
+   CONFIG<CORRELATOR> *eff_mass = new CONFIG<CORRELATOR>;
+   CONFIG<FIT>        *fit      = new CONFIG<FIT>;
    
-   char    fit_data_name[MAX_LEN_PATH];
+   char    outfile_name[1024];
    double  param_ini[2] = { 0.001, 1.0 };   // <- init. value of effmass fit
-   double *eff_mass     = new double[Nhad*4];
+   double *data         = new double[analysis::tSIZE];
+   double *cood         = new double[analysis::tSIZE];
+   double *err          = new double[analysis::tSIZE];
+   double *chisq        = new double[analysis::Nconf];
+   double *param        = new double[analysis::Nconf];
+   double *mass         = new double[Nhad*4];
+   
+   for (int it=0; it<analysis::tSIZE; it++) cood[it] = it;
    
    for (int loop=0; loop<Nhad; loop++) {
       
-      hadron->set_corr           ( hadron_type[loop] );
-      hadron->make_JK_sample_corr( 1 );
-      hadron->output_effmass_err ( outfile_path );
+      for (int conf=0; conf<analysis::Nconf; conf++)
+         (*Corr)(conf).set( hadron_type[loop], conf, "PS" );
+      
+      Corr->make_JK_sample();
+      
+      for (int conf=0; conf<analysis::Nconf; conf++) {
+         (*eff_mass)(conf).mem_alloc();
+         for (int it=0; it<analysis::tSIZE-1; it++)
+            (*eff_mass)(conf)(it) = -log(  (*Corr)(conf)(it+1)
+                                         / (*Corr)(conf)(it) );
+      }
+      snprintf(  outfile_name, sizeof(outfile_name)
+               , "%s/%s_effmass_err"
+               , outfile_path, hadron_type[loop].name.c_str() );
+      
+      analysis::output_data_err( *eff_mass, outfile_name );
       
       if (calc_flg_fit) {
-         hadron->output_corr_fit( "./tmp" );
-         snprintf(  fit_data_name, sizeof(fit_data_name)
-                  , "./tmp/%s_corr_fitdata"
-                  , hadron_type[loop].name.c_str() );
-         
-         fit->input_data ( fit_data_name );
-         fit->set_func   ( "1EXP", param_ini, 2 );
-         fit->fit_data_NR( fit_range_min, fit_range_max, 0.000001 );
-         
-         eff_mass[0+4*loop] = fit->param_mean[1];
-         eff_mass[1+4*loop] = fit->param_err[1];
-         eff_mass[2+4*loop] = fit->chisq_mean;
-         eff_mass[3+4*loop] = fit->chisq_err;
-         fit->reset_func();
-         fit->delete_data();
+         Corr->make_mean_err( data, err, true );
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            for (int it=0; it<analysis::tSIZE; it++)
+               data[it] = (*Corr)(conf)(it).real();
+            
+            (*fit)(conf).set_func( "1EXP", param_ini );
+            chisq[conf] =
+             (*fit)(conf).fit_data_NR(  cood, data, err
+                                      , fit_range_min, fit_range_max, 0.000001 );
+            param[conf] = (*fit)(conf)(1);
+         }
+         analysis::make_mean_err( param, mass[0+4*loop], mass[1+4*loop], true  );
+         analysis::make_mean_err( chisq, mass[2+4*loop], mass[3+4*loop], false );
       }
-      hadron->delete_corr();
-   }
+      
+   } // Nhad
+   
+   delete [] data;
+   delete [] cood;
+   delete [] err;
+   delete [] chisq;
+   delete [] param;
+
    delete fit;
-   delete hadron;
+   delete Corr;
+   delete eff_mass;
    
    if (calc_flg_fit) {
       printf("\n @ =================================================== @\n");
@@ -86,14 +112,14 @@ int main(int argc, char **argv) {
                 "           : [   MeV/c2   ] %lf +/- %lf\n"
                 "           : [ chisq/conf ] %lf +/- %lf\n\n"
                 , hadron_type[loop].name_only.c_str()
-                , eff_mass[0+4*loop], eff_mass[1+4*loop]
-                , eff_mass[0+4*loop]*197.327/lat_space
-                , eff_mass[1+4*loop]*197.327/lat_space
-                , eff_mass[2+4*loop], eff_mass[3+4*loop] );
+                , mass[0+4*loop], mass[1+4*loop]
+                , mass[0+4*loop]*197.327/lat_space
+                , mass[1+4*loop]*197.327/lat_space
+                , mass[2+4*loop], mass[3+4*loop] );
       printf(" @ =================================================== @\n");
    }
    delete [] hadron_type;
-   delete [] eff_mass;
+   delete [] mass;
    
    time( &end_time );
    printf("\n @ JOB END : ELAPSED TIME [s] = %d\n\n"

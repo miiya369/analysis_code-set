@@ -4,14 +4,14 @@
  * @ingroup scattering length
  * @brief   Header file for scattering length class
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 18:02:30 JST 2015
+ * @since   Fri Sep  4 00:04:33 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #ifndef SCATTERNG_LENGTH_H
 #define SCATTERNG_LENGTH_H
 
-#include <common/analysis.h>
+#include <observable/observable_base.h>
 
 //--------------------------------------------------------------------------
 /**
@@ -23,32 +23,20 @@ class SCATTERING_LENGTH {
 private:
    string class_name, func_name;
    
-   int    E_min, E_max;
-   double mass;
-   double hbar_c;
-   
-   double *phase_shift;
+   int     data_size;
+   double *scatt_length;
+   double *energy;
    
 protected:
    
 public:
-   double *scatt_length;
 //============================ For inner index ===========================//
-   int idx( int conf, int dat ) {
-      return conf + analysis::Nconf * dat;
-   }
+   
 //============================== For writing =============================//
-   double& operator()(int energy, int conf) {
-      return scatt_length[conf + analysis::Nconf * energy];
-   }
    double& operator()(size_t index) {
       return scatt_length[index];
    }
 //============================== For reading =============================//
-   const double& operator()(int energy, int conf) const {
-      return scatt_length[conf + analysis::Nconf * energy];
-   }
-   
    const double& operator()(size_t index) const {
       return scatt_length[index];
    }
@@ -58,30 +46,89 @@ public:
       func_name = "______________________";
       analysis::route( class_name, func_name, 1 );
       
-      hbar_c = 197.327;   // MeV*fm
-      
-      phase_shift  = NULL;
       scatt_length = NULL;
+      energy       = NULL;
    }
-   
+   SCATTERING_LENGTH(double E_min, double E_max, double E_dev) {
+      class_name = "SCATTERNG_LENGTH________________";
+      func_name = "______________________";
+      analysis::route( class_name, func_name, 1 );
+      
+      scatt_length = NULL;
+      energy       = NULL;
+      
+      mem_alloc(E_min, E_max, E_dev);
+   }
+   SCATTERING_LENGTH(size_t dataSIZE) {
+      class_name = "SCATTERNG_LENGTH________________";
+      func_name = "______________________";
+      analysis::route( class_name, func_name, 1 );
+      
+      scatt_length = NULL;
+      energy       = NULL;
+      
+      mem_alloc(dataSIZE);
+   }
    ~SCATTERING_LENGTH() {
-      if (phase_shift  != NULL) delete [] phase_shift;
       if (scatt_length != NULL) delete [] scatt_length;
+      if (energy       != NULL) delete [] energy;
       
       func_name = "______________________";
       analysis::route( class_name, func_name, 0 );
    }
 //============================= For initialize ===========================//
-   void delete_scatt_length() {
+   void mem_alloc(double E_min, double E_max, double E_dev) {
       
-      func_name = "delete_scatt_length___";
+      func_name = "mem_alloc_scatt_length";
+      analysis::route( class_name, func_name, 1 );
+      
+      int count = 0;
+      for (double loop=E_min; loop<=E_max; loop+=E_dev) count++;
+      
+      data_size = count;
+      
+      if (scatt_length == NULL) scatt_length = new double[data_size];
+      if (energy       == NULL) energy       = new double[data_size];
+      
+      double tmp_E = E_min;
+      for (int loop=0; loop<data_size; loop++) {
+         energy[loop] = tmp_E;
+         tmp_E += E_dev;
+      }
+      analysis::route(class_name, func_name, 0);
+   }
+   void mem_alloc(size_t dataSIZE) {
+      
+      func_name = "mem_alloc_scatt_length";
+      analysis::route( class_name, func_name, 1 );
+      
+      data_size = dataSIZE;
+      
+      if (scatt_length == NULL) scatt_length = new double[data_size];
+      if (energy       == NULL) energy       = new double[data_size];
+      
+      analysis::route(class_name, func_name, 0);
+   }
+   void set_E(double iE, size_t index) {
+      
+      func_name = "set_energy____________";
       analysis::route(class_name, func_name, 1);
       
-      if (phase_shift  != NULL) {
-         delete [] phase_shift;    phase_shift  = NULL;
-      }
+      if (energy != NULL) energy[index] = iE;
+      else analysis::error(1,"Scatt length has not been alloc. memory yet !");
+      
+      analysis::route(class_name, func_name, 0);
+   }
+   void mem_del() {
+      
+      func_name = "mem_delete_scattlength";
+      analysis::route(class_name, func_name, 1);
+      
       if (scatt_length != NULL) {
-         delete [] scatt_length;   scatt_length = NULL;
+         delete [] scatt_length;   scatt_length  = NULL;
+      }
+      if (energy       != NULL) {
+         delete [] energy;         energy = NULL;
       }
       analysis::route(class_name, func_name, 0);
    }
@@ -90,11 +137,10 @@ public:
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   void input_phase_shift( const char* );
-   void input_phase_shift( double*, double, int, int );
-   void calc_scatt_len( );
-   void output_scatt_len_all( const char* );
-   void output_scatt_len_err( const char* );
+   int          info_class()     { return CLASS_SCATTERING_LENGTH; }
+   size_t       info_data_size() { return data_size; }
+   
+   double E(size_t index){ return energy[index]; }
 };
 
 #endif

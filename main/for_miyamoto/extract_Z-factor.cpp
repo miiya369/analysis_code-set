@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for extract Z-factor from PS and SS correlator
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 21:57:51 JST 2015
+ * @since   Mon Sep  7 17:33:17 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -17,7 +17,6 @@ int  analysis::xSIZE;
 int  analysis::ySIZE;
 int  analysis::zSIZE;
 int  analysis::tSIZE;
-char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 int          Nhad;
 HADRON_TYPE *hadron_type = NULL;
@@ -36,16 +35,16 @@ int main(int argc, char **argv) {
    time_t start_time, end_time;
    time( &start_time );
    
-   CORRELATOR *hadron = new CORRELATOR;
-   
-   for (int loop=0; loop<Nhad; loop++) {
-      
-      hadron->set_corr( hadron_type[loop] );
-      hadron->calc_z_factor();
-      hadron->output_z_factor_err( outfile_path );
-      hadron->delete_corr();
-   }
-   delete hadron;
+//   CORRELATOR *hadron = new CORRELATOR;
+//   
+//   for (int loop=0; loop<Nhad; loop++) {
+//      
+//      hadron->set_corr( hadron_type[loop] );
+//      hadron->calc_z_factor();
+//      hadron->output_z_factor_err( outfile_path );
+//      hadron->delete_corr();
+//   }
+//   delete hadron;
    
    time( &end_time );
    printf("\n @ JOB END : ELAPSED TIME [s] = %d\n\n"

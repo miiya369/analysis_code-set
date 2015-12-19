@@ -4,7 +4,7 @@
  * @ingroup R-correlator
  * @brief   Header file for R-correlator class
  * @author  Takaya Miyamoto
- * @since   Wed Jul 29 02:09:59 JST 2015
+ * @since   Mon Aug 31 18:42:39 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -19,45 +19,61 @@
  * @brief The class for R-correlator
  */
 //--------------------------------------------------------------------------
-class R_CORRELATOR : public NBS_WAVE, public CORRELATOR {
+class R_CORRELATOR {
     
 private:
    string class_name, func_name;
    
-   HADRON_TYPE hadron1;
-   HADRON_TYPE hadron2;
+   cdouble *Rcorr;
    
 protected:
    
 public:
-   cdouble *Rcorr;
 //============================ For inner index ===========================//
-
+   size_t idx(int x,int y,int z) {
+      return x + analysis::xSIZE *( y + analysis::ySIZE * z );
+   }
 //============================== For writing =============================//
-   cdouble& operator()(int x, int y, int z, int conf) {
-      return Rcorr[   x + analysis::xSIZE
-                   *( y + analysis::ySIZE
-                   *( z + analysis::zSIZE * conf ))];
+   cdouble& operator()(int x, int y, int z) {
+      return Rcorr[ x + analysis::xSIZE *( y + analysis::ySIZE * z ) ];
    }
    cdouble& operator()(size_t index) {
       return Rcorr[index];
    }
 //============================== For reading =============================//
-   const cdouble& operator()(int x, int y, int z, int conf) const {
-      return Rcorr[   x + analysis::xSIZE
-                   *( y + analysis::ySIZE
-                   *( z + analysis::zSIZE * conf ))];
+   const cdouble& operator()(int x, int y, int z) const {
+      return Rcorr[ x + analysis::xSIZE *( y + analysis::ySIZE * z ) ];
    }
    const cdouble& operator()(size_t index) const {
       return Rcorr[index];
    }
 //======================== Constructor & Destructor ======================//
    R_CORRELATOR() {
-      class_name = "R_CORRELATOR:CORRELATOR,NBS_WAVE";
+      class_name = "R_CORRELATOR____________________";
+      func_name = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      Rcorr      = NULL;
+   }
+   R_CORRELATOR(  NBS_WAVE &nbs
+                , CORRELATOR &corr1, CORRELATOR &corr2, int time_slice ) {
+      class_name = "R_CORRELATOR____________________";
       func_name = "______________________";
       analysis::route(class_name, func_name, 1);
       
       Rcorr = NULL;
+      
+      set( nbs, corr1, corr2, time_slice );
+   }
+   R_CORRELATOR(  NBS_WAVE &nbs
+                , double HAD1_mass, double HAD2_mass, int time_slice ) {
+      class_name = "R_CORRELATOR____________________";
+      func_name = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      Rcorr = NULL;
+      
+      set( nbs, HAD1_mass, HAD2_mass, time_slice );
    }
    ~R_CORRELATOR() {
       if (Rcorr != NULL) delete [] Rcorr;
@@ -66,86 +82,43 @@ public:
       analysis::route(class_name, func_name, 0);
    }
 //============================= For initialize ===========================//
-   void set_Rcorr(  CHANNEL_TYPE ch, int it, bool endian_FLG
-                  , int SPIN, int SPIN_z, int ANG_MOM, bool compress_FLG ) {
+   void mem_alloc() {
       
-      func_name = "set_Rcorr_NBS/readcorr";
-      analysis::route(class_name, func_name, 1);
+      func_name = "mem_alloc_Rcorr_______";
+      analysis::route( class_name, func_name, 1 );
       
-      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
-      
-      channel      = ch;
-      hadron1      = channel.hadron1;
-      hadron2      = channel.hadron2;
-      time_slice   = it;
-      endian_flg   = endian_FLG;
-      compress_flg = compress_FLG;
-      spin         = SPIN;
-      spin_z       = SPIN_z;
-      ang_mom      = ANG_MOM;
-      if (spin == 0) spin_z = 0;
-      
-      input_Rcorr();
-      func_name = "set_Rcorr_NBS/readcorr";
+      if (Rcorr == NULL) {
+         size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+         Rcorr = new cdouble[xyzSIZE];
+      }
       analysis::route(class_name, func_name, 0);
    }
-   
-   void set_Rcorr(  CHANNEL_TYPE ch,int it,bool endian_FLG,int SPIN, int SPIN_z
-                  , int ANG_MOM, cdouble *corr1, cdouble *corr2
-                  , bool compress_FLG ) {
+   void set(  NBS_WAVE &nbs
+            , CORRELATOR &corr1, CORRELATOR &corr2, int time_slice ) {
       
       func_name = "set_Rcorr_NBS/corr____";
       analysis::route(class_name, func_name, 1);
       
-      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
+      mem_alloc();
+      input(nbs, corr1, corr2, time_slice);
       
-      channel      = ch;
-      hadron1      = channel.hadron1;
-      hadron2      = channel.hadron2;
-      time_slice   = it;
-      endian_flg   = endian_FLG;
-      compress_flg = compress_FLG;
-      spin         = SPIN;
-      spin_z       = SPIN_z;
-      ang_mom      = ANG_MOM;
-      if (spin == 0) spin_z = 0;
-      
-      input_Rcorr( corr1, corr2 );
       func_name = "set_Rcorr_NBS/corr____";
       analysis::route(class_name, func_name, 0);
    }
-   
-   void set_Rcorr(  CHANNEL_TYPE ch,int it,bool endian_FLG, int SPIN, int SPIN_z
-                  , int ANG_MOM, double HAD1_mass, double HAD2_mass
-                  , bool compress_FLG ) {
+   void set( NBS_WAVE &nbs, double HAD1_mass, double HAD2_mass, int time_slice ) {
       
       func_name = "set_Rcorr_NBS/mass____";
       analysis::route(class_name, func_name, 1);
       
-      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
+      mem_alloc();
+      input(nbs, HAD1_mass, HAD2_mass, time_slice);
       
-      channel      = ch;
-      hadron1      = channel.hadron1;
-      hadron2      = channel.hadron2;
-      time_slice   = it;
-      endian_flg   = endian_FLG;
-      compress_flg = compress_FLG;
-      spin         = SPIN;
-      spin_z       = SPIN_z;
-      ang_mom      = ANG_MOM;
-      if (spin == 0) spin_z = 0;
-      
-      input_Rcorr( HAD1_mass, HAD2_mass );
       func_name = "set_Rcorr_NBS/mass____";
       analysis::route(class_name, func_name, 0);
    }
-   
-   void delete_Rcorr() {
+   void mem_del() {
       
-      func_name = "delete_Rcorr__________";
+      func_name = "mem_delete_Rcorr______";
       analysis::route(class_name, func_name, 1);
       
       if (Rcorr != NULL) {
@@ -158,13 +131,13 @@ public:
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   int  info_time(){ return time_slice; }
+   int          info_class()     { return CLASS_R_CORRELATOR; }
+   size_t       info_data_size() {
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   }
    
-   void input_Rcorr();
-   void input_Rcorr( cdouble*, cdouble* );
-   void input_Rcorr( double, double );
-   void output_Rcorr_all( const char* );
-   void output_Rcorr_err( const char*, bool );
+   void input( NBS_WAVE&, CORRELATOR&, CORRELATOR&, int );
+   void input( NBS_WAVE&, double, double, int );
 };
 
 #endif

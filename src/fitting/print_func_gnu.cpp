@@ -4,33 +4,23 @@
  * @ingroup fitting
  * @brief   Print the function with gnuplot-format
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 09:15:44 JST 2015
+ * @since   Wed Sep  2 23:18:04 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <fitting/fitting.h>
 
-void FIT::print_func_gnu( bool ini_flg ) {
+void FIT::print_func_gnu() {
    
    func_name = "print_func_gnu________";
    analysis::route(class_name, func_name, 1);
    
-   if (!new_flg_param) {
-      analysis::error(1,"Fit parameter has not set yet !");
+   if (param == NULL) {
+      analysis::error(1,"Fit function has not set yet !");
       analysis::route(class_name, func_name, 0);
       return;
    }
-   double* param = NULL;
-   
-   if (ini_flg) {
-      param = param_ini;
-      printf(" @ For gnuplot function ( Initial parameter )\n");
-   } else {
-      param = param_mean;
-      printf(" @ For gnuplot function ( Fitted parameter )\n");
-   }
-   
-   printf(" @ ");
+   printf(" @ For gnuplot function :\n @ ");
    
    if (     func_type.Nparam == 1)
       printf(func_type.gnuplot_form.c_str(), param[0]);
@@ -52,7 +42,7 @@ void FIT::print_func_gnu( bool ini_flg ) {
    else if (func_type.Nparam == 6)
       printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
                                            , param[3], param[4], param[5]);
-   
+      
    else if (func_type.Nparam == 7)
       printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
                                            , param[3], param[4]

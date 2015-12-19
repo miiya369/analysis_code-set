@@ -4,26 +4,22 @@
  * @ingroup fitting
  * @brief   Function for output parameter list file
  * @author  Takaya Miyamoto
- * @since   Thu Jul 23 14:24:38 JST 2015
+ * @since   Thu Sep  3 18:30:34 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <fitting/fitting.h>
 
-void FIT::output_param( const char* outFILE_name ) {
+void fitting::output_param( CONFIG<FIT> &data, const char* outFILE_name ) {
    
-   func_name = "input_data____________";
+   string class_name = "________________________________";
+   string func_name = "output_param__________";
    analysis::route(class_name, func_name, 1);
    
-   if (!fitting_flg) {
-      analysis::error(1,"Data fitting has not done yet !");
-      analysis::route(class_name, func_name, 0);
-      return;
-   }
    ofstream ofs(outFILE_name, ios::out | ios::binary);
    
-   int tmp_Nconf    = analysis::Nconf;
-   int tmp_func_num = func_type.number;
+   int tmp_Nconf    = data.info_conf();
+   int tmp_func_num = data(0).info_func_num();
    
    if (!analysis::machine_is_little_endian()) {
       analysis::endian_convert(&tmp_Nconf,    1);
@@ -33,10 +29,10 @@ void FIT::output_param( const char* outFILE_name ) {
    ofs.write( (char*)&tmp_func_num, sizeof(int) );
    
    double tmp;
-   for (   int loop=0; loop<func_type.Nparam; loop++)
-      for (int conf=0; conf<analysis::Nconf;  conf++) {
+   for (   size_t loop=0; loop<data(0).info_data_size(); loop++)
+      for (int    conf=0; conf<data.info_conf();         conf++) {
          
-         tmp = param_out[idx(conf,loop)];
+         tmp = data(conf)(loop);
          if (!analysis::machine_is_little_endian())
             analysis::endian_convert(&tmp, 1);
          ofs.write((char*)&tmp, sizeof(double));

@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Header file for NBS wave function
  * @author  Takaya Miyamoto
- * @since   Wed Jul 29 02:08:07 JST 2015
+ * @since   Thu Sep  3 01:25:46 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -19,16 +19,139 @@
  */
 //--------------------------------------------------------------------------
 namespace NBSwave {
-
-   extern size_t xyzSIZE;
-   extern size_t xyznSIZE;
    
-   int reduced_Ndata();
+   extern int  rot_matrix[384];
+   extern bool compress_init_flg;
+   
+   void rot_matrix_init();
 }
 
 //--------------------------------------------------------------------------
 /**
- * @brief The class for NBS wave function
+ * @brief The class for original NBS wave function
+ */
+//--------------------------------------------------------------------------
+class NBS_WAVE_ORG {
+   
+private:
+   string class_name, func_name;
+   
+   cdouble *wave_org;
+   
+protected:
+   
+public:
+//============================ For inner index ===========================//
+   size_t idx(int x,int y,int z,int a,int b) {
+      return    a + 4
+             *( x + analysis::xSIZE
+             *( y + analysis::ySIZE
+             *( z + analysis::zSIZE * b )));
+   }
+//============================== For writing =============================//
+   cdouble& operator()(int x,int y,int z, int a,int b) {
+      return wave_org[   a + 4
+                      *( x + analysis::xSIZE
+                      *( y + analysis::ySIZE
+                      *( z + analysis::zSIZE * b ))) ];
+   }
+   cdouble& operator()(int space,int a,int b) {
+      return wave_org[ a + 4
+            *( space + analysis::xSIZE*analysis::ySIZE*analysis::zSIZE * b ) ];
+   }
+   cdouble& operator()(size_t index) {
+      return wave_org[index];
+   }
+//============================== For reading =============================//
+   const cdouble& operator()(int x,int y,int z, int a,int b) const {
+      return wave_org[   a + 4
+                      *( x + analysis::xSIZE
+                      *( y + analysis::ySIZE
+                      *( z + analysis::zSIZE * b ))) ];
+   }
+   const cdouble& operator()(int space,int a,int b) const {
+      return wave_org[ a + 4
+            *( space + analysis::xSIZE*analysis::ySIZE*analysis::zSIZE * b ) ];
+   }
+   const cdouble& operator()(size_t index) const {
+      return wave_org[index];
+   }
+//======================== Constructor & Destructor ======================//
+   NBS_WAVE_ORG() {
+      class_name = "NBS_WAVE_ORG____________________";
+      func_name  = "______________________";
+      analysis::route(class_name, func_name, 1);
+
+      wave_org   = NULL;
+   }
+   NBS_WAVE_ORG(  CHANNEL_TYPE ch, int it, int iconf
+                , bool endian_FLG, bool compress_FLG ) {
+      class_name = "NBS_WAVE_ORG____________________";
+      func_name  = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      wave_org = NULL;
+      
+      set( ch, it, iconf, endian_FLG, compress_FLG );
+   }
+   ~NBS_WAVE_ORG() {
+      if (wave_org != NULL) delete [] wave_org;
+      
+      func_name = "______________________";
+      analysis::route( class_name, func_name, 0 );
+   }
+//============================= For initialize ===========================//
+   void mem_alloc() {
+      
+      func_name = "mem_alloc_NBS_ORG_____";
+      analysis::route( class_name, func_name, 1 );
+      
+      if (wave_org == NULL) {
+         size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+         wave_org       = new cdouble[xyzSIZE * 4 * 4];
+      }
+      analysis::route(class_name, func_name, 0);
+   }
+   void set(  CHANNEL_TYPE ch, int it, int iconf
+            , bool endian_FLG, bool compress_FLG ) {
+      
+      func_name = "set_NBS_ORG___________";
+      analysis::route( class_name, func_name, 1 );
+      
+      mem_alloc();
+      
+      if (compress_FLG) input_compressed(ch, it, iconf, endian_FLG);
+      else              input(ch, it, iconf, endian_FLG);
+      func_name = "set_NBS_ORG___________";
+      analysis::route(class_name, func_name, 0);
+   }
+   void mem_del() {
+      
+      func_name = "mem_delete_NBS_ORG____";
+      analysis::route(class_name, func_name, 1);
+      
+      if (wave_org != NULL) {
+         delete [] wave_org;   wave_org = NULL;
+      }
+      analysis::route( class_name, func_name, 0 );
+   }
+//============================ Operator define ===========================//
+   
+//============================ Operator helper ===========================//
+   
+//=========================== Several functions ==========================//
+   int          info_class()     { return CLASS_NBS_WAVE_ORG; }
+   size_t       info_data_size() {
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE * 4 * 4;
+   }
+   
+   void input( CHANNEL_TYPE, int, int, bool );
+   void input_compressed( CHANNEL_TYPE, int, int, bool );
+};
+
+//--------------------------------------------------------------------------
+/**
+ * @brief The class for spin projected NBS wave function
  */
 //--------------------------------------------------------------------------
 class NBS_WAVE {
@@ -36,45 +159,28 @@ class NBS_WAVE {
 private:
    string class_name, func_name;
    
-   int    rot_matrix[384];
+   cdouble *wave;
     
 protected:
-   bool endian_flg, compress_flg, compress_init_flg;
-   int  time_slice, spin, spin_z, ang_mom;
-   CHANNEL_TYPE channel;
-   
-   cdouble *wave;
     
 public:
 //============================ For inner index ===========================//
-   size_t idx(int x,int y,int z,int n) {
-      return    x + analysis::xSIZE
-             *( y + analysis::ySIZE
-             *( z + analysis::zSIZE * n ));
-   }
-   size_t NBSidx(int x,int y,int z,int a,int b) {
-      return    a + 4
-             *( x + analysis::xSIZE
-             *( y + analysis::ySIZE
-             *( z + analysis::zSIZE * b )));
+   size_t idx(int x,int y,int z) {
+      return x + analysis::xSIZE *( y + analysis::ySIZE * z );
    }
    int matrix_idx(int row, int column, int rot_type) {
       return column + 4 * ( row + 4 * rot_type );
    }   // rot_type = 0 -> E, 1~6 -> 6C4, 7~9 -> 3C2, 10~17 -> 8C3, 18~23 -> 6C2
 //============================== For writing =============================//
-   cdouble& operator()(int x, int y, int z, int conf) {
-      return wave[   x + analysis::xSIZE
-                     *( y + analysis::ySIZE
-                     *( z + analysis::zSIZE * conf ))];
+   cdouble& operator()(int x, int y, int z) {
+      return wave[ x + analysis::xSIZE *( y + analysis::ySIZE * z ) ];
    }
    cdouble& operator()(size_t index) {
       return wave[index];
    }
 //============================== For reading =============================//
-   const cdouble& operator()(int x, int y, int z, int conf) const {
-      return wave[   x + analysis::xSIZE
-                     *( y + analysis::ySIZE
-                     *( z + analysis::zSIZE * conf ))];
+   const cdouble& operator()(int x, int y, int z) const {
+      return wave[ x + analysis::xSIZE *( y + analysis::ySIZE * z ) ];
    }
    const cdouble& operator()(size_t index) const {
       return wave[index];
@@ -84,10 +190,17 @@ public:
       class_name = "NBS_WAVE________________________";
       func_name  = "______________________";
       analysis::route(class_name, func_name, 1);
-        
-      endian_flg        = false;
-      compress_init_flg = false;
-      wave              = NULL;
+      
+      wave       = NULL;
+   }
+   NBS_WAVE( NBS_WAVE_ORG &orgNBS, int SPIN, int SPIN_z ) {
+      class_name = "NBS_WAVE________________________";
+      func_name  = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      wave       = NULL;
+      
+      set( orgNBS, SPIN, SPIN_z );
    }
    ~NBS_WAVE() {
       if (wave != NULL) delete [] wave;
@@ -96,33 +209,31 @@ public:
       analysis::route( class_name, func_name, 0 );
    }
 //============================= For initialize ===========================//
-   void set_NBS(CHANNEL_TYPE ch, int it, bool endian_FLG
-                , int SPIN, int SPIN_z, int ANG_MOM, bool compress_FLG) {
-        
+   void mem_alloc() {
+      
+      func_name = "mem_alloc_NBS_________";
+      analysis::route( class_name, func_name, 1 );
+      
+      if (wave == NULL) {
+         size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+         wave = new cdouble[xyzSIZE];
+      }
+      analysis::route(class_name, func_name, 0);
+   }
+   void set( NBS_WAVE_ORG &orgNBS, int SPIN, int SPIN_z ) {
+      
       func_name = "set_NBS_______________";
       analysis::route( class_name, func_name, 1 );
       
-      NBSwave::xyzSIZE  = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-      NBSwave::xyznSIZE = NBSwave::xyzSIZE * analysis::Nconf;
+      mem_alloc();
+      spin_projection(orgNBS, SPIN, SPIN_z);
       
-      channel      = ch;
-      time_slice   = it;
-      endian_flg   = endian_FLG;
-      compress_flg = compress_FLG;
-      spin         = SPIN;
-      spin_z       = SPIN_z;
-      ang_mom      = ANG_MOM;
-      if (spin == 0) spin_z = 0;
-        
-      if (compress_flg) input_compressed_NBS();
-      else              input_NBS();
       func_name = "set_NBS_______________";
       analysis::route(class_name, func_name, 0);
    }
-    
-   void delete_NBS() {
+   void mem_del() {
       
-      func_name = "delete_NBS____________";
+      func_name = "mem_delete_NBS________";
       analysis::route(class_name, func_name, 1);
         
       if (wave != NULL) {
@@ -135,16 +246,15 @@ public:
 //============================ Operator helper ===========================//
     
 //=========================== Several functions ==========================//
-   void input_NBS();
-   void input_compressed_NBS();
-   void make_JK_sample_NBS( int );
-   void spin_projection( cdouble*, int );
-   void ang_mom_projection();
+   int          info_class()     { return CLASS_NBS_WAVE; }
+   size_t       info_data_size() {
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   }
+
+   void spin_projection( NBS_WAVE_ORG&, int, int );
+   void ang_mom_projection( int );
    void parity_projection();
-   void projection();
-   void set_rot_matrix();
-   void output_NBS_all( const char* );
-   void output_NBS_err( const char*, bool );
+   void projection( int );
 };
 
 #endif

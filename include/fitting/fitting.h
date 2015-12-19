@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Header file for fitting class
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 21:40:39 JST 2015
+ * @since   Thu Sep  3 18:29:53 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -16,6 +16,17 @@
 
 //--------------------------------------------------------------------------
 /**
+ * @brief The namespace for fitting
+ */
+//--------------------------------------------------------------------------
+namespace fitting {
+   
+   void input_data_binary( const char*, int&, int& );   // for header
+   void input_data_binary( const char*, double*, double*, double* );
+}
+
+//--------------------------------------------------------------------------
+/**
  * @brief The class for fitting
  */
 //--------------------------------------------------------------------------
@@ -24,100 +35,90 @@ class FIT {
 private:
    string class_name, func_name;
    
-   int fit_type;
-   int Ndata;
-   double *cood;
-   double *data;
-   double *err;
-   
-   FIT_FUNCTION func_type;
-   double *param_ini;
-   double *param_out;
-   
-   bool new_flg_data, new_flg_param, fitting_flg;
+   double       *param;
+   FIT_FUNCTION  func_type;
    
 protected:
     
 public:
-   double chisq_mean;
-   double chisq_err;
-   double *param_mean;
-   double *param_err;
 //============================ For inner index ===========================//
-   int idx( int conf, int dat ) {
-      return conf + analysis::Nconf * dat;
-   }
+   
 //============================== For writing =============================//
-   
+   double& operator()(size_t index) {
+      return param[index];
+   }
 //============================== For reading =============================//
-   
+   const double& operator()(size_t index) const {
+      return param[index];
+   }
 //======================== Constructor & Destructor ======================//
    FIT() {
       class_name = "FITTING_________________________";
       func_name = "______________________";
       analysis::route(class_name, func_name, 1);
       
-      new_flg_data  = false;
-      new_flg_param = false;
-      fitting_flg   = false;
+      param = NULL;
+   }
+   FIT( const char* FUNC_NAME, const double *PARAM ) {
+      class_name = "FITTING_________________________";
+      func_name = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      param = NULL;
+      set_func( FUNC_NAME, PARAM );
    }
    ~FIT() {
-      if (new_flg_data) {
-         delete [] cood;
-         delete [] data;
-         delete [] err;
-      }
-      if (new_flg_param) {
-         delete [] param_ini;
-         delete [] param_out;
-         delete [] param_err;
-         delete [] param_mean;
-      }
+      if (param != NULL) delete [] param;
+      
       func_name = "______________________";
       analysis::route(class_name, func_name, 0);
    }
 //============================= For initialize ===========================//
-   void delete_data() {
+   void set_func( const char* FUNC_NAME, const double *PARAM ) {
       
-      func_name = "delete_data___________";
+      func_name = "set_func______________";
       analysis::route(class_name, func_name, 1);
       
-      if (new_flg_data) {
-         delete [] cood;
-         delete [] data;
-         delete [] err;
-         new_flg_data = false;
-         fitting_flg  = false;
-      }
+      func_type.set(FUNC_NAME);
+      
+      if (param != NULL) delete [] param;
+      param = new double[func_type.Nparam];
+      
+//      printf(" @ fit function = %s\n", func_type.name.c_str());
+      
+      for (int loop=0; loop<func_type.Nparam; loop++)
+         param[loop] = PARAM[loop];
+      
       analysis::route(class_name, func_name, 0);
    }
-   
-   void reset_func() {
+   void mem_del() {
       
-      func_name = "reset_func____________";
+      func_name = "mem_delete_FIT________";
       analysis::route(class_name, func_name, 1);
       
-      if (new_flg_param) {
-         delete [] param_ini;
-         delete [] param_out;
-         delete [] param_err;
-         delete [] param_mean;
-         new_flg_param = false;
-         fitting_flg   = false;
+      if (param != NULL) {
+         delete [] param;   param = NULL;
       }
-      analysis::route(class_name, func_name, 0);
+      analysis::route( class_name, func_name, 0 );
    }
 //============================ Operator define ===========================//
    
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   void input_data     ( const char* );
-   void set_func       ( const char*, double*, int );
-   void fit_data_NR    ( int, int, double );
-   void print_func_gnu ( bool );
-   void print_param    ();
-   void output_param   ( const char* );
+   int          info_class()     { return CLASS_FITTING; }
+   int          info_func_num()  { return func_type.number; }
+   size_t       info_data_size() { return func_type.Nparam; }
+   
+   void   print_func_gnu ();
+   void   print_param    ();
+   double fit_data_NR    ( double*, double*, double*, int, int, double );
+   double fit_data_NR    ( double*, double*, double*, int, double );
 };
+
+namespace fitting {
+   
+   void output_param( CONFIG<FIT>&, const char* );
+}
 
 #endif

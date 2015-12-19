@@ -1,6 +1,6 @@
 
 #  Make file of the Analysis code set
-# Since : Tue Aug 25 16:55:07 JST 2015
+# Since : Mon Sep  7 17:40:05 JST 2015
 
 # You may change this for your environment
 
@@ -35,8 +35,8 @@ FIT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_FIT:.cpp=.o)))
 OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
 yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
-TERGETS	    = mas pot fit obs 
-FOR_MIYA    = ccp zfac iso red gfix
+TERGETS	    = mas wave pot fit obs 
+FOR_MIYA    = ccp gfix zfac red ave
 
 ### SRCDIR と MAINDIR 以下の全ての .cpp ファイルの依存関係を探す ###
 vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto
@@ -48,6 +48,9 @@ all: $(TERGETS)
 mas: $(OBJDIR)/effective_mass.o $(COMMON) $(CORR) $(FIT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+wave: $(OBJDIR)/wave_function.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 pot: $(OBJDIR)/potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
@@ -55,9 +58,6 @@ fit: $(OBJDIR)/fitting.o $(COMMON) $(FIT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 obs: $(OBJDIR)/observable.o $(COMMON) $(OBS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
-iso: $(OBJDIR)/isospin_proj.o $(COMMON)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 ccp: $(OBJDIR)/coupled_channel_potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
@@ -70,6 +70,9 @@ red: $(OBJDIR)/data_reduction_check.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 gfix: $(OBJDIR)/check_coulomb_gfix.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+ave: $(OBJDIR)/average_compress.o $(COMMON) $(yukawa)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(OBJDIR)/%.o: %.cpp
@@ -86,7 +89,7 @@ clean:
 
 ###### FOR TEST ######
 .PHONY: test
-test: $(OBJDIR)/test.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+test: $(OBJDIR)/test.o $(COMMON) $(NBS) $(yukawa)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 .PHONY: ALL

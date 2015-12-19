@@ -72,10 +72,9 @@
 
  OpenMP は、特に計算に時間がかかる以下の部分にのみ
  用いています。
- * src/NBSwave/projection.cpp の
-	ang_mom_projection()
- * src/NBSwave/make_jack_knife_NBS.cpp の
-	make_JK_sample_NBS()
+
+ * include/common/make_jack_knife_sample.h の
+	make_JK_sample()
  * src/observable/calc_phase_shift.cpp の
 	calc_phase_shift()
 

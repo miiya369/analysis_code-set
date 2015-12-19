@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Common header file for all class of Analysis Code set
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 03:48:15 JST 2015
+ * @since   Mon Sep  7 02:31:08 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@
 #define ANALYSIS_H
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <fstream>
 #include <stdlib.h>
 #include <string>
@@ -26,9 +27,10 @@
 using namespace std;
 
 #define PI (4.0*atan(1))   // Definition for analysis code set
-#define MAX_N_ARG    64
-#define MAX_N_DATA   1024
-#define MAX_LEN_PATH 256
+#define MAX_N_CH_NAME 32
+#define MAX_N_ARG     64
+#define MAX_N_DATA    1024
+#define MAX_LEN_PATH  256
 
 typedef complex<int> cint;
 typedef complex<double> cdouble;
@@ -62,6 +64,7 @@ namespace analysis {
    //! Wrapper of above 2 functions
    int  set_data_list(  const char*, const char*, const char*, const char*
                       , const char*, const char*, const char*, const char* );
+   void set_data_list(  int, const char*, ... );
    //! Set the path of data file
    string set_path( int );
    
@@ -79,14 +82,30 @@ namespace analysis {
    //! Convert index xyzn -> x,y,z,conf
    void convert_xyzn(int *ix, int *iy, int *iz, int *conf, size_t xyzn);
    
+   int  reduced_Ndata();
+   
+   void make_mean_err( double*, double&, double&, bool );
+   void make_mean_err( cdouble*, cdouble&, cdouble&, bool );
+   
    //! Print the current class & function name
    void route( string, string, int );
    //! Indicate some error, and kill the job
    void error( int, const char* );
 }
 
+#include <common/config_tmp.h>
+
+namespace analysis {
+   //! The function for data output
+   template <class X> void output_data_all( X&, const char* );
+   template <class X> void output_data_err( CONFIG<X>&, const char* );
+   template <class X> void output_data_fit( CONFIG<X>&, const char* );
+}
+
 #include <common/analysis_const.h>
 #include <common/hadron_type_const.h>
 #include <common/channel_type_const.h>
+
+#include <common/output_data.h>
 
 #endif
