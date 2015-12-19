@@ -19,3 +19,7 @@
  9) Hadron name と、fb_mean_flg は構造体で纏める
 10) Numerical Recipe の fit は良くない？
 
+* R-corr の effmass
+* ポテンシャルinput の 有限box 固有値計算
+* coupled channel
+

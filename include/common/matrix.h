@@ -177,6 +177,18 @@ public:
          tmp += (*this)(i,i);
       return tmp;
    }
+   cdouble sum_all_elements() {
+      cdouble tmp;
+      for (int i=0; i<MAT_DIM*MAT_DIM; i++)
+         tmp += (*this)(i);
+      return tmp;
+   }
+   cdouble sum_all_elements2() {
+      cdouble tmp;
+      for (int i=0; i<MAT_DIM*MAT_DIM; i++)
+         tmp += (*this)(i)*(*this)(i);
+      return tmp;
+   }
    MATRIX pow_mat(int index) {
       MATRIX ret( (*this) );
       for (int n=1; n<index; n++)

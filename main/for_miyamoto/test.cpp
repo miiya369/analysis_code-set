@@ -8,7 +8,8 @@
 //--------------------------------------------------------------------------
 
 #include <common/analysis.h>
-#include <NBSwave/NBSwave.h>
+#include <potential/potential.h>
+#include <common/matrix.h>
 
 int analysis::Nconf = 10;
 int analysis::xSIZE = 16;
@@ -23,30 +24,17 @@ char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 int main(int argc, char **argv) {
 
-   analysis::Nconf = analysis::set_data_list
-   (  "/Users/miiya/Desktop/work_kyoto/test_data/cp-pacs+JLQCD_ens3_193conf"
-    , "0", "0", "0", "0", "CG05", "CG05", argv[1] );
+   char tes[320];
    
-   printf(" conf = %d\n", analysis::Nconf);
-   
-   if (analysis::machine_is_little_endian()) printf("LITTLE\n");
-   else printf("BIG\n");
-   
-//   CHANNEL_TYPE channel("Pro-Lam_Pro-Lam");
-//   NBS_WAVE lambdaN;
-//   lambdaN.set_NBS(channel, 8, true, false);
-//   lambdaN.projection(0,0);
-//   lambdaN.make_JK_sample_projNBS(1);
-//   lambdaN.output_NBS_err("./results");
-   
-//   HADRON_TYPE hadron("pion");
-//   CORRELATOR corr;
-//   corr.set_corr(hadron);
-//   corr.output_effmass_err("./results");
-   
-//   R_CORRELATOR Rcorr;
-//   Rcorr.set_Rcorr(channel, 8, true, 0, 0, false);
-//   Rcorr.output_Rcorr_err("./results");
+   printf(" %d \n",sizeof(CORRELATOR));
+   printf(" %d \n",sizeof(NBS_WAVE));
+   printf(" %d \n",sizeof(R_CORRELATOR));
+   printf(" %d \n",sizeof(POTENTIAL));
+   printf(" %d \n",sizeof(MATRIX));
+   printf(" %d \n",sizeof(CHANNEL_TYPE));
+   printf(" %d \n",sizeof(HADRON_TYPE));
+   printf(" %d \n",sizeof(string));
+   printf(" %d \n",sizeof(tes));
    
    return 0;
 }

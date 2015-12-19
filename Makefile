@@ -1,20 +1,20 @@
 
 #  Make file of the Analysis code set
-# Since : Tue Jul 28 21:59:24 JST 2015
+# Since : Tue Aug 25 16:55:07 JST 2015
 
 # You may change this for your environment
 
-CXX	  = g++
-CXXFLAGS  = -Wall -O3 -g
+CXX	  = g++-5
+CXXFLAGS  = -Wall -O3 -g -fopenmp
 
+#===================================================================================#
+#============================= DON’T CHANGE FROM HERE ==============================#
+#===================================================================================#
 MAINDIR   = ./main
 SRCDIR	  = ./src
 OBJDIR	  = ./obj
 HEADERDIR = ./include ./include/extern
 
-#===================================================================================#
-#============================= DON’T CHANGE FROM HERE ==============================#
-#===================================================================================#
 INCLUDES    = $(patsubst %,-I%,$(HEADERDIR))
 
 SRCS_COMMON = $(wildcard $(SRCDIR)/common/*.cpp)
@@ -36,7 +36,7 @@ OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
 yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
 TERGETS	    = mas pot fit obs 
-FOR_MIYA    = ccp zfac iso red
+FOR_MIYA    = ccp zfac iso red gfix
 
 ### SRCDIR と MAINDIR 以下の全ての .cpp ファイルの依存関係を探す ###
 vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto
@@ -69,6 +69,9 @@ zfac: $(OBJDIR)/extract_Z-factor.o $(COMMON) $(CORR)
 red: $(OBJDIR)/data_reduction_check.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
+gfix: $(OBJDIR)/check_coulomb_gfix.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 $(OBJDIR)/extern/yukawa/%.o: %.C
@@ -76,7 +79,7 @@ $(OBJDIR)/extern/yukawa/%.o: %.C
 
 .PHONY: clean
 clean:
-	rm -f $(TERGETS) $(FOR_MIYA) test obj/*.o obj/extern/*/*.o
+	rm -f -r $(TERGETS) $(FOR_MIYA) test obj/*.o obj/extern/*/*.o *.dSYM
 #===================================================================================#
 #===================================================================================#
 #===================================================================================#
