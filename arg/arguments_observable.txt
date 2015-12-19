@@ -11,8 +11,6 @@ OBS_Calc_energy_max	= 300
 OBS_Runge_kutta_delta	= 0.0005
 OBS_Runge_kutta_max_r	= 6
 
-OBS_Endian_convert	= no
-
 OBS_Calc_squ_wall_pot	= no
 OBS_Squ_wall_pot_V0	= -234
 OBS_Squ_wall_pot_r0	= 1.5

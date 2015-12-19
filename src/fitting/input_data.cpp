@@ -4,92 +4,108 @@
  * @ingroup fitting
  * @brief   Function for input the ( miyamoto-format ) fit data
  * @author  Takaya Miyamoto
+ * @since   Wed Jul 22 20:58:00 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#include <fitting.h>
+#include <fitting/fitting.h>
 
-void FITTING::input_data( const char *INFILE_NAME, bool endian_flg ){
-    
-    func_name = "input_data____________";
-    route( class_name, func_name, 1 );
-    
-    if( new_flg_data ) error(1,"Fit data has already inputed !");
-    else{
-        
-        printf(" @ Fit data reading |   0%%");
-        ifstream infile( INFILE_NAME, ios::in | ios::binary );
-        if( !infile ) error(2, INFILE_NAME);
-        
-        infile.read( (char*)&fit_type, sizeof(int) );   // read file header
-        if( endian_flg ) endian_convert(&fit_type);
-        infile.read( (char*)&N_conf, sizeof(int) );
-        if( endian_flg ) endian_convert(&N_conf);
-        
+void FIT::input_data( const char *infile_name ) {
+   
+   func_name = "input_data____________";
+   analysis::route(class_name, func_name, 1);
+   
+   if (new_flg_data){
+      delete_data();
+      func_name = "input_data____________";
+   }
+   printf(" @ Fit data reading |   0%%");
+   ifstream ifs(infile_name, ios::in | ios::binary);
+   if (!ifs) analysis::error(2, infile_name);
+   
+//======================== miyamoto-format notation =======================//
+//
+//                        !! ALWAYS LITTLE ENDIAN !!
+//
+//      1) fit type (int) -> 1 = corr type, 2 = pot type
+//      2) #.conf   (int)
+//      3) #.data   (int)
+//
+//      4) data     (double float)
+//         -> for i = 0 to #.data {    |   for i = 0 to #.data {
+//               err[i]                |      cood[i]
+//               for n = 0 to #.conf   |       err[i]
+//                  data[n+#.conf*i]   |      for n = 0 to #.conf
+//            }                        |         data[n+#.conf*i]
+//                                     |   }
+//                 (at fit type = 1)   |        (at fit type = 2)
+//
+//=========================================================================//
+   ifs.read((char*)&fit_type       , sizeof(int));
+   ifs.read((char*)&analysis::Nconf, sizeof(int));   // read file header
+   ifs.read((char*)&Ndata          , sizeof(int));
+   
+   if (!analysis::machine_is_little_endian()) {
+      analysis::endian_convert(&fit_type, 1);
+      analysis::endian_convert(&analysis::Nconf, 1);
+      analysis::endian_convert(&Ndata, 1);
+   }
 //=========================== read corr-type data =========================//
-        if( fit_type == 1 ){
-            dataSIZE = new int[1];
-            infile.read( (char*)&dataSIZE[0], sizeof(int) );
-            if( endian_flg ) endian_convert(&dataSIZE[0]);
-            cood = new double[ dataSIZE[0] ];
-            data = new double[ dataSIZE[0] * N_conf ];
-            err  = new double[ dataSIZE[0] ];
-            new_flg_data = true;
-            
-            for(int t=0; t<dataSIZE[0]; t++){
-                cood[t] = t;
-                infile.read( (char*)&err[t], sizeof(double) );
-                for( int i=0; i<N_conf; i++)
-                    infile.read( (char*)&data[ idx(i,t) ], sizeof(double) );
-                
-                printf("\b\b\b\b%3.0lf%%",double(t+1)/double(dataSIZE[0])*100);
-                fflush(stdout);
-            }
-            printf("\n");
-            if( endian_flg ){
-                endian_convert( data, dataSIZE[0] * N_conf );
-                endian_convert( err,  dataSIZE[0] );
-            }
+   if(fit_type == 1) {
+      cood = new double[Ndata];
+      data = new double[Ndata * analysis::Nconf];
+      err  = new double[Ndata];
+      new_flg_data = true;
+      
+      for (int t=0; t<Ndata; t++) {
+         cood[t] = t;
+         ifs.read((char*)&err[t], sizeof(double));
+         for (int i=0; i<analysis::Nconf; i++)
+            ifs.read((char*)&data[idx(i,t)], sizeof(double));
+         
+         printf("\b\b\b\b%3.0lf%%",double(t+1)/double(Ndata)*100);
+         fflush(stdout);
+      }
+      printf("\n");
+      if (!analysis::machine_is_little_endian()) {
+         analysis::endian_convert(data, Ndata * analysis::Nconf);
+         analysis::endian_convert(err,  Ndata);
+      }
 //========================= read potential-type data ======================//
-        }else if( fit_type == 2 ){
-            dataSIZE = new int[ N_conf ];
-            int tmp_dataSIZE = 0;
-            for(int i=0; i<N_conf; i++){
-                infile.read( (char*)&dataSIZE[i], sizeof(int) );
-                if( endian_flg ) endian_convert(&dataSIZE[i]);
-                tmp_dataSIZE += dataSIZE[i];
-            }
-            cood = new double[ tmp_dataSIZE ];
-            data = new double[ tmp_dataSIZE ];
-            err  = new double[ tmp_dataSIZE ];
-            new_flg_data = true;
-            
-            for( int i=0; i<N_conf; i++){
-                for(int j=0; j<dataSIZE[i]; j++){
-                    infile.read( (char*)&cood[ idx(i,j) ], sizeof(double) );
-                    infile.read( (char*)&data[ idx(i,j) ], sizeof(double) );
-                    infile.read( (char*)&err[  idx(i,j) ], sizeof(double) );
-                }
-                printf("\b\b\b\b%3.0lf%%",double(i+1)/double(N_conf)*100);
-                fflush(stdout);
-            }
-            printf("\n");
-            if( endian_flg ){
-                endian_convert( cood, tmp_dataSIZE );
-                endian_convert( data, tmp_dataSIZE );
-                endian_convert( err,  tmp_dataSIZE );
-            }
-        }
-//===========================================================================//
-        else{
-            printf("\n @ fit type         = %d\n", fit_type);
-            printf(" @ #.confs          = %d\n", N_conf);
-            infile.close();
-            error(3,"This file is not miyamoto-format fit data");
-        }
-        printf(" @ fit type         = %d\n", fit_type);
-        printf(" @ #.confs          = %d\n", N_conf);
-        infile.close();
-    }
-    route( class_name, func_name, 0 );
+   }else if(fit_type == 2) {
+      cood = new double[Ndata];
+      data = new double[Ndata * analysis::Nconf];
+      err  = new double[Ndata];
+      new_flg_data = true;
+      
+      for (int r=0; r<Ndata; r++) {
+         ifs.read((char*)&cood[r], sizeof(double));
+         ifs.read((char*)&err[r] , sizeof(double));
+         for (int i=0; i<analysis::Nconf; i++)
+            ifs.read((char*)&data[idx(i,r)], sizeof(double));
+         
+         printf("\b\b\b\b%3.0lf%%",double(r+1)/double(Ndata)*100);
+         fflush(stdout);
+      }
+      printf("\n");
+      if(!analysis::machine_is_little_endian()){
+         analysis::endian_convert(cood, Ndata);
+         analysis::endian_convert(data, Ndata * analysis::Nconf);
+         analysis::endian_convert(err,  Ndata);
+      }
+   }
+//========================================================================//
+   else{
+      printf("\n @ fit type         = %d\n", fit_type);
+      printf(" @ #.confs          = %d\n", analysis::Nconf);
+      printf(" @ #.data size      = %d\n", Ndata);
+      ifs.close();
+      analysis::error(3,"This file is not miyamoto-format fit data");
+   }
+   printf(" @ fit type         = %d\n", fit_type);
+   printf(" @ #.confs          = %d\n", analysis::Nconf);
+   printf(" @ #.data size      = %d\n", Ndata);
+   ifs.close();
+   
+   analysis::route(class_name, func_name, 0);
 }

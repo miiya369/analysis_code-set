@@ -1,5 +1,7 @@
 
-# Make file of the Analysis code set
+#  Make file of the Analysis code set
+# Since : Thu Jul 23 21:28:58 JST 2015
+
 # You may change this for your environment
 
 CXX	  = g++
@@ -8,81 +10,81 @@ CXXFLAGS  = -Wall -O3 -g
 MAINDIR   = ./main
 SRCDIR	  = ./src
 OBJDIR	  = ./obj
-HEADERDIR = ./include
+HEADERDIR = ./include ./include/extern
 
 #===================================================================================#
 #============================= DON’T CHANGE FROM HERE ==============================#
 #===================================================================================#
+INCLUDES    = $(patsubst %,-I%,$(HEADERDIR))
 
-SRCS_cmn = $(wildcard $(SRCDIR)/common/*.cpp)
-SRCS_mas = $(MAINDIR)/effective_mass.cpp $(wildcard $(SRCDIR)/potential/*.cpp) \
-$(wildcard $(SRCDIR)/fitting/*.cpp) $(SRCS_cmn)
-SRCS_pot = $(MAINDIR)/potential.cpp $(wildcard $(SRCDIR)/potential/*.cpp) $(SRCS_cmn)
-SRCS_fit = $(MAINDIR)/fitting.cpp $(wildcard $(SRCDIR)/fitting/*.cpp) $(SRCS_cmn)
-SRCS_obs = $(MAINDIR)/observable.cpp $(wildcard $(SRCDIR)/observable/*.cpp) $(SRCS_cmn)
-SRCS_iso = $(MAINDIR)/isospin_proj.cpp $(SRCS_cmn)
-SRCS_ccp = $(MAINDIR)/coupled_channel_potential.cpp $(SRCS_cmn) \
-$(wildcard $(SRCDIR)/potential/*.cpp)
-SRCS_zfac= $(MAINDIR)/extract_Z-factor.cpp $(wildcard $(SRCDIR)/potential/*.cpp) \
-$(SRCS_cmn)
+SRCS_COMMON = $(wildcard $(SRCDIR)/common/*.cpp)
+SRCS_NBS    = $(wildcard $(SRCDIR)/NBSwave/*.cpp) $(wildcard $(SRCDIR)/data_reduction/*.cpp)
+SRCS_CORR   = $(wildcard $(SRCDIR)/correlator/*.cpp)
+SRCS_RCORR  = $(wildcard $(SRCDIR)/R_correlator/*.cpp)
+SRCS_POT    = $(wildcard $(SRCDIR)/potential/*.cpp)
+SRCS_FIT    = $(wildcard $(SRCDIR)/fitting/*.cpp)
+SRCS_OBS    = $(wildcard $(SRCDIR)/observable/*.cpp)
+SRCS_yukawa = $(wildcard $(SRCDIR)/extern/yukawa*/*.C)
 
-OBJS_mas = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_mas:.cpp=.o)))
-OBJS_pot = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_pot:.cpp=.o)))
-OBJS_fit = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_fit:.cpp=.o)))
-OBJS_obs = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_obs:.cpp=.o)))
-OBJS_iso = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_iso:.cpp=.o)))
-OBJS_ccp = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_ccp:.cpp=.o)))
-OBJS_zfac= $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_zfac:.cpp=.o)))
+COMMON      = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_COMMON:.cpp=.o)))
+NBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_NBS:.cpp=.o)))
+CORR        = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_CORR:.cpp=.o)))
+RCORR       = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_RCORR:.cpp=.o)))
+POT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_POT:.cpp=.o)))
+FIT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_FIT:.cpp=.o)))
+OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
+yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
-INCLUDES = $(patsubst %,-I%,$(HEADERDIR))
-
-TERGETS		= mas pot fit obs iso
-FOR_MIYA	= ccp zfac
+TERGETS	    = mas pot fit obs 
+FOR_MIYA    = ccp zfac iso red
 
 ### SRCDIR と MAINDIR 以下の全ての .cpp ファイルの依存関係を探す ###
-vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR)
+vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto
+vpath %.C $(wildcard $(SRCDIR)/extern/yukawa*)   # <- for yukawa
 
 .PHONY: all
 all: $(TERGETS)
 
-mas: $(OBJS_mas)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_mas)
+mas: $(OBJDIR)/effective_mass.o $(COMMON) $(CORR) $(FIT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-pot: $(OBJS_pot)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_pot)
+pot: $(OBJDIR)/potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-fit: $(OBJS_fit)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_fit)
+fit: $(OBJDIR)/fitting.o $(COMMON) $(FIT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-obs: $(OBJS_obs)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_obs)
+obs: $(OBJDIR)/observable.o $(COMMON) $(OBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-iso: $(OBJS_iso)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_iso)
+iso: $(OBJDIR)/isospin_proj.o $(COMMON)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-ccp: $(OBJS_ccp)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_ccp)
+ccp: $(OBJDIR)/coupled_channel_potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-zfac: $(OBJS_zfac)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_zfac)
+zfac: $(OBJDIR)/extract_Z-factor.o $(COMMON) $(CORR)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+red: $(OBJDIR)/data_reduction_check.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(OBJDIR)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
+$(OBJDIR)/extern/yukawa/%.o: %.C
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
 
 .PHONY: clean
 clean:
-	rm -f $(TERGETS) $(FOR_MIYA) test obj/*.o
-
+	rm -f $(TERGETS) $(FOR_MIYA) test obj/*.o obj/extern/*/*.o
 #===================================================================================#
 #===================================================================================#
 #===================================================================================#
 
 ###### FOR TEST ######
-SRCS_test= $(MAINDIR)/test.cpp
-OBJS_test= $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_test:.cpp=.o)))
 .PHONY: test
-test: $(OBJS_test)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS_test)
+test: $(OBJDIR)/test.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 .PHONY: ALL
 ALL: $(TERGETS) $(FOR_MIYA)

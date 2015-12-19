@@ -4,39 +4,45 @@
  * @ingroup phase shift
  * @brief   Function for input the ( miyamoto-format ) fit parameter data
  * @author  Takaya Miyamoto
+ * @since   Thu Jul 23 18:17:57 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#include <phase_shift.h>
+#include <observable/phase_shift.h>
 
-void PHASE_SHIFT::input_param( const char *INFILE_NAME, bool endian_flg ){
-    
-    func_name = "input_param___________";
-    route( class_name, func_name, 1 );
-    
-    if( new_flg_param ) error(1,"Fit parameter has already inputed !");
-    else{
-        
-        printf(" @ parameter data reading |   0%%");
-        ifstream infile( INFILE_NAME, ios::in | ios::binary );
-        if( !infile ) error(2, INFILE_NAME);
-        
-        infile.read( (char*)&N_conf, sizeof(int) );
-        infile.read( (char*)&N_param, sizeof(int) );   // read file header
-        infile.read( (char*)&func_type, sizeof(int) );
-        
-        param = new double[ N_conf * N_param ];
-        new_flg_param = true;
+void PHASE_SHIFT::input_param( const char *infile_name ) {
+   
+   func_name = "input_param___________";
+   analysis::route(class_name, func_name, 1);
+   
+   ifstream ifs(infile_name, ios::in | ios::binary);
+   if(!ifs) analysis::error(2, infile_name);
+   
+   int tmp_Nconf;
+   int func_type_number;
+   ifs.read( (char*)&tmp_Nconf,        sizeof(int) );   // read file header
+   ifs.read( (char*)&func_type_number, sizeof(int) );
+   
+   if (!analysis::machine_is_little_endian()) {
+      analysis::endian_convert(&tmp_Nconf,    1);
+      analysis::endian_convert(&func_type_number, 1);
+   }
+   analysis::Nconf = tmp_Nconf;
+   char tmp_str[10];
+   snprintf(tmp_str, sizeof(tmp_str), "%d", func_type_number);
+   func_type.set(tmp_str);
+   
+   if (param != NULL) delete [] param;
+   param = new double[analysis::Nconf * func_type.Nparam];
+   
+   ifs.read((char*)&param[0], sizeof(double)*analysis::Nconf*func_type.Nparam);
 
-        for( int loop=0; loop<N_param; loop++ ){
-            for( int conf=0; conf<N_conf; conf++ )
-                infile.read( (char*)&param[ idx(conf,loop) ],sizeof(double) );
-            printf("\b\b\b\b%3.0lf%%",double(loop+1)/double(N_param)*100);
-            fflush(stdout);
-        }
-        printf("\n @ function type = %s\n", N_func_to_name(func_type).c_str());
-        infile.close();
-        
-    }
-    route( class_name, func_name, 0 );
+   if (!analysis::machine_is_little_endian())
+      analysis::endian_convert(param, analysis::Nconf * func_type.Nparam);
+   
+   printf(" @ #.confs       = %d\n", analysis::Nconf);
+   printf(" @ function type = %s\n", func_type.name.c_str());
+   ifs.close();
+   
+   analysis::route(class_name, func_name, 0);
 }

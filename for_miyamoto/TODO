@@ -13,7 +13,9 @@
  4) bin size 2 以上の jack-knife の作成
  5) openMP を使った際のバグの修正
  6) compress された NBSwave の読み込み
-	（コード中で解凍させる）
+	（コード中で展開させる）
  7) S wave 以外への projection の作成
  8) phase shift 計算の高速化
+ 9) Hadron name と、fb_mean_flg は構造体で纏める
+10) Numerical Recipe の fit は良くない？
 

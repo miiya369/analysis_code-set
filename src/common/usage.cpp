@@ -4,69 +4,82 @@
  * @ingroup All
  * @brief   Function for usage
  * @author  Takaya Miyamoto
+ * @since   Fri Jul 24 00:29:10 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#include <analysis.h>
+#include <common/analysis.h>
 
-void usage( int usage_type ){
-    
-    if( usage_type == EXTRACT_Z_FACTOR ){
-        printf("\n ====== Calculation & Output Z-factor usage ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n\n");
-    }
-    if( usage_type == COUPLED_CHANNEL_POT ){
-        printf("\n ====== Calculation & Output coupled channel potential usage ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
-        printf("   -t [ Value of time slice for calculate ]\n\n");
-    }
-    if( usage_type == EFFECTIVEMASS ){
-        printf("\n ====== Calculation & Output effective mass usage   ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
-        printf("   -i [ Path of the input directory ]\n");
-        printf("   -o [ Path of the output directory ]\n");
-        printf("   -m  Do fitting effective mass\n");
-        printf("   -t [ Minimum range of fitting [t] ] : For effective mass fitting\n");
-        printf("   -T [ Maximum range of fitting [t] ] : For effective mass fitting\n\n");
-    }
-    if( usage_type == CALC_POTENTIAL ){
-        printf("\n ====== Calculation & Output potential usage ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
-        printf("   -t [ Minimum value of time slice ]\n");
-        printf("   -T [ Maximum value of time slice ]\n");
-        printf("   -c [ Channel name to calculate ]\n");
-        printf("   -m [ Mass of hadron 1 ]\n");
-        printf("   -M [ Mass of hadron 2 ]\n\n");
-    }
-    if( usage_type == FITTING_DATA ){
-        printf("\n ======   Data fitting usage   ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
-        printf("   -i [ Path of the input fit data file ]\n");
-        printf("   -o [ The output file name ]\n");
-        printf("   -r [ Minimum range of fitting [t] ] : For correlator\n");
-        printf("   -R [ Maximum range of fitting [t] ] : For correlator\n");
-        printf("   -t [ Fit function type ]\n");
-        printf("   -p [ Parameter ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n\n");
-    }
-    if( usage_type == CALC_OBSERVABLE ){
-        printf("\n ======   Observable calculation usage   ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n");
-        printf("   -i [ Path of the input parameter file ]\n");
-        printf("   -o [ The output file name ]\n");
-        printf("   -m [ Reduced mass [Mev/c2] ]\n\n");
-        printf("   -t  Calculate test potential ( Square wall )\n");
-        printf("   -e [ Energy of Square wall potential ( For test ) ]\n");
-        printf("   -r [ Range  of Square wall potential ( For test ) ]\n\n");
-    }
-    if( usage_type == ISOSPIN_PROJECTION ){
-        printf("\n ======   Isospin projection usage   ======\n");
-        printf("\n");
-        printf("   -f [ Path of the input arguments file ] <- Must be required !\n\n");
-    }
+void analysis::usage( int usage_type ) {
+   
+   if (usage_type == EXTRACT_Z_FACTOR) {
+      printf("\n ====== Calculation & Output Z-factor usage ======\n");
+      printf("\n");
+      printf("   -f      [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -ifile  [ Path of the input directory ]\n");
+      printf("   -ofile  [ Path of the output directory ]\n");
+      printf("   -hadron [ hadron name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
+      printf("   -check    Check the arguments\n\n");
+   }
+   if (usage_type == COUPLED_CHANNEL_POT) {
+      printf("\n ====== Calculation & Output coupled channel potential usage ======\n");
+      printf("\n");
+      printf("   -f    [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -time [ Value of time slice for calculate ]\n");
+      printf("   -check  Check the arguments\n\n");
+   }
+   if (usage_type == EFFECTIVEMASS) {
+      printf("\n ====== Calculation & Output effective mass usage   ======\n");
+      printf("\n");
+      printf("   -f      [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -ifile  [ Path of the input directory ]\n");
+      printf("   -ofile  [ Path of the output directory ]\n");
+      printf("   -fit      Do fitting effective mass\n");
+      printf("   -t_min  [ Minimum range of fitting [t] ] : For effective mass fitting\n");
+      printf("   -t_max  [ Maximum range of fitting [t] ] : For effective mass fitting\n");
+      printf("   -hadron [ hadron name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
+      printf("   -check    Check the arguments\n\n");
+   }
+   if (usage_type == CALC_POTENTIAL) {
+      printf("\n ====== Calculation & Output potential usage ======\n");
+      printf("\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -t_min     [ Minimum value of time slice ]\n");
+      printf("   -t_max     [ Maximum value of time slice ]\n");
+      printf("   -channel   [ Channel name to calculate ]\n");
+      printf("   -mass_had1 [ Mass of hadron 1 ]\n");
+      printf("   -mass_had2 [ Mass of hadron 2 ]\n");
+      printf("   -comp        Read compress NBS wave\n");
+      printf("   -check       Check the arguments\n\n");
+   }
+   if (usage_type == FITTING_DATA) {
+      printf("\n ======   Data fitting usage   ======\n");
+      printf("\n");
+      printf("   -f        [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -ifile    [ Path of the input fit data file ]\n");
+      printf("   -ofile    [ Path of the output parameter data file ]\n");
+      printf("   -t_min    [ Minimum range of fitting [t] ] : For correlator\n");
+      printf("   -t_max    [ Maximum range of fitting [t] ] : For correlator\n");
+      printf("   -fit_func [ Fit function type ]\n");
+      printf("   -param    [ Parameter ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
+      printf("   -check      Check the arguments\n\n");
+   }
+   if (usage_type == CALC_OBSERVABLE) {
+      printf("\n ======   Observable calculation usage   ======\n");
+      printf("\n");
+      printf("   -f     [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -ifile [ Path of the input parameter file ]\n");
+      printf("   -ofile [ Path of the output file]\n");
+      printf("   -mass  [ Reduced mass [Mev/c2] ]\n\n");
+      printf("   -test    Calculate test potential ( Square wall )\n");
+      printf("   -V0    [ Energy of Square wall potential ( For test ) ]\n");
+      printf("   -r0    [ Range  of Square wall potential ( For test ) ]\n");
+      printf("   -check   Check the arguments\n\n");
+   }
+   if (usage_type == ISOSPIN_PROJECTION) {
+      printf("\n ======   Isospin projection usage   ======\n");
+      printf("\n");
+      printf("   -f     [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -check   Check the arguments\n\n");
+   }
 }

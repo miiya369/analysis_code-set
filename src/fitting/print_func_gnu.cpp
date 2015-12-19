@@ -4,89 +4,72 @@
  * @ingroup fitting
  * @brief   Print the function with gnuplot-format
  * @author  Takaya Miyamoto
+ * @since   Wed Jul 22 09:15:44 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#include <fitting.h>
+#include <fitting/fitting.h>
 
-void FITTING::print_func_gnu( bool ini_flg, double lat_a ){
-    
-    func_name = "print_func_gnu________";
-    route( class_name, func_name, 1 );
-    
-    if( !new_flg_param ){ error(1,"Fit parameter has not setted yet !"); }
-    else{
-        if( ini_flg ){
-            if( func_type == CONSTANT ){
-                printf(" @ For gnuplot function ( Initial parameter )\n");
-                printf(" @ %lf\n", param_ini[0]);
-            
-            }else if( func_type == ONE_EXPONENTIAL ){
-                printf(" @ For gnuplot function ( Initial parameter )\n");
-                printf(" @ %lf*exp(-(%lf)*x)\n"
-                       , param_ini[0], param_ini[1]);
-            
-            }else if( func_type == TWO_GAUSSIAN ){
-                printf(" @ For gnuplot function ( Initial parameter )\n");
-                printf(" @ [Lat Unit] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_ini[0], param_ini[1], param_ini[2], param_ini[3]);
-                printf(" @ [Mass Dim] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_ini[0]*hbar_c/lat_a, param_ini[1]*lat_a
-                       , param_ini[2]*hbar_c/lat_a, param_ini[3]*lat_a);
-            
-            }else if( func_type == THREE_GAUSSIAN ){
-                printf(" @ For gnuplot function ( Initial parameter )\n");
-                printf(" @ [Lat Unit] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_ini[0], param_ini[1], param_ini[2], param_ini[3], param_ini[4], param_ini[5]);
-                printf(" @ [Mass Dim] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_ini[0]*hbar_c/lat_a, param_ini[1]*lat_a, param_ini[2]*lat_a
-                       , param_ini[3]*hbar_c/lat_a, param_ini[4]*lat_a, param_ini[5]*lat_a);
-                
-            }else if( func_type == TWO_SHIFTED_GAUSSIAN ){
-                printf(" @ For gnuplot function ( Initial parameter )\n");
-                printf(" @ [Lat Unit] %lf*exp(-((x-(%lf))/(%lf))**2)+(%lf)*exp(-((x-(%lf))/(%lf))**2)\n"
-                       , param_ini[0], param_ini[1], param_ini[2], param_ini[3], param_ini[4], param_ini[5]);
-                printf(" @ [Mass Dim] %lf*exp(-((x-(%lf))/(%lf))**2)+(%lf)*exp(-((x-(%lf))/(%lf))**2)\n"
-                       , param_ini[0]*hbar_c/lat_a, param_ini[1]*lat_a, param_ini[2]*hbar_c/lat_a
-                       , param_ini[3]*lat_a, param_ini[4]*hbar_c/lat_a, param_ini[5]*lat_a);
-            }
-        }else{
-            if( func_type == CONSTANT ){
-                printf(" @ For gnuplot function ( Fitted parameter )\n");
-                printf(" @ %lf\n", param_mean[0]);
-            
-            }else if( func_type == ONE_EXPONENTIAL ){
-                printf(" @ For gnuplot function ( Fitted parameter )\n");
-                printf(" @ %lf*exp(-(%lf)*x)\n"
-                       , param_mean[0], param_mean[1]);
-            
-            }else if( func_type == TWO_GAUSSIAN ){
-                printf(" @ For gnuplot function ( Fitted parameter )\n");
-                printf(" @ [Lat Unit] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_mean[0], param_mean[1], param_mean[2], param_mean[3]);
-                printf(" @ [Mass Dim] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_mean[0]*hbar_c/lat_a, param_mean[1]*lat_a
-                       , param_mean[2]*hbar_c/lat_a, param_mean[3]*lat_a);
-            
-            }else if( func_type == THREE_GAUSSIAN ){
-                printf(" @ For gnuplot function ( Fitted parameter )\n");
-                printf(" @ [Lat Unit] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_mean[0], param_mean[1], param_mean[2]
-                       , param_mean[3], param_mean[4], param_mean[5]);
-                printf(" @ [Mass Dim] %lf*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)+(%lf)*exp(-(x/(%lf))**2)\n"
-                       , param_mean[0]*hbar_c/lat_a, param_mean[1]*lat_a, param_mean[2]*hbar_c/lat_a
-                       , param_mean[3]*lat_a, param_mean[4]*hbar_c/lat_a, param_mean[5]*lat_a);
-                
-            }else if( func_type == TWO_SHIFTED_GAUSSIAN ){
-                printf(" @ For gnuplot function ( Fitted parameter )\n");
-                printf(" @ [Lat Unit] %lf*exp(-((x-(%lf))/(%lf))**2)+(%lf)*exp(-((x-(%lf))/(%lf))**2)\n"
-                       , param_mean[0], param_mean[1], param_mean[2]
-                       , param_mean[3], param_mean[4], param_mean[5]);
-                printf(" @ [Mass Dim] %lf*exp(-((x-(%lf))/(%lf))**2)+(%lf)*exp(-((x-(%lf))/(%lf))**2)\n"
-                       , param_mean[0]*hbar_c/lat_a, param_mean[1]*lat_a, param_mean[2]*lat_a
-                       , param_mean[3]*hbar_c/lat_a, param_mean[4]*lat_a, param_mean[5]*lat_a);
-            }
-        }
-    }
-    route( class_name, func_name, 0 );
+void FIT::print_func_gnu( bool ini_flg ) {
+   
+   func_name = "print_func_gnu________";
+   analysis::route(class_name, func_name, 1);
+   
+   if (!new_flg_param) {
+      analysis::error(1,"Fit parameter has not set yet !");
+      analysis::route(class_name, func_name, 0);
+      return;
+   }
+   double* param = NULL;
+   
+   if (ini_flg) {
+      param = param_ini;
+      printf(" @ For gnuplot function ( Initial parameter )\n");
+   } else {
+      param = param_mean;
+      printf(" @ For gnuplot function ( Fitted parameter )\n");
+   }
+   
+   printf(" @ ");
+   
+   if (     func_type.Nparam == 1)
+      printf(func_type.gnuplot_form.c_str(), param[0]);
+   
+   else if (func_type.Nparam == 2)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1]);
+   
+   else if (func_type.Nparam == 3)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]);
+   
+   else if (func_type.Nparam == 4)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1]
+                                           , param[2], param[3]);
+   
+   else if (func_type.Nparam == 5)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
+                                           , param[3], param[4]);
+   
+   else if (func_type.Nparam == 6)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
+                                           , param[3], param[4], param[5]);
+   
+   else if (func_type.Nparam == 7)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
+                                           , param[3], param[4]
+                                           , param[5], param[6]);
+   
+   else if (func_type.Nparam == 8)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
+                                           , param[3], param[4], param[5]
+                                           , param[6], param[7]);
+   
+   else if (func_type.Nparam == 9)
+      printf(func_type.gnuplot_form.c_str(), param[0], param[1], param[2]
+                                           , param[3], param[4], param[5]
+                                           , param[6], param[7], param[8]);
+   else printf(" @ UNKOWN \n");
+   
+   printf("\n");
+
+   analysis::route(class_name, func_name, 0);
 }

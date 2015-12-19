@@ -4,35 +4,39 @@
  * @ingroup scattering length
  * @brief   Functions for output scattering length data
  * @author  Takaya Miyamoto
+ * @since   Thu Jul 23 17:30:34 JST 2015
  */
 //--------------------------------------------------------------------------
 
-#include <observable.h>
+#include <observable/scattering_length.h>
 
 //--------------------------------------------------------------------------
 /**
  * @brief Function for output scattering length data every gauge configurations
  */
 //--------------------------------------------------------------------------
-
-void OBSERVABLE::output_scatt_len_all( const char* out_file_name ){
-    
-    func_name = "output_scatt_len_all__";
-    route( class_name, func_name, 1 );
-    
-    if( new_flg_scatt_length ){
-        ofstream out_file( out_file_name, ios::out );
-        
-        for( int E=E_min; E<=E_max; E++ )
-            for(int i=0; i<N_conf; i++)
-                out_file << sqrt( 2 * mass * E ) << " "
-                         << scatt_length[ idx(i,E-E_min) ] << endl;
-        
-        out_file.close();
-    }else
-        error(1,"Have not calculated scattering length yet !");
-    
-    route( class_name, func_name, 0 );
+void SCATTERING_LENGTH::output_scatt_len_all( const char* out_file_name ) {
+   
+   func_name = "output_scatt_len_all__";
+   analysis::route(class_name, func_name, 1);
+   
+   if (scatt_length == NULL) {
+      analysis::error(1,"scattering length has not been calculated yet !");
+      analysis::route(class_name, func_name, 0);
+      return;
+   }
+   ofstream ofs(out_file_name, ios::out | ios::binary);
+   
+   double tmp;
+   for (size_t n=0; n<analysis::Nconf*(E_max-E_min+1); n++) {
+      tmp = scatt_length[n];
+      if (!analysis::machine_is_little_endian())
+         analysis::endian_convert(&tmp, 1);
+      ofs.write((char*)&tmp, sizeof(double));
+   }
+   ofs.close();
+   
+   analysis::route(class_name, func_name, 0);
 }
 
 //--------------------------------------------------------------------------
@@ -40,35 +44,34 @@ void OBSERVABLE::output_scatt_len_all( const char* out_file_name ){
  * @brief Function for output mean of scattering length data with error
  */
 //--------------------------------------------------------------------------
-
-void OBSERVABLE::output_scatt_len_err( const char* out_file_name ){
-    
-    func_name = "output_scatt_len_err__";
-    route( class_name, func_name, 1 );
-    
-    if( new_flg_scatt_length ){
-        double err, mean, sqr_mean;
-        ofstream out_file( out_file_name, ios::out );
-        
-        for( int E=E_min; E<=E_max; E++ ){
-            mean     = 0.0;
-            sqr_mean = 0.0;
-            
-            for(int i=0; i<N_conf; i++){
-                
-                mean     +=      scatt_length[ idx(i,E-E_min) ];
-                sqr_mean += pow( scatt_length[ idx(i,E-E_min) ],2 );
-            }
-            mean     /= double(N_conf);
-            sqr_mean /= double(N_conf);
-            
-            err = sqrt( double(N_conf-1) * ( sqr_mean - pow(mean,2) ));
-            
-            out_file << sqrt( 2 * mass * E ) << " " << mean << " " << err << endl;
-        }
-        out_file.close();
-    }else
-        error(1,"Have not calculated scattering length yet !");
-    
-    route( class_name, func_name, 0 );
+void SCATTERING_LENGTH::output_scatt_len_err( const char* out_file_name ) {
+   
+   func_name = "output_scatt_len_err__";
+   analysis::route(class_name, func_name, 1);
+   
+   if (scatt_length == NULL) {
+      analysis::error(1,"scattering length has not been calculated yet !");
+      analysis::route(class_name, func_name, 0);
+      return;
+   }
+   double err, mean, sqr_mean;
+   ofstream ofs(out_file_name, ios::out);
+   
+   for (int E=E_min; E<=E_max; E++) {
+      mean     = 0.0;
+      sqr_mean = 0.0;
+      
+      for (int i=0; i<analysis::Nconf; i++) {
+         mean     +=     scatt_length[idx(i,E-E_min)];
+         sqr_mean += pow(scatt_length[idx(i,E-E_min)],2);
+      }
+      mean     /= double(analysis::Nconf);
+      sqr_mean /= double(analysis::Nconf);
+      err       = sqrt(double(analysis::Nconf-1) * (sqr_mean - mean*mean));
+      
+      ofs << sqrt(2*mass*E) << " " << mean << " " << err << endl;
+   }
+   ofs.close();
+   
+   analysis::route(class_name, func_name, 0);
 }

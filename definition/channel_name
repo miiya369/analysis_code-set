@@ -1,0 +1,48 @@
+
+ ////////////////////////////////////////////////
+ ///                                          ///
+            Definition of channel name
+
+             Author : Takaya Miyamoto
+ ///                                          ///
+ ////////////////////////////////////////////////
+
+
+ ./pot の arguments file の中の
+ 「POT_Channel_name」
+
+ もしくは ./pot へのオプション「-channel」
+
+ に指定する channel name は、Hadron Force 
+ の notation を省略したものになっています。
+ 基本的に 3 文字で 1 つのバリオンを表すことにしています。 
+
+ * Proton  -> Pro
+ * Neutron -> Nue
+ * Lambda  -> Lam
+ * SigmaP  -> SigP
+ * SigmaZ  -> SigZ
+ * SigmaM  -> SigM
+
+ * XiP, XiZ, XiM はそのまま
+
+ 例えば、Hadron Force での
+
+ PID_SNK_Neutron_XiZ_SRC_SigmaP_SigmaM
+
+ チャネルのポテンシャルを計算したければ、
+
+ Neu-XiZ_SigP-SigM
+
+ のように記入することでプログラム内で自動的に
+ Hadron Force のディレクトリ名である「S2.15」を指定し、
+ NBS 波動関数を読み込みます。
+
+ ここで、- と _ の使い分けに注意してください。
+
+ (snk1)-(snk2)_(src1)-(src2)
+
+ のように記入してください。
+
+ channel name の追加は容易にできます。ご連絡ください。
+

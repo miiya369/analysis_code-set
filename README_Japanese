@@ -14,11 +14,10 @@
  各実行ファイルが生成されます。
  全てビルドする必要がない場合は、make に次のターゲットを
  つけて実行してください。
- * potential		-> pot
- * effective mass	-> mas
- * fitting		-> fit
- * observable		-> obs
- * isospin projection	-> iso
+ * pot : potential, NBSwave などの計算
+ * mas : effective mass, mass fitting などの計算
+ * fit : potential fitting などの計算
+ * obs : phase shift, scattering length などの計算
 
 
  #########   How to use   #########
@@ -30,16 +29,30 @@
  例 : ./pot -f ./arg/arguments_potential.txt
 
  また、各実行ファイルはオプション無しで実行すると
- その usage が表示されます。-f 以外のオプションは
- 基本的には必要ないですが、arguments ファイルを
- 編集するのが手間であるときに用いることで、オプション
- で指定した引数が優先されて実行されます。
+ その usage が表示されます。基本的には -f オプション
+ だけで実行可能ですが、他のオプションを指定すればその
+ オプションで指定した引数が優先されて実行されます。
+ これは、バッチ処理を行う際に特に効果的であり、複数の
+ arguments ファイルを用意する手間を省くことができます。
+
+
+ #########   Name definition   #########
+ arguments ファイルに記入する
+ hadron名、channel名、fit function名
+ の定義は、それぞれ
+
+ definition/hadron_name.txt
+ definition/channel_name.txt
+ definition/fit_function_name.txt
+
+ にあります。参照してください。
 
 
  #######   Gauge configs list   #######
  pot, mas の実行の際には gauge configs の list
- を読み込ませる必要があります。sample が ./arg/conf_list に
- ありますので、必要に応じて同様に作ってください。
+ を読み込ませる必要があります。sample が 
+ ./arg/conf_list にありますので、
+ 必要に応じて同様に作ってください。
  この際、gauge configs list の行数が #.confs 
  として読み込まれますので、余分な改行を入れないように
  してください。
@@ -57,15 +70,14 @@
  OpenMP を使う場合は、Makefile 内の CXXFLAGS に
  -fopenmp を加えてからビルドしてください。
 
- @@@@@@@@@@@@@ COUTION @@@@@@@@@@@@@@@@
- 現 version では OpenMP を使うとバグが発生します
- 使わないでください。
- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
- OpenMP は以下の部分にのみ用いています。
- * src/common/misc.cpp の endian_convert()
- * src/potential/projection.cpp の
+ OpenMP は、特に計算に時間がかかる以下の部分にのみ
+ 用いています。
+ * src/NBSwave/projection.cpp の
 	ang_mom_projection()
+ * src/NBSwave/make_jack_knife_NBS.cpp の
+	make_JK_sample_NBS()
+ * src/observable/calc_phase_shift.cpp の
+	calc_phase_shift()
 
 
  ############   doxygen   ############
@@ -84,10 +96,12 @@
 
 
  ######### Fit function の追加 #########
- 1) analysis_const.h の enum に追加
- 2) fitting/N_func_to_name.cpp に追加
- 3) fitting/set_func.cpp に追加（パラメータ数）
- 4) fitting/print_func_gnu.cpp に追加（関数形）
- 5) fitting/fit_funcs.cpp に追加（関数の戻り値）
- 6) include/phase_shift.h に追加（関数の定義）
+ 1) include/fitting/function_type_const.h
+ 2) include/fitting/fit_NR.h
+ 3) include/phase_shift.h
+ 4) src/observable/potential_funcs.cpp
+
+ にそれぞれ追加する。
+ パラメータ数が10を超える場合は、
+ src/fitting/print_func_gnu.cpp も編集
 

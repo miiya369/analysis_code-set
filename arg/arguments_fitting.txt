@@ -4,11 +4,8 @@
 FIT_Fit_data_file_name	= ./results/Pro_Lam__Pro_Lam_potential_fitdata_t8
 FIT_Output_file_name	= ./results/fit_params
 FIT_Stopping_condition	= 0.000001
-FIT_Function_type	= 3G
+FIT_Function_name	= 3G
 FIT_Fit_range_min	= 6
 FIT_Fit_range_max	= 12
-FIT_lattice_spacing	= 0.0907
 
-FIT_Endian_convert	= no
-
-FIT_Parameter		= { 1 2 3 4 5 6 }
+FIT_Parameter		= { 2 3 4 6 }

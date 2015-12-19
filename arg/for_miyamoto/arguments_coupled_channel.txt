@@ -1,11 +1,11 @@
 
 ### For Coupled channel potential ###
 
-CCP_Gauge_confs_list	= ./arg/conf_list.cp-pacs_ens3_190confs
+CCP_Gauge_confs_list	= ./arg/conf_list/conf_list.cp-pacs+JLQCD_ens3_190confs
 CCP_Path_to_input_dir	= /mnt/bblqcd00/miyamoto/results_kek/results_kek_cp-pacs+JLQCD_ens3/c_quark/t_shift_000
 CCP_Path_to_output_dir	= ./results
 CCP_Size_of_time	= 32
-CCP_Size_of_xyz		= 16
+CCP_Size_of_space	= 16
 CCP_calc_time_slice	= 8
 CCP_T_shift		= 0
 CCP_X_shift		= 0
@@ -27,4 +27,5 @@ CCP_Spin_z_component	= 0
 CCP_Ang_mom_projection	= 0
 
 CCP_Endian_convert	= yes
-CCP_Calc_fit_data	= yes
+CCP_out_fit_data	= yes
+CCP_read_pot_from_bin	= no
