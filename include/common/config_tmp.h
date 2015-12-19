@@ -4,14 +4,14 @@
  * @ingroup All
  * @brief   Common header file for configuration template class
  * @author  Takaya Miyamoto
- * @since   Wed Sep  2 22:28:05 JST 2015
+ * @since   Wed Sep 16 21:44:47 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #ifndef CONFIG_TMP_H
 #define CONFIG_TMP_H
 
-#include <common/analysis.h>
+#include <common/common_inc.h>
 
 //--------------------------------------------------------------------------
 /**
@@ -106,6 +106,14 @@ public:
    void make_mean_err( cdouble*, cdouble*, bool );
 };
 
+namespace analysis {
+   //! The function for data output
+   template <class X> void output_data_all( CONFIG<X>&, const char* );
+   template <class X> void output_data_err( CONFIG<X>&, const char* );
+   template <class X> void output_data_fit( CONFIG<X>&, const char* );
+}
+
 #include <common/make_jack_knife_sample.h>
+#include <common/output_data.h>
 
 #endif

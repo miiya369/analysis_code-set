@@ -1,0 +1,13 @@
+
+if(!exist("first_setting_fit")) first_setting_fit=0; \
+\
+set term x11 font "arial,18,bold"; \
+set ylabel "V(r) [Lat.Unit]"; \
+set xlabel "r [Lat.Unit]"; \
+set xr[0:28]; \
+
+set yr[$2:$3]
+
+p "$0" u 4:5:6 w yer notitle; \
+rep 0 w l lc "black" notitle; \
+rep $1 w l lw $4 notitle

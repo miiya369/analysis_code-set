@@ -4,7 +4,7 @@
  * @ingroup scattering length
  * @brief   Function for input phase shift data
  * @author  Takaya Miyamoto
- * @since   Fri Sep  4 03:23:49 JST 2015
+ * @since   Wed Sep 23 18:42:31 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ void observable::input_phase_shift(  const char* infile_name
  */
 //--------------------------------------------------------------------------
 void observable::input_phase_shift(  const char* infile_name
-                                   , double *energy, double *phase ) {
+                                   , double *energy, cdouble *phase ) {
    
    string class_name = "________________________________";
    string func_name = "input_phase_shift_body";
@@ -68,19 +68,20 @@ void observable::input_phase_shift(  const char* infile_name
       analysis::endian_convert(&tmp_Nconf, 1);
       analysis::endian_convert(&tmp_Ndata, 1);
    }
-   double tmp;
+   double  ftmp;
+   cdouble ctmp;
    for (int loop=0; loop<tmp_Ndata; loop++) {
       
-      ifs.read((char*)&tmp, sizeof(double));
+      ifs.read((char*)&ftmp, sizeof(double));
       if (!analysis::machine_is_little_endian())
-         analysis::endian_convert(&tmp, 1);
-      energy[loop] = tmp;
+         analysis::endian_convert(&ftmp, 1);
+      energy[loop] = ftmp;
       
       for (int conf=0; conf<tmp_Nconf; conf++) {
-         ifs.read((char*)&tmp, sizeof(double));
+         ifs.read((char*)&ctmp, sizeof(cdouble));
          if (!analysis::machine_is_little_endian())
-            analysis::endian_convert(&tmp, 1);
-         phase[conf+tmp_Nconf*loop] = tmp;
+            analysis::endian_convert(&ctmp, 1);
+         phase[conf+tmp_Nconf*loop] = ctmp;
       }
    }
    ifs.close();

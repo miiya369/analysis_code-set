@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Header file for potential class
  * @author  Takaya Miyamoto
- * @since   Mon Aug 31 18:50:09 JST 2015
+ * @since   Sat Sep 12 01:11:13 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -143,6 +143,8 @@ public:
    void input( R_CORRELATOR&, R_CORRELATOR& );
    void input( R_CORRELATOR& );
    void set_from_binary( const char* );
+   
+   cdouble momentum_rep( double );
 };
 
 #endif

@@ -1,5 +1,5 @@
 
-if(!exist("first_setting")) first_setting=0; \
+if(!exist("first_setting_pot”)) first_setting_pot=0; \
 \
 convfm=0.0907; \
 convMeV=197.327/0.0907; \

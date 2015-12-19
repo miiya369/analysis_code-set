@@ -41,8 +41,8 @@ void observable::input_param(  const char *infile_name
    snprintf(tmp_str, sizeof(tmp_str), "%d", func_type_number);
    func_type.set(tmp_str);
    
-   printf(" @ #.confs       = %d\n", tmp_Nconf);
-   printf(" @ function type = %s\n", func_type.name.c_str());
+//   printf(" @ #.confs       = %d\n", tmp_Nconf);
+//   printf(" @ function type = %s\n", func_type.name.c_str());
    ifs.close();
    
    n_conf  = tmp_Nconf;

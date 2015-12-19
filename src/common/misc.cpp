@@ -2,7 +2,7 @@
 /**
  * @file
  * @ingroup All
- * @brief   Miscellaneous functions
+ * @brief   Miscellaneous functions of analysis namespace
  * @author  Takaya Miyamoto
  * @since   Wed Jul 22 01:55:13 JST 2015
  */

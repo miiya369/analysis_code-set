@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Common header file for make jack-knife samples
  * @author  Takaya Miyamoto
- * @since   Wed Sep  2 22:38:50 JST 2015
+ * @since   Wed Sep 16 21:47:42 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -46,10 +46,10 @@ template <class X> void CONFIG<X>::make_mean_err(  double *mean, double *err
    double sqr_mean;
    
    if (is_jack_knife_data) {
-      factor = double(analysis::Nconf-1);
+      factor = double(num_conf-1);
    }
    else {
-      factor = 1.0 / double(analysis::Nconf-1);
+      factor = 1.0 / double(num_conf-1);
    }
 
    for (size_t n=0; n<data_size; n++) {
@@ -78,10 +78,10 @@ template <class X> void CONFIG<X>::make_mean_err(  cdouble *mean, cdouble *err
    cdouble sqr_mean;
    
    if (is_jack_knife_data) {
-      factor = double(analysis::Nconf-1);
+      factor = double(num_conf-1);
    }
    else {
-      factor = 1.0 / double(analysis::Nconf-1);
+      factor = 1.0 / double(num_conf-1);
    }
    
    for (size_t n=0; n<data_size; n++) {

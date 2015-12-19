@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Function for Input NBS wave function files
  * @author  Takaya Miyamoto
- * @since   Wed Sep  2 03:19:21 JST 2015
+ * @since   Sun Oct 18 04:37:52 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ void NBS_WAVE_ORG::input( CHANNEL_TYPE ch, int it, int iconf, bool endian_FLG ) 
     
    snprintf(         analysis::data_list[N_TIME]
             , sizeof(analysis::data_list[N_TIME])
-            , "%d", it);
+            , "%03d", it);
    snprintf(         analysis::data_list[NBS_DIRECTORY]
             , sizeof(analysis::data_list[NBS_DIRECTORY])
             , "%s", ch.directory.c_str());
@@ -67,7 +67,7 @@ void NBS_WAVE_ORG::input_compressed(  CHANNEL_TYPE ch
    
    snprintf(         analysis::data_list[N_TIME]
             , sizeof(analysis::data_list[N_TIME])
-            , "%d", it);
+            , "%03d", it);
    snprintf(         analysis::data_list[NBS_DIRECTORY]
             , sizeof(analysis::data_list[NBS_DIRECTORY])
             , "%s", ch.directory.c_str());

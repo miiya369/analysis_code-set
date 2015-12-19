@@ -12,10 +12,10 @@ POT_Y_shift		= 0
 POT_Z_shift		= 0
 POT_Snk_relativistic	= CG05
 POT_Src_relativistic	= CG05
-POT_Min_time_slice	= 8
-POT_Max_time_slice	= 8
-POT_Had1_mass		= 1.132174
-POT_Had2_mass		= 1.113707
+POT_Min_time_slice	= 9
+POT_Max_time_slice	= 9
+POT_Had1_mass		= 1.0
+POT_Had2_mass		= 1.0
 POT_Channel_name	= Pro-Lam_Pro-Lam
 POT_Spin_projection	= 0
 POT_Spin_z_component	= 0
@@ -26,8 +26,8 @@ POT_read_compress_NBS	= no
 POT_Rcorr_NBS/corr	= yes
 
 POT_Out_sum_pot		= yes
-POT_Out_laplacian	= no
-POT_Out_1st_t_diff	= no
-POT_Out_2nd_t_diff	= no
+POT_Out_laplacian	= yes
+POT_Out_1st_t_diff	= yes
+POT_Out_2nd_t_diff	= yes
 
-POT_Out_fit_data	= yes
+POT_Out_fit_data	= no

@@ -4,7 +4,7 @@
  * @ingroup correlator, NBS wave function
  * @brief   Main part for average of correlator & compress NBSwave data
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 17:30:18 JST 2015
+ * @since   Sun Oct 18 03:03:33 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -20,12 +20,6 @@ typedef four_point_base::BC BC;
 typedef PH1                 Core;
 typedef four_point<Core>    Four_Point;
 typedef compress48<Core>    Compress48;
-
-int  analysis::Nconf;
-int  analysis::xSIZE;
-int  analysis::ySIZE;
-int  analysis::zSIZE;
-int  analysis::tSIZE;
 
 int time_slice_min, time_slice_max;
 
@@ -122,10 +116,10 @@ int main(int argc, char **argv) {
                                  , channel_type[ich].number.c_str());
          
          for (int Tslice=time_slice_min; Tslice<=time_slice_max; Tslice++) {
-            analysis::set_data_list(  N_TIME, "%d", Tslice);
+            analysis::set_data_list(  N_TIME, "%03d", Tslice);
             analysis::set_data_list(  MAIN_PATH
                                     , "%s/t_shift_%03d", work_dir, Tshift[0]);
-            analysis::set_data_list(  N_T_SHIFT, "%d", Tshift[0]);
+            analysis::set_data_list(  N_T_SHIFT, "%03d", Tshift[0]);
             
             mapping48  map;    map.read( analysis::set_path(conf).c_str());
             Compress48 comp;   comp.read(analysis::set_path(conf).c_str(), map);
@@ -133,13 +127,13 @@ int main(int argc, char **argv) {
             for (int it=1; it<N_Tshift; it++) {
                analysis::set_data_list(  MAIN_PATH
                                        , "%s/t_shift_%03d", work_dir, Tshift[it]);
-               analysis::set_data_list(  N_T_SHIFT, "%d", Tshift[it]);
+               analysis::set_data_list(  N_T_SHIFT, "%03d", Tshift[it]);
                tmp.read(analysis::set_path(conf).c_str(), map);
                comp += tmp; // NBSwave ave.
             } // it
             analysis::set_data_list(  MAIN_PATH, "%s/t_shift_ave/%dsrc"
                                     , work_dir, N_Tshift);
-            analysis::set_data_list(N_T_SHIFT, "-%d", N_Tshift);
+            analysis::set_data_list(N_T_SHIFT, "A%02d", N_Tshift);
             comp /= double(N_Tshift);
             comp.write(analysis::set_path(conf).c_str());
             
@@ -310,18 +304,24 @@ int set_args_from_file(char* file_name) {
          snprintf(conf_list,sizeof(conf_list),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"AVE_Path_to_working_dir")==0)
          snprintf(work_dir,sizeof(work_dir),"%s",tmp_c2);
-      else if (strcmp(tmp_c1,"AVE_X_shift"           )==0)
+      else if (strcmp(tmp_c1,"AVE_X_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_X_SHIFT]
                   , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"AVE_Y_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"AVE_Y_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Y_SHIFT]
                   , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"AVE_Z_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"AVE_Z_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Z_SHIFT]
                   , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%s", tmp_c2);
+                  , "%03d", tmp_i);
+      }
       else if (strcmp(tmp_c1,"AVE_Snk_relativistic"  )==0)
          snprintf(         analysis::data_list[SNK_RELA]
                   , sizeof(analysis::data_list[SNK_RELA])
@@ -397,7 +397,7 @@ int set_args_from_file(char* file_name) {
 void input_corr_all(string CORRtype, int CONF, int TSHIFT, double *CORR) {
    
    analysis::set_data_list(MAIN_PATH, "%s/t_shift_%03d", work_dir, TSHIFT);
-   analysis::set_data_list(N_T_SHIFT, "%d", TSHIFT);
+   analysis::set_data_list(N_T_SHIFT, "%03d", TSHIFT);
    analysis::set_data_list(CORR_DIRECTORY, "%s", CORRtype.c_str());
    
    FILE* fp = fopen( analysis::set_path(CONF).c_str(), "r" );
@@ -422,7 +422,7 @@ void input_corr_all(string CORRtype, int CONF, int TSHIFT, double *CORR) {
 void output_corr_all(string CORRtype, int CONF, int N_TSHIFT, double *CORR) {
    
    analysis::set_data_list(MAIN_PATH, "%s/t_shift_ave/%dsrc", work_dir, N_TSHIFT);
-   analysis::set_data_list(N_T_SHIFT, "-%d", N_TSHIFT);
+   analysis::set_data_list(N_T_SHIFT, "A%02d", N_TSHIFT);
    analysis::set_data_list(CORR_DIRECTORY, "%s", CORRtype.c_str());
    
    FILE* fp = fopen( analysis::set_path(CONF).c_str(), "w" );

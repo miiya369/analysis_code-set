@@ -4,19 +4,13 @@
  * @ingroup NBS wave function, R-correlator
  * @brief   Main part for wave function calculation
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 16:59:10 JST 2015
+ * @since   Sun Oct 18 03:50:05 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <R_correlator/R_correlator.h>
 
 #define PROJECT CALC_WAVE_FUNCTION // <- Project name
-
-int  analysis::Nconf;
-int  analysis::xSIZE;
-int  analysis::ySIZE;
-int  analysis::zSIZE;
-int  analysis::tSIZE;
 
 CHANNEL_TYPE channel;
 int time_min;
@@ -219,22 +213,30 @@ int set_args_from_file(char* file_name) {
          snprintf(         analysis::data_list[MAIN_PATH]
                   , sizeof(analysis::data_list[MAIN_PATH])
                   , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_T_shift"           )==0)
+      else if (strcmp(tmp_c1,"WAVE_T_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_T_SHIFT]
                   , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_X_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"WAVE_X_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_X_SHIFT]
                   , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_Y_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"WAVE_Y_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Y_SHIFT]
                   , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_Z_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"WAVE_Z_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Z_SHIFT]
                   , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%s", tmp_c2);
+                  , "%03d", tmp_i);
+      }
       else if (strcmp(tmp_c1,"WAVE_Size_of_time"      )==0)
          analysis::tSIZE = atoi(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Snk_relativistic"  )==0)

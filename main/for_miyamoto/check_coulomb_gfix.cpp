@@ -7,7 +7,8 @@
  */
 //--------------------------------------------------------------------------
 
-#include <common/gauge_link.h>
+#include <common/common_inc.h>
+#include <gauge/gauge_link.h>
 
 int main(int argc, char **argv) {
 

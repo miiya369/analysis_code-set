@@ -13,5 +13,5 @@ AVE_Z_shift		= 0
 AVE_Snk_relativistic	= CG05
 AVE_Src_relativistic	= CG05
 AVE_T_shift_list	= { 0 16 32 48 }
-AVE_Calc_hadron_name	= { pion proton Lambda Sigma }
-AVE_Calc_channel_name	= { }
+AVE_Calc_hadron_name	= { pion phi proton Lambda Sigma }
+AVE_Calc_channel_name	= { Pro-Neu_Pro-Neu Pro-Lam_Pro-Lam Pro-Lam_Pro-SigZ Pro-Lam_Neu-SigP Pro-SigZ_Pro-Lam Pro-SigZ_Pro-SigZ Pro-SigZ_Neu-SigP Neu-SigP_Pro-Lam Neu-SigP_Pro-SigZ Neu-SigP_Neu-SigP }

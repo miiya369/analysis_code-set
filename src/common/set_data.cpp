@@ -4,11 +4,19 @@
  * @ingroup All
  * @brief   Function for data list setting, data_list is used on set_path
  * @author  Takaya Miyamoto
- * @since   Fri Sep  4 18:58:26 JST 2015
+ * @since   Wed Sep 16 22:06:04 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <common/analysis.h>
+
+int analysis::xSIZE;
+int analysis::ySIZE;
+int analysis::zSIZE;
+int analysis::tSIZE;
+int analysis::Nconf;
+
+char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
 int analysis::set_data_list( const char* path_conf_file_list ) {
    
@@ -109,4 +117,13 @@ void analysis::set_data_list( int SET_INDEX, const char* format, ... ) {
             ,sizeof(analysis::data_list[SET_INDEX]), tmp_c );
    
    va_end(args);
+}
+
+void analysis::set_data( int xxx, int yyy, int zzz, int ttt, int nnn ) {
+   
+   analysis::xSIZE = xxx;
+   analysis::ySIZE = yyy;
+   analysis::zSIZE = zzz;
+   analysis::tSIZE = ttt;
+   analysis::Nconf = nnn;
 }

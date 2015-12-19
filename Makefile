@@ -89,7 +89,7 @@ clean:
 
 ###### FOR TEST ######
 .PHONY: test
-test: $(OBJDIR)/test.o $(COMMON) $(NBS) $(yukawa)
+test: $(OBJDIR)/test.o $(COMMON) $(OBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 .PHONY: ALL

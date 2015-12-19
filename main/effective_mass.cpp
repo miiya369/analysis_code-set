@@ -4,7 +4,7 @@
  * @ingroup correlator
  * @brief   Main part for effective mass calculation
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 17:31:47 JST 2015
+ * @since   Sun Oct 18 04:10:27 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,12 +12,6 @@
 #include <correlator/correlator.h>
 
 #define PROJECT EFFECTIVEMASS    // <- Project name
-
-int  analysis::Nconf;
-int  analysis::xSIZE;
-int  analysis::ySIZE;
-int  analysis::zSIZE;
-int  analysis::tSIZE;
 
 int          Nhad;
 HADRON_TYPE *hadron_type = NULL;
@@ -87,8 +81,10 @@ int main(int argc, char **argv) {
                                       , fit_range_min, fit_range_max, 0.000001 );
             param[conf] = (*fit)(conf)(1);
          }
-         analysis::make_mean_err( param, mass[0+4*loop], mass[1+4*loop], true  );
-         analysis::make_mean_err( chisq, mass[2+4*loop], mass[3+4*loop], false );
+         analysis::make_mean_err(  param, mass[0+4*loop], mass[1+4*loop]
+                                 , analysis::Nconf, true  );
+         analysis::make_mean_err(  chisq, mass[2+4*loop], mass[3+4*loop]
+                                 , analysis::Nconf, false );
       }
       
    } // Nhad
@@ -243,22 +239,30 @@ int set_args_from_file(char* file_name) {
          snprintf(outfile_path,sizeof(outfile_path),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Size_of_time"      )==0)
          analysis::tSIZE = atoi(tmp_c2);
-      else if (strcmp(tmp_c1,"MAS_T_shift"           )==0)
+      else if (strcmp(tmp_c1,"MAS_T_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_T_SHIFT]
                   , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"MAS_X_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"MAS_X_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_X_SHIFT]
                   , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"MAS_Y_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"MAS_Y_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Y_SHIFT]
                   , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"MAS_Z_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"MAS_Z_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Z_SHIFT]
                   , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%s", tmp_c2);
+                  , "%03d", tmp_i);
+      }
       else if (strcmp(tmp_c1,"MAS_Calc_hadron_name"  )==0     ) {
          char *tmp_tok;
          char  tmp_tmp_str[MAX_N_DATA][MAX_LEN_PATH];

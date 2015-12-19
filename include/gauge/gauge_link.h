@@ -5,16 +5,16 @@
  * @brief   Header file for several functions of gauge link valiable
  * @brief   NOTE: gauge link valiable must be form "ildg format"
  * @author  Takaya Miyamoto
- * @since   Mon Aug 17 00:55:17 JST 2015
+ * @since   Thu Sep 17 22:33:34 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #ifndef GAUGE_LINK_H
 #define GAUGE_LINK_H
 
-#include <common/matrix.h>
+#include <gauge/matrix_class.h>
 
-#define idx(mu,x,y,z,t) mu+4*(x+sSIZE*(y+sSIZE*(z+sSIZE*t)))
+#define idx(mu,x,y,z,t) (mu+4*(x+sSIZE*(y+sSIZE*(z+sSIZE*t))))
 
 double plaquette(double *iconf, int sSIZE, int tSIZE) {
    
@@ -118,7 +118,8 @@ void stout_smearing(double *iconf, double param, int sSIZE, int tSIZE) {
          } // nu
          staple *= conf[idx(mu,n[0],n[1],n[2],n[3])].dagger();
          tmp = (   (staple.dagger() - staple)
-                - ((staple.dagger() - staple).trace()/3.0))* cdouble(0.0, 0.5);
+                - ((staple.dagger() - staple).trace()/3.0))
+               * std::complex<double>(0.0, 0.5);
          conf_tmp[idx(mu,n[0],n[1],n[2],n[3])]
             = tmp.exp_su3() * conf[idx(mu,n[0],n[1],n[2],n[3])];
       } // mu
@@ -132,10 +133,10 @@ void stout_smearing(double *iconf, double param, int sSIZE, int tSIZE) {
    delete [] conf_tmp;
 }
 
-cdouble check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
+std::complex<double> check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
    
-   MATRIX* conf = (MATRIX*)iconf;
-   cdouble ret = 0.0;
+   MATRIX*              conf = (MATRIX*)iconf;
+   std::complex<double> ret  = 0.0;
    
    size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
    int    size[]   = { sSIZE, sSIZE, sSIZE, tSIZE };   // x, y, z, t
@@ -149,8 +150,8 @@ cdouble check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
       int n[4],m[4];
 //=========================   notation   ========================
 //
-//        m       n                 define, m = n - mu
-//        x--->---@--->---x
+//        m       n                    define, m = n - mu
+//        x--->---@--->---x   -> mu
 //
 //                           ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
@@ -175,6 +176,47 @@ cdouble check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
          }
    }
    return ret/double(xyztSIZE*4);
+}
+
+void gfix_by_gmat(double *iconf, double *igmat, int sSIZE, int tSIZE) {
+   
+   MATRIX* conf = (MATRIX*)iconf;
+   MATRIX* gmat = (MATRIX*)igmat;
+   
+   size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
+   int    size[]   = { sSIZE, sSIZE, sSIZE, tSIZE };   // x, y, z, t
+   
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++) {
+      
+      int n[4],m[4];
+//=========================   notation   ========================
+//
+//      G(n)  U(n,mu)  G(m).dagger        define, m = n + mu
+//        x------>------x          -> mu
+//
+//                           ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
+//===============================================================
+      size_t tmp_site = site_loop;
+      for (int xyzt=0; xyzt<4; xyzt++) {
+         n[xyzt]  =  tmp_site          % size[xyzt];
+         tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
+      }
+      for (int mu=0; mu<4;  mu++) {
+         
+         for (int loop=0; loop<4; loop++)
+            m[loop] = n[loop];
+         
+         m[mu] = (m[mu]+1) % size[mu];
+         
+           conf[idx(mu,n[0],n[1],n[2],n[3])]
+         = gmat[idx(0, n[0],n[1],n[2],n[3])/4]
+         * conf[idx(mu,n[0],n[1],n[2],n[3])]
+         * gmat[idx(0, m[0],m[1],m[2],m[3])/4].dagger();
+      }
+   } // site_loop
 }
 
 #undef idx

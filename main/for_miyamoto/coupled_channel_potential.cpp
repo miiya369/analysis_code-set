@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for calculate coupled channel potential
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 17:36:48 JST 2015
+ * @since   Sun Oct 18 03:45:59 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -14,12 +14,6 @@
 
 #define IT(iii,ttt) ((iii)+ 4* (ttt))
 #define RC(Row,Colomn) ((Colomn)+ 2* (Row))
-
-int  analysis::Nconf;
-int  analysis::xSIZE;
-int  analysis::ySIZE;
-int  analysis::zSIZE;
-int  analysis::tSIZE;
 
 int    time_slice;
 int    spin;
@@ -332,22 +326,30 @@ int set_args_from_file(char* file_name) {
          snprintf(         analysis::data_list[MAIN_PATH]
                   , sizeof(analysis::data_list[MAIN_PATH])
                   , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_T_shift"           )==0)
+      else if (strcmp(tmp_c1,"CCP_T_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_T_SHIFT]
                   , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_X_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"CCP_X_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_X_SHIFT]
                   , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_Y_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"CCP_Y_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Y_SHIFT]
                   , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_Z_shift"           )==0)
+                  , "%03d", tmp_i);
+      }
+      else if (strcmp(tmp_c1,"CCP_Z_shift"           )==0) {
+         int tmp_i = atoi(tmp_c2);
          snprintf(         analysis::data_list[N_Z_SHIFT]
                   , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%s", tmp_c2);
+                  , "%03d", tmp_i);
+      }
       else if (strcmp(tmp_c1,"CCP_Snk_relativistic"  )==0)
          snprintf(         analysis::data_list[SNK_RELA]
                   , sizeof(analysis::data_list[SNK_RELA])

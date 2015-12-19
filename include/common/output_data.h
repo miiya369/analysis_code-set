@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Common header file for definition of data output
  * @author  Takaya Miyamoto
- * @since   Thu Sep  3 01:34:55 JST 2015
+ * @since   Tue Sep 22 19:57:24 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -20,25 +20,38 @@
  * @brief Function for data output ( one conf. with binary )
  */
 //--------------------------------------------------------------------------
-template <class X> void analysis::output_data_all(  X &data
+template <class X> void analysis::output_data_all(  CONFIG<X> &data
                                                   , const char* outfile_name ) {
    
    string class_name = "________________________________";
    string func_name  = "output_data_all_______";
    analysis::route(class_name, func_name, 1);
-
+   
    ofstream ofs( outfile_name, ios::out | ios::binary );
    
-   size_t  data_size = data.data_size();
+   int     itmp1, itmp2;
+   int     num_conf  = data.info_conf();
+   size_t  data_size = data(0).info_data_size();
    cdouble tmp;
-   for (size_t n=0; n<data_size; n++) {
-      tmp = data(n);
-      if (!analysis::machine_is_little_endian())
-         analysis::endian_convert(&tmp, 1);
-      ofs.write((char*)&tmp, sizeof(cdouble));
+   
+   itmp1 = num_conf;
+   itmp2 = data_size;
+   if (!analysis::machine_is_little_endian()) {
+      analysis::endian_convert(&itmp1, 1);
+      analysis::endian_convert(&itmp2, 1);
+   }
+   ofs.write((char*)&itmp1, sizeof(int));
+   ofs.write((char*)&itmp2, sizeof(int));
+   
+   for(    int    i=0; i<num_conf;  i++)
+      for (size_t n=0; n<data_size; n++) {
+         tmp = data(i)(n);
+         if (!analysis::machine_is_little_endian())
+            analysis::endian_convert(&tmp, 1);
+         ofs.write((char*)&tmp, sizeof(cdouble));
    }
    ofs.close();
-      
+   
    analysis::route(class_name, func_name, 0);
 }
 
@@ -56,24 +69,26 @@ template <class X> void analysis::output_data_err(  CONFIG<X> &data
    analysis::route(class_name, func_name, 1);
    
    cdouble err, mean, sqr_mean;
+   int     num_conf = data.info_conf();
 
    ofstream ofs( outfile_name, ios::out );
    ofs << "#   t, mean.real, err.real, mean.imag, err.imag" << endl;
    
    if (data(0).info_class()==CLASS_CORRELATOR) {   // for CORRELATOR-TYPE datas
       
-      for(int t=0; t<analysis::tSIZE; t++) {
+      int data_size = data(0).info_data_size();
+      for(int t=0; t<data_size; t++) {
          
          mean     = COMP_ZERO;
          sqr_mean = COMP_ZERO;
          
-         for( int i=0; i<analysis::Nconf; i++) {
+         for( int i=0; i<num_conf; i++) {
             mean     +=          data(i)(t);
             sqr_mean += cmp_sqr( data(i)(t) );
          }
-         mean     /= double(analysis::Nconf);
-         sqr_mean /= double(analysis::Nconf);
-         err = cmp_sqrt(double(analysis::Nconf-1)*(sqr_mean - cmp_sqr(mean)));
+         mean     /= double(num_conf);
+         sqr_mean /= double(num_conf);
+         err = cmp_sqrt(double(num_conf-1)*(sqr_mean - cmp_sqr(mean)));
          
          ofs << t << " " << mean.real() << " " << err.real()
              << " " << mean.imag() << " " << err.imag() << endl;
@@ -90,13 +105,13 @@ template <class X> void analysis::output_data_err(  CONFIG<X> &data
                mean     = COMP_ZERO;
                sqr_mean = COMP_ZERO;
             
-               for (int i=0; i<analysis::Nconf; i++) {
+               for (int i=0; i<num_conf; i++) {
                   mean     +=          data(i)(idx(x,y,z));
                   sqr_mean += cmp_sqr( data(i)(idx(x,y,z)) );
                }
-               mean     /= double(analysis::Nconf);
-               sqr_mean /= double(analysis::Nconf);
-               err       = cmp_sqrt(  double(analysis::Nconf-1)
+               mean     /= double(num_conf);
+               sqr_mean /= double(num_conf);
+               err       = cmp_sqrt(  double(num_conf-1)
                                     * ( sqr_mean - cmp_sqr( mean )) );
                
                R = sqrt( x*x + y*y + z*z );
@@ -143,11 +158,12 @@ template <class X> void analysis::output_data_fit(  CONFIG<X> &data
    ofstream ofs( outfile_name, ios::out | ios::binary );
    double   mean, sqr_mean, err, tmp;
    int      fit_type, tmp_Nconf, tmp_Ndata;
+   int      num_conf = data.info_conf();
    
    if (data(0).info_class()==CLASS_CORRELATOR) {   // for CORRELATOR-TYPE datas
       
       fit_type  = 1;   // write file header
-      tmp_Nconf = analysis::Nconf;
+      tmp_Nconf = num_conf;
       tmp_Ndata = analysis::tSIZE;
       
       if (!analysis::machine_is_little_endian()) {
@@ -163,19 +179,19 @@ template <class X> void analysis::output_data_fit(  CONFIG<X> &data
          mean     = 0.0;
          sqr_mean = 0.0;
          
-         for(int i=0; i<analysis::Nconf; i++) {
+         for(int i=0; i<num_conf; i++) {
             mean     +=     data(i)(t).real();
             sqr_mean += pow(data(i)(t).real(),2);
          }
-         mean     /= double(analysis::Nconf);
-         sqr_mean /= double(analysis::Nconf);
-         err       = sqrt(double(analysis::Nconf-1) * (sqr_mean - pow(mean,2)));
+         mean     /= double(num_conf);
+         sqr_mean /= double(num_conf);
+         err       = sqrt(double(num_conf-1) * (sqr_mean - pow(mean,2)));
          
          if (!analysis::machine_is_little_endian())
             analysis::endian_convert(&err, 1);
          ofs.write((char*)&err, sizeof(double));   // write fit data
          
-         for( int i=0; i<analysis::Nconf; i++) {
+         for( int i=0; i<num_conf; i++) {
             tmp = data(i)(t).real();
             if (!analysis::machine_is_little_endian())
                analysis::endian_convert(&tmp,1);
@@ -186,7 +202,7 @@ template <class X> void analysis::output_data_fit(  CONFIG<X> &data
    } else {   // for POTENTIAL-TYPE datas
       
       fit_type  = 2;   // write file header
-      tmp_Nconf = analysis::Nconf;
+      tmp_Nconf = num_conf;
       int Ndata = analysis::reduced_Ndata();
       tmp_Ndata = Ndata;
       
@@ -208,13 +224,13 @@ template <class X> void analysis::output_data_fit(  CONFIG<X> &data
                mean     = 0.0;
                sqr_mean = 0.0;
                
-               for (int i=0; i<analysis::Nconf; i++) {
+               for (int i=0; i<num_conf; i++) {
                   mean     +=      data(i)(idx(x,y,z)).real();
                   sqr_mean += pow( data(i)(idx(x,y,z)).real(), 2 );
                }
-               mean     /= double(analysis::Nconf);
-               sqr_mean /= double(analysis::Nconf);
-               err       = sqrt(double(analysis::Nconf-1)*(sqr_mean-pow(mean,2)));
+               mean     /= double(num_conf);
+               sqr_mean /= double(num_conf);
+               err       = sqrt(double(num_conf-1)*(sqr_mean-pow(mean,2)));
  
                R = sqrt( x*x + y*y + z*z );
                
@@ -225,7 +241,7 @@ template <class X> void analysis::output_data_fit(  CONFIG<X> &data
                ofs.write((char*)&R  , sizeof(double));
                ofs.write((char*)&err, sizeof(double));
                
-               for (int i=0; i<analysis::Nconf; i++){
+               for (int i=0; i<num_conf; i++){
                   tmp = data(i)(idx(x,y,z)).real();
                   if (!analysis::machine_is_little_endian())
                      analysis::endian_convert(&tmp,1);

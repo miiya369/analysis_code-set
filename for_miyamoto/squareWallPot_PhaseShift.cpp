@@ -51,13 +51,13 @@ int main( int argc, char** argv ){
     
     ofstream ofs( outfile_name, ios::out );
     
-    for(int E=0; E<=600; E++){
+    for(int E=0; E<=200; E++){
         k    = sqrt(2*m*E/pow(hber_c,2));
         kk   = sqrt(2*m*(E+V_0)/pow(hber_c,2));
         nume = kk*j_0_diff(a*kk)*j_0(a*k)-k*j_0_diff(a*k)*j_0(a*kk);
         deno = kk*j_0_diff(a*kk)*n_0(a*k)-k*n_0_diff(a*k)*j_0(a*kk);
         
-        ofs << k << " " << -(nume/deno) /k << endl;
+        ofs << E << " " << atan(nume/deno) *180/PI << endl;
     }
     ofs.close();
     return 0;

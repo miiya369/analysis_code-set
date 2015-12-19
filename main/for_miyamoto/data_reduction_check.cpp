@@ -2,14 +2,14 @@
 #include <common/analysis.h>
 #include <potential/potential.h>
 
-int analysis::Nconf=10;
-int analysis::xSIZE=16;
-int analysis::ySIZE=16;
-int analysis::zSIZE=16;
-int analysis::tSIZE=16;
-
 int main(int argc, char **argv) {
    
+//   analysis::Nconf=10;
+//   analysis::xSIZE=16;
+//   analysis::ySIZE=16;
+//   analysis::zSIZE=16;
+//   analysis::tSIZE=16;
+//   
 //   analysis::Nconf = analysis::set_data_list(
 //     "/Users/miiya/Desktop/work_kyoto/test_data/cp-pacs+JLQCD_ens3_193conf"
 //   , "0", "0", "0", "0", "CG05", "CG05"

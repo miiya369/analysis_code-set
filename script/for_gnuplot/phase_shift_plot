@@ -1,0 +1,16 @@
+
+if(!exist("first_setting_phase")) first_setting_phase=0; \
+\
+set term x11 font "arial,18,bold"; \
+set key right top; \
+set ylabel "delta [Deg]"; \
+set xlabel "E [MeV]"; \
+
+set xr[$0:$1]
+set yr[$2:$3]
+
+if ("$6"!=0) \
+p "$4" u 1:2:3 w yer title "$5"; \
+rep 0 w l lc "black" notitle; \
+else \
+rep "$4" u 1:2:3 w yer title "$5"

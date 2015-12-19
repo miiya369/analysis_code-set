@@ -4,7 +4,7 @@
  * @ingroup phase shift
  * @brief   Header file for phase shift class
  * @author  Takaya Miyamoto
- * @since   Fri Sep  4 04:44:46 JST 2015
+ * @since   Fri Oct  9 07:33:55 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -23,9 +23,9 @@ class PHASE_SHIFT {
 private:
    string class_name, func_name;
    
-   int     data_size;
-   double *phase_shift;
-   double *energy;
+   int      data_size;
+   cdouble *phase_shift;
+   double  *energy;
    
 protected:
    
@@ -33,11 +33,11 @@ public:
 //============================ For inner index ===========================//
    
 //============================== For writing =============================//
-   double& operator()(size_t index) {
+   cdouble& operator()(size_t index) {
       return phase_shift[index];
    }
 //============================== For reading =============================//
-   const double& operator()(size_t index) const {
+   const cdouble& operator()(size_t index) const {
       return phase_shift[index];
    }
 //======================== Constructor & Destructor ======================//
@@ -88,8 +88,8 @@ public:
       
       data_size = count;
       
-      if (phase_shift == NULL) phase_shift = new double[data_size];
-      if (energy      == NULL) energy      = new double[data_size];
+      if (phase_shift == NULL) phase_shift = new cdouble[data_size];
+      if (energy      == NULL) energy      = new double[ data_size];
       
       if (E_dev < 0) {
          double tmp_E = E_max;
@@ -114,8 +114,8 @@ public:
       
       data_size = dataSIZE;
       
-      if (phase_shift == NULL) phase_shift = new double[data_size];
-      if (energy      == NULL) energy      = new double[data_size];
+      if (phase_shift == NULL) phase_shift = new cdouble[data_size];
+      if (energy      == NULL) energy      = new double[ data_size];
       
       for (int loop=0; loop<data_size; loop++) energy[loop] = ENERGY[loop];
       
@@ -147,12 +147,14 @@ public:
 
 namespace observable {
    
+   void output_phase_shift    ( const char*, PHASE_SHIFT& );
    void output_phase_shift_all( const char*, CONFIG<PHASE_SHIFT>& );
    void output_phase_shift_err( const char*, CONFIG<PHASE_SHIFT>& );
-   void output_scatt_length(    const char*, CONFIG<PHASE_SHIFT>&, double );
-   
-   void calc_phase_shift(  PHASE_SHIFT&, double*, int, int, double, double
-                         , double, double, double );
+
+   void calc_phase_shift_dif(  PHASE_SHIFT*, double*, double*, double*
+                             , int, int, int, double, double, double );
+   void calc_phase_shift_int(  PHASE_SHIFT*, double*, double*, double*
+                             , int, int, int, double, int );
 }
 
 #endif

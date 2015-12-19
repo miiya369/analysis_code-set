@@ -4,19 +4,13 @@
  * @ingroup fitting
  * @brief   Main part for fitting analysis
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 17:32:01 JST 2015
+ * @since   Sun Oct 18 04:16:59 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <fitting/fitting.h>
 
 #define PROJECT FITTING_DATA   // <- Project name
-
-int  analysis::Nconf;
-int  analysis::xSIZE;
-int  analysis::ySIZE;
-int  analysis::zSIZE;
-int  analysis::tSIZE;
 
 int     n_param;
 double* param_initial = NULL;
@@ -56,6 +50,8 @@ int main(int argc, char **argv) {
    double      *chisq = new double[analysis::Nconf];
    double      *param = new double[analysis::Nconf * n_param];
    
+   int counter = 0;
+   printf(" @ data fitting |   0%%");
 //#pragma omp parallel for
    for (int conf=0; conf<analysis::Nconf; conf++) {
       
@@ -71,15 +67,19 @@ int main(int argc, char **argv) {
       
       delete [] data;
       
+      counter++;
+      printf("\b\b\b\b%3.0lf%%",double(counter)/double(analysis::Nconf)*100);
+      fflush(stdout);
    } // conf
+   printf("\n");
    
    double param_mean, param_err, chisq_mean, chisq_err;
-   analysis::make_mean_err( chisq, chisq_mean, chisq_err, false );
+   analysis::make_mean_err( chisq, chisq_mean, chisq_err, analysis::Nconf, false );
    printf(" @ Finished fitting : chisq/dof = %lf +/- %lf\n",chisq_mean,chisq_err);
    
    for (int loop=0; loop<n_param; loop++) {
       analysis::make_mean_err(  &param[analysis::Nconf*loop]
-                              , param_mean, param_err, false );
+                              , param_mean, param_err, analysis::Nconf, false );
       printf(" @                  : param[%1d]  = %lf +/- %lf\n"
              , loop, param_mean, param_err);
       

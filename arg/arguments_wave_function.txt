@@ -20,7 +20,7 @@ WAVE_Spin_z_component	= 0
 WAVE_Ang_mom_projection	= 0
 
 WAVE_Endian_convert	= yes
-WAVE_read_compress_NBS	= no
+WAVE_read_compress_NBS	= yes
 WAVE_Rcorr_NBS/corr	= yes
 
 WAVE_Out_R_correlator	= no
