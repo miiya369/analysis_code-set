@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Header File for definition of fit function type
  * @author  Takaya Miyamoto
- * @since   Thu Sep  3 02:43:09 JST 2015
+ * @since   Thu Dec 10 21:14:59 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -99,6 +99,15 @@ public:
          gnuplot_form += "+(%lf)*exp(-((x-(%lf))/(%lf))**2)";
          number       = 7;
          Nparam       = 6;
+      }
+      else if (func_name == "4G" || func_name == "8") {
+         name         = "three gaussians";
+         gnuplot_form  = "%lf*exp(-(x/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-(x/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-(x/(%lf))**2)";
+         gnuplot_form += "+(%lf)*exp(-(x/(%lf))**2)";
+         number       = 8;
+         Nparam       = 8;
       }
 //---   ---//
       else {

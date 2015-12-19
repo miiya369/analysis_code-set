@@ -8,6 +8,6 @@ set xr[0:28]; \
 
 set yr[$2:$3]
 
-p "$0" u 4:5:6 w yer notitle; \
+p "$0” u 4:5:6 w yer notitle; \
 rep 0 w l lc "black" notitle; \
 rep $1 w l lw $4 notitle

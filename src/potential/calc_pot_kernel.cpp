@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Calculate potential kernel
  * @author  Takaya Miyamoto
- * @since   Mon Aug 31 18:45:39 JST 2015
+ * @since   Fri Nov 13 02:21:49 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -15,6 +15,8 @@ string potential::kernel(  R_CORRELATOR &K_Rcorr
                          , R_CORRELATOR &Rcorr2
                          , R_CORRELATOR &Rcorr3
                          , double        reduced_mass ) {
+   
+   K_Rcorr.mem_alloc();
    
    int xSHIFT, ySHIFT, zSHIFT;
    for (      int z=0; z<analysis::zSIZE; z++)

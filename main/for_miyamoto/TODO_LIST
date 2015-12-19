@@ -1,0 +1,80 @@
+
+ ////////////////////////////////////////////////
+ ///                                          ///
+                    TODO LIST
+
+            Author : Takaya Miyamoto
+ ///                                          ///
+ ////////////////////////////////////////////////
+
+
+ * ALL
+	- ファイルの書き込みのエラー出力はまだ作っていない
+	error 関数に書き込み用のやつをつくる。
+	（読み込み時のエラーと分ける）
+	- corr の input の最適化（ << は遅い ）
+	- error の際の終了を安全にできるようにする
+	（今は exit(1)）-> bblqcd ではできない？
+	- 時空間の index において、int と size_t が
+	   混じっている！ 32-bit integer の 
+	   over flow が起こるのは 
+	   2^31-1 = 2,147,483,647 なので、
+	   NBS_org でも L = 512 まで大丈夫。
+	   gauge conf の index 以外は全て int でよい？
+
+ * effective_mass
+	- OK
+
+ * eigen_energy_schrodinger
+	- ジャックナイフを取るタイミングが、
+	スピン角運動量の射影を行う前後で結果は変わるか？
+	- 固有ベクトルから基底状態＆励起状態の NBS を
+	取り出せるようにする。
+	- 外部 lib を使って早く＆正確にする。NR など？
+
+ * fitting
+	- OK
+	- NR 以外のフィッティングにも対応できるようにする
+	   (Numerical Recipe の fit は良くない？)
+
+ * observable
+	- phase shift 計算の高速化 (NRなどの外部libで)
+
+ * potential
+	- OK
+
+ * wave_function
+	- ジャックナイフを取るタイミングが、
+	スピン角運動量の射影を行う前後で結果は変わるか？
+
+ * gfix_from_gmat
+	- OK
+
+ * jack_knife_bin_check
+	- OK
+
+ * average_compress
+	- OK
+
+ * make_JK_samples.cpp
+	- 石井さんの compressed NBS の取り扱いが
+	よくわからない。mapping48 は全 conf で
+	同じものを使っているが、それで良いのか？
+	- correlator の部分は OK
+
+ * tensor_force
+	- OK
+======
+
+ * coupled_channel_potential
+	- まだ I=1/2 Octet Baryon にしか対応していない
+
+ * data_reduction_check
+	- 1/48 reduction 用の昔のコード
+	- x,y,z の大小関係で簡単に reduction
+	できることに気づいてしまった今としては
+	もういらないかもしれない。
+
+ * extract_Z-factor
+	- 全然つくってない。
+

@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Function for data fitting, according to Numerical Recipe
  * @author  Takaya Miyamoto
- * @since   Wed Sep  2 23:41:46 JST 2015
+ * @since   Thu Dec 10 21:18:21 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -72,7 +72,8 @@ double FIT::fit_data_NR(  double *cood, double *data, double *err
       
       } else if (func_type.number == 3 ||
                  func_type.number == 4 ||
-                 func_type.number == 5 ) {
+                 func_type.number == 5 ||
+                 func_type.number == 8 ) {
          Fitmrq fit_NR(COOD, DATA, ERR, PARAM, &fit_funcs::func_gauss, stp_cnd);
          fit_NR.fit();
          for (int n=0; n<func_type.Nparam; n++)

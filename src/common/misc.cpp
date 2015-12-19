@@ -4,15 +4,17 @@
  * @ingroup All
  * @brief   Miscellaneous functions of analysis namespace
  * @author  Takaya Miyamoto
- * @since   Wed Jul 22 01:55:13 JST 2015
+ * @since   Fri Dec 18 02:23:57 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #include <common/analysis.h>
 
+bool analysis::do_debug = false;
+
 void analysis::route( string class_name, string func_name, int io ) {
    
-   return;   // for no debug.
+   if(!do_debug) return;   // for no debug.
    
    time_t timer;
    time(&timer);

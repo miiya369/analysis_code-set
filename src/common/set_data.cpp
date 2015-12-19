@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Function for data list setting, data_list is used on set_path
  * @author  Takaya Miyamoto
- * @since   Wed Sep 16 22:06:04 JST 2015
+ * @since   Fri Nov 13 00:45:20 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -17,6 +17,19 @@ int analysis::tSIZE;
 int analysis::Nconf;
 
 char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
+
+void analysis::set_data_list( int SET_INDEX, const char* format, ... ) {
+   
+   char tmp_c[MAX_LEN_PATH];
+   va_list args;
+   va_start(args,  format);
+   vsprintf(tmp_c, format, args);
+   
+   snprintf(        analysis::data_list[SET_INDEX]
+            ,sizeof(analysis::data_list[SET_INDEX]), tmp_c );
+   
+   va_end(args);
+}
 
 int analysis::set_data_list( const char* path_conf_file_list ) {
    
@@ -40,27 +53,13 @@ void analysis::set_data_list(  const char* main_path
                              , const char* snk_rela
                              , const char* src_rela ) {
    
-   snprintf(  analysis::data_list[MAIN_PATH]
-            ,sizeof(analysis::data_list[MAIN_PATH])
-            , "%s", main_path );
-   snprintf(  analysis::data_list[N_T_SHIFT]
-            ,sizeof(analysis::data_list[N_T_SHIFT])
-            , "%s", N_Tshift );
-   snprintf(  analysis::data_list[N_X_SHIFT]
-            ,sizeof(analysis::data_list[N_X_SHIFT])
-            , "%s", N_Xshift );
-   snprintf(  analysis::data_list[N_Y_SHIFT]
-            ,sizeof(analysis::data_list[N_Y_SHIFT])
-            , "%s", N_Yshift );
-   snprintf(  analysis::data_list[N_Z_SHIFT]
-            ,sizeof(analysis::data_list[N_Z_SHIFT])
-            , "%s", N_Zshift );
-   snprintf(  analysis::data_list[SNK_RELA]
-            ,sizeof(analysis::data_list[SNK_RELA])
-            , "%s", snk_rela );
-   snprintf(  analysis::data_list[SRC_RELA]
-            ,sizeof(analysis::data_list[SRC_RELA])
-            , "%s", src_rela );
+   set_data_list(MAIN_PATH, "%s", main_path);
+   set_data_list(N_T_SHIFT, "%s", N_Tshift);
+   set_data_list(N_X_SHIFT, "%s", N_Xshift);
+   set_data_list(N_Y_SHIFT, "%s", N_Yshift);
+   set_data_list(N_Z_SHIFT, "%s", N_Zshift);
+   set_data_list(SNK_RELA,  "%s", snk_rela);
+   set_data_list(SRC_RELA,  "%s", src_rela);
 }
 
 int analysis::set_data_list(  const char* main_path
@@ -72,27 +71,13 @@ int analysis::set_data_list(  const char* main_path
                              , const char* src_rela
                              , const char* path_conf_file_list ) {
    
-   snprintf(  analysis::data_list[MAIN_PATH]
-            ,sizeof(analysis::data_list[MAIN_PATH])
-            , "%s", main_path );
-   snprintf(  analysis::data_list[N_T_SHIFT]
-            ,sizeof(analysis::data_list[N_T_SHIFT])
-            , "%s", N_Tshift );
-   snprintf(  analysis::data_list[N_X_SHIFT]
-            ,sizeof(analysis::data_list[N_X_SHIFT])
-            , "%s", N_Xshift );
-   snprintf(  analysis::data_list[N_Y_SHIFT]
-            ,sizeof(analysis::data_list[N_Y_SHIFT])
-            , "%s", N_Yshift );
-   snprintf(  analysis::data_list[N_Z_SHIFT]
-            ,sizeof(analysis::data_list[N_Z_SHIFT])
-            , "%s", N_Zshift );
-   snprintf(  analysis::data_list[SNK_RELA]
-            ,sizeof(analysis::data_list[SNK_RELA])
-            , "%s", snk_rela );
-   snprintf(  analysis::data_list[SRC_RELA]
-            ,sizeof(analysis::data_list[SRC_RELA])
-            , "%s", src_rela );
+   set_data_list(MAIN_PATH, "%s", main_path);
+   set_data_list(N_T_SHIFT, "%s", N_Tshift);
+   set_data_list(N_X_SHIFT, "%s", N_Xshift);
+   set_data_list(N_Y_SHIFT, "%s", N_Yshift);
+   set_data_list(N_Z_SHIFT, "%s", N_Zshift);
+   set_data_list(SNK_RELA,  "%s", snk_rela);
+   set_data_list(SRC_RELA,  "%s", src_rela);
    
    int i=0;
    
@@ -104,19 +89,6 @@ int analysis::set_data_list(  const char* main_path
    ifs.close();
    
    return i;
-}
-
-void analysis::set_data_list( int SET_INDEX, const char* format, ... ) {
-   
-   char tmp_c[MAX_LEN_PATH];
-   va_list args;
-   va_start(args,  format);
-   vsprintf(tmp_c, format, args);
-   
-   snprintf(        analysis::data_list[SET_INDEX]
-            ,sizeof(analysis::data_list[SET_INDEX]), tmp_c );
-   
-   va_end(args);
 }
 
 void analysis::set_data( int xxx, int yyy, int zzz, int ttt, int nnn ) {

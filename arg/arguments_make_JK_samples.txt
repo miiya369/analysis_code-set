@@ -1,0 +1,20 @@
+
+### For creation of Jack-Knife samples ###
+
+JKS_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2
+JKS_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/cp-pacs+JLQCD_ens3_193conf
+JKS_Path_to_output_dir	= ./results
+JKS_output_base_name	= conf
+JKS_Size_of_time	= 64
+JKS_Size_of_space	= 32
+JKS_bin_size		= 20
+JKS_Min_time_slice	= 5
+JKS_Max_time_slice	= 25
+JKS_T_shift		= 000
+JKS_X_shift		= 000
+JKS_Y_shift		= 000
+JKS_Z_shift		= 000
+JKS_Snk_relativistic	= CG05
+JKS_Src_relativistic	= CG05
+JKS_Calc_hadron_name	= { pion phi proton Lambda Sigma }
+JKS_Calc_channel_name	= { Pro-Neu_Pro-Neu Pro-Lam_Pro-Lam Pro-Lam_Pro-SigZ Pro-Lam_Neu-SigP Pro-SigZ_Pro-Lam Pro-SigZ_Pro-SigZ Pro-SigZ_Neu-SigP Neu-SigP_Pro-Lam Neu-SigP_Pro-SigZ Neu-SigP_Neu-SigP }

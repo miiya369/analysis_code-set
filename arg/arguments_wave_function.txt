@@ -6,18 +6,19 @@ WAVE_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_
 WAVE_Path_to_output_dir	= ./results
 WAVE_Size_of_time	= 64
 WAVE_Size_of_space	= 32
-WAVE_T_shift		= 0
-WAVE_X_shift		= 0
-WAVE_Y_shift		= 0
-WAVE_Z_shift		= 0
+WAVE_T_shift		= 000
+WAVE_X_shift		= 000
+WAVE_Y_shift		= 000
+WAVE_Z_shift		= 000
 WAVE_Snk_relativistic	= CG05
 WAVE_Src_relativistic	= CG05
 WAVE_Min_time_slice	= 6
 WAVE_Max_time_slice	= 8
 WAVE_Channel_name	= Pro-Lam_Pro-Lam
-WAVE_Spin_projection	= 0
-WAVE_Spin_z_component	= 0
-WAVE_Ang_mom_projection	= 0
+WAVE_Spin_projection	= S1_Sz0
+
+WAVE_Use_jack_knife_data = no
+WAVE_Take_jack_knife	= yes
 
 WAVE_Endian_convert	= yes
 WAVE_read_compress_NBS	= yes

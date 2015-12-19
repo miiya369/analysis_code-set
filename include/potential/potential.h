@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Header file for potential class
  * @author  Takaya Miyamoto
- * @since   Sat Sep 12 01:11:13 JST 2015
+ * @since   Fri Dec 18 00:56:00 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -27,6 +27,9 @@ namespace potential {
    
    string laplacian(  R_CORRELATOR&
                     , R_CORRELATOR&, double );
+   
+   string laplacian(  NBS_WAVE&
+                    , NBS_WAVE&, double );
    
    string first_time_diff(  R_CORRELATOR&
                           , R_CORRELATOR&
@@ -79,6 +82,13 @@ public:
 
       potential    = NULL;
    }
+   POTENTIAL(R_CORRELATOR &K_Rcorr, R_CORRELATOR &Rcorr) {
+      class_name = "POTENTIAL_______________________";
+      func_name = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      potential    = NULL;
+   }
    ~POTENTIAL() {
       if (potential != NULL) delete [] potential;
       
@@ -108,15 +118,15 @@ public:
       func_name = "set_pot_K_R_/_R_______";
       analysis::route(class_name, func_name, 0);
    }
-   void set(R_CORRELATOR &Rcorr) {
+   void set(NBS_WAVE &K_NBS, NBS_WAVE &NBS, double E) {
       
-      func_name = "set_pot_R_____________";
+      func_name = "set_pot_E-K_NBS_/_NBS_";
       analysis::route(class_name, func_name, 1);
       
       mem_alloc();
-      input(Rcorr);
+      input(K_NBS, NBS, E);
       
-      func_name = "set_pot_R_____________";
+      func_name = "set_pot_E-K_NBS_/_NBS_";
       analysis::route(class_name, func_name, 0);
    }
    void mem_del() {
@@ -135,16 +145,20 @@ public:
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   int          info_class()    { return CLASS_POTENTIAL; }
-   size_t       info_data_size(){
-      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-   }
+   int info_class() { return CLASS_POTENTIAL; }
+   int data_size () { return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; }
    
    void input( R_CORRELATOR&, R_CORRELATOR& );
-   void input( R_CORRELATOR& );
-   void set_from_binary( const char* );
+   void input( NBS_WAVE&    , NBS_WAVE&, double );
    
    cdouble momentum_rep( double );
 };
+
+namespace potential {
+   
+   void set_from_binary(   CONFIG<POTENTIAL>, const char* );
+   void tensor_potential(  POTENTIAL&, POTENTIAL&
+                         , R_CORRELATOR&, R_CORRELATOR&, R_CORRELATOR&);
+}
 
 #endif

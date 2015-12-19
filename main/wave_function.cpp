@@ -4,7 +4,7 @@
  * @ingroup NBS wave function, R-correlator
  * @brief   Main part for wave function calculation
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 03:50:05 JST 2015
+ * @since   Thu Dec 17 23:40:47 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,21 +12,24 @@
 
 #define PROJECT CALC_WAVE_FUNCTION // <- Project name
 
-CHANNEL_TYPE channel;
-int time_min;
-int time_max;
-int spin;
-int spin_z;
-int ang_mom;
+static CHANNEL_TYPE channel;
+static int          time_min;
+static int          time_max;
+static SPIN_TYPE    spin;
 
-char conf_list[MAX_LEN_PATH];
-char outfile_path[MAX_LEN_PATH];
+static char conf_list[MAX_LEN_PATH];
+static char outfile_path[MAX_LEN_PATH];
 
-bool endian_flg, calc_flg_Rcorr, dev_corr_flg, read_cmp_flg;
+static bool endian_flg     = false;
+static bool calc_flg_Rcorr = false;
+static bool dev_corr_flg   = false;
+static bool read_cmp_flg   = false;
+static bool take_JK_flg  = false;
+static bool use_JK_data  = false;
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -34,6 +37,8 @@ int main(int argc, char **argv) {
    
    time_t start_time, end_time;
    time( &start_time );
+   
+   if (take_JK_flg) use_JK_data = true;
    
    NBSwave::rot_matrix_init();
    
@@ -56,38 +61,39 @@ int main(int argc, char **argv) {
       
       for (int conf=0; conf<analysis::Nconf; conf++) {
          Wave_org->set( channel, it, conf, endian_flg, read_cmp_flg );
-         (*Wave)(conf).set( *Wave_org, spin, spin_z );
-         (*Wave)(conf).projection( ang_mom );
+         NBSwave::spin_projection((*Wave_org), (*Wave)(conf), spin);
+         NBSwave::LP_projection((*Wave)(conf));
          
          if (calc_flg_Rcorr)
             if (it==time_min) {
-               (*Corr1)(conf).set( channel.hadron1, conf, "PS" );
-               (*Corr2)(conf).set( channel.hadron2, conf, "PS" );
+               (*Corr1)(conf).set(channel.hadron1, conf, 0, "PS");
+               (*Corr2)(conf).set(channel.hadron2, conf, 0, "PS");
             }
       } // conf
       
-      Wave->make_JK_sample();
+      if (take_JK_flg) Wave->make_JK_sample();
       
       if (calc_flg_Rcorr) {
-         if (it==time_min) {
-            Corr1->make_JK_sample();
-            Corr2->make_JK_sample();
-         }
+         if (it==time_min)
+            if (take_JK_flg) {
+               Corr1->make_JK_sample();
+               Corr2->make_JK_sample();
+            }
          for (int conf=0; conf<analysis::Nconf; conf++)
             (*Rcorr)(conf).set( (*Wave)(conf),(*Corr1)(conf),(*Corr2)(conf), it );
          
          snprintf(  outfile_name, sizeof(outfile_name)
-                  , "%s/%s_Rcorr_S%dSz%d_err_t%d"
-                  , outfile_path, channel.name.c_str(), spin, spin_z, it );
+                  , "%s/%s_Rcorr_%s_err_t%d"
+                  , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
          
-         analysis::output_data_err( *Rcorr, outfile_name );
+         analysis::output_data_err( *Rcorr, outfile_name, use_JK_data );
       }
       
       snprintf(  outfile_name, sizeof(outfile_name)
-               , "%s/%s_NBSwave_S%dSz%d_err_t%d"
-               , outfile_path, channel.name.c_str(), spin, spin_z, it );
+               , "%s/%s_NBSwave_%s_err_t%d"
+               , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
       
-      analysis::output_data_err( *Wave, outfile_name );
+      analysis::output_data_err( *Wave, outfile_name, use_JK_data );
       
    } // it
    
@@ -98,7 +104,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -153,12 +159,12 @@ int set_args(int argc, char** argv) {
    printf(" @ time_min   = %d\n",time_min);
    printf(" @ time_max   = %d\n",time_max);
    printf(" @ channel    = %s\n",channel.name.c_str());
-   printf(" @ spin       = %d\n",spin);
-   printf(" @ spin z cmp = %d\n",spin_z);
-   printf(" @ ang mom    = %d\n",ang_mom);
+   printf(" @ spin       = %s\n",spin.name.c_str());
    printf(" @ conf list  = %s\n",conf_list);
    printf(" @ infile     = %s\n",analysis::data_list[MAIN_PATH]);
    printf(" @ outfile    = %s\n",outfile_path);
+   printf(" @ use JK data= %s\n",analysis::bool_to_str(use_JK_data).c_str());
+   printf(" @ take JK    = %s\n",analysis::bool_to_str(take_JK_flg).c_str());
    printf(" @ endian cnv = %s\n",analysis::bool_to_str(endian_flg).c_str());
    printf(" @ dev corr   = %s\n",analysis::bool_to_str(dev_corr_flg).c_str());
    printf(" @ read comp  = %s\n",analysis::bool_to_str(read_cmp_flg).c_str());
@@ -169,7 +175,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {
@@ -198,11 +204,7 @@ int set_args_from_file(char* file_name) {
       else if (strcmp(tmp_c1,"WAVE_Channel_name"      )==0)
          channel.set(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Spin_projection"   )==0)
-         spin = atoi(tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_Spin_z_component"  )==0)
-         spin_z = atoi(tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_Ang_mom_projection")==0)
-         ang_mom = atoi(tmp_c2);
+         spin.set(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Gauge_confs_list"  )==0)
          snprintf(conf_list,sizeof(conf_list),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Path_to_output_dir")==0)
@@ -210,43 +212,25 @@ int set_args_from_file(char* file_name) {
       else if (strcmp(tmp_c1,"WAVE_Endian_convert"    )==0)
          endian_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Path_to_input_dir" )==0)
-         snprintf(         analysis::data_list[MAIN_PATH]
-                  , sizeof(analysis::data_list[MAIN_PATH])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"WAVE_T_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_T_SHIFT]
-                  , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"WAVE_X_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_X_SHIFT]
-                  , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"WAVE_Y_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Y_SHIFT]
-                  , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"WAVE_Z_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Z_SHIFT]
-                  , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%03d", tmp_i);
-      }
+         analysis::set_data_list(MAIN_PATH, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_T_shift"           )==0)
+         analysis::set_data_list(N_T_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_X_shift"           )==0)
+         analysis::set_data_list(N_X_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_Y_shift"           )==0)
+         analysis::set_data_list(N_Y_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_Z_shift"           )==0)
+         analysis::set_data_list(N_Z_SHIFT, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Size_of_time"      )==0)
          analysis::tSIZE = atoi(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Snk_relativistic"  )==0)
-         snprintf(         analysis::data_list[SNK_RELA]
-                  , sizeof(analysis::data_list[SNK_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SNK_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Src_relativistic"  )==0)
-         snprintf(         analysis::data_list[SRC_RELA]
-                  , sizeof(analysis::data_list[SRC_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_Take_jack_knife"    )==0)
+         take_JK_flg = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_Use_jack_knife_data")==0)
+         use_JK_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Out_R_correlator"  )==0)
          calc_flg_Rcorr = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Rcorr_NBS/corr"    )==0)

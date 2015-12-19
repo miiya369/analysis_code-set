@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Common header file for make jack-knife samples
  * @author  Takaya Miyamoto
- * @since   Wed Sep 16 21:47:42 JST 2015
+ * @since   Fri Dec 11 02:09:30 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -18,12 +18,12 @@ template <class X> void CONFIG<X>::make_JK_sample() {
    func_name = "make_JK_sample________";
    analysis::route(class_name, func_name, 1);
    
-   size_t data_size = data[0].info_data_size();
+   int data_size = data[0].data_size();
    
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-   for (size_t n=0; n<data_size; n++) {
+   for (int n=0; n<data_size; n++) {
       cdouble sum;
       
       for (int i=0; i<num_conf; i++)
@@ -35,24 +35,59 @@ template <class X> void CONFIG<X>::make_JK_sample() {
    analysis::route(class_name, func_name, 0);
 }
 
+template <class X> void CONFIG<X>::make_JK_sample( CONFIG<X>& data_bin ) {
+   
+   func_name = "make_JK_sample_bin____";
+   analysis::route(class_name, func_name, 1);
+   
+   int data_size = data[0].data_size();
+   int num_bin   = data_bin.Nconf();
+   
+   for (int i=0; i<num_bin; i++) data_bin(i).mem_alloc( data_size );
+   
+   if (num_conf % num_bin != 0)
+      analysis::error(3, "#.conf is indivisible by #.bin.");
+   if (num_bin == 1)
+      analysis::error(3, "#.bin = 1 is not allowed.");
+   
+   int bin_size = num_conf / num_bin;
+   
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+   for (int n=0; n<data_size; n++) {
+      cdouble sum;
+      
+      for (int i=0; i<num_conf; i++)
+         sum += data[i](n);
+      
+      for (   int i=0; i<num_bin;  i++) {
+         cdouble sum_bin;
+         for (int b=0; b<bin_size; b++)
+            sum_bin += data[b + bin_size*i](n);
+         
+         data_bin(i)(n) = ( sum - sum_bin ) / double(num_conf-bin_size);
+      }
+   }
+   analysis::route(class_name, func_name, 0);
+}
+
 template <class X> void CONFIG<X>::make_mean_err(  double *mean, double *err
                                                  , bool is_jack_knife_data ) {
    
    func_name = "make_mean_err_________";
    analysis::route(class_name, func_name, 1);
    
-   size_t  data_size = data[0].info_data_size();
+   int     data_size = data[0].data_size();
    double  factor;
-   double sqr_mean;
+   double  sqr_mean;
    
-   if (is_jack_knife_data) {
+   if (is_jack_knife_data)
       factor = double(num_conf-1);
-   }
-   else {
+   else
       factor = 1.0 / double(num_conf-1);
-   }
 
-   for (size_t n=0; n<data_size; n++) {
+   for (int n=0; n<data_size; n++) {
       mean[n]  = 0.0;
       sqr_mean = 0.0;
       
@@ -73,18 +108,16 @@ template <class X> void CONFIG<X>::make_mean_err(  cdouble *mean, cdouble *err
    func_name = "make_mean_err_________";
    analysis::route(class_name, func_name, 1);
    
-   size_t  data_size = data[0].info_data_size();
+   int     data_size = data[0].data_size();
    double  factor;
    cdouble sqr_mean;
    
-   if (is_jack_knife_data) {
+   if (is_jack_knife_data)
       factor = double(num_conf-1);
-   }
-   else {
+   else
       factor = 1.0 / double(num_conf-1);
-   }
    
-   for (size_t n=0; n<data_size; n++) {
+   for (int n=0; n<data_size; n++) {
       mean[n]  = COMP_ZERO;
       sqr_mean = COMP_ZERO;
       

@@ -4,7 +4,7 @@
  * @ingroup R-correlator
  * @brief   Header file for R-correlator class
  * @author  Takaya Miyamoto
- * @since   Mon Aug 31 18:42:39 JST 2015
+ * @since   Fri Dec 18 00:19:32 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -131,13 +131,24 @@ public:
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   int          info_class()     { return CLASS_R_CORRELATOR; }
-   size_t       info_data_size() {
-      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-   }
+   int info_class() { return CLASS_R_CORRELATOR; }
+   int data_size () { return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; }
    
    void input( NBS_WAVE&, CORRELATOR&, CORRELATOR&, int );
    void input( NBS_WAVE&, double, double, int );
 };
+
+namespace Rcorrelator {
+   
+   void Swave_projection ( R_CORRELATOR& );
+   void Swave_division   ( R_CORRELATOR&, R_CORRELATOR& );
+   void parity_projection( R_CORRELATOR&);
+   void LP_projection    ( R_CORRELATOR& );
+   void remove_angular   ( R_CORRELATOR&, int, double );
+   
+   inline int matrix_idx(int row, int column, int rot_type) {
+      return column + 4 * ( row + 4 * rot_type );
+   }   // rot_type = 0 -> E, 1~6 -> 6C4, 7~9 -> 3C2, 10~17 -> 8C3, 18~23 -> 6C2
+}
 
 #endif

@@ -4,7 +4,7 @@
  * @ingroup phase shift
  * @brief   Function for calculate phase shift
  * @author  Takaya Miyamoto
- * @since   Mon Oct 19 23:37:55 JST 2015
+ * @since   Fri Nov 13 01:44:42 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *
    delta_E[0] = 0.0;
    
 #define mat(R,C)  (C + Nchannel * R)
-   for (size_t iE=0; iE<phase[0].info_data_size(); iE++) {
+   for (size_t iE=0; iE<phase[0].data_size(); iE++) {
       for (int ch=0; ch<Nchannel; ch++) E[ch] = phase[0].E(iE) - delta_E[ch];
       for (int ch=0; ch<Nchannel; ch++)
          kk[ch] = sqrt( cdouble(2.0*mu[ch]*E[ch]) ) / hbar_c;
@@ -214,7 +214,7 @@ void observable::calc_phase_shift_int(  PHASE_SHIFT *phase, double *aa, double *
    cdouble *Vmat    = new cdouble[Nchannel*Nchannel*(Ndev+1)*(Ndev+1)];
    
 #define mat(a,b,i,j) (b+Nchannel*(j+(Ndev+1)*(a+Nchannel*(i))))
-   for (size_t iE=0; iE<phase[0].info_data_size(); iE++) {
+   for (size_t iE=0; iE<phase[0].data_size(); iE++) {
       
       for (int ch=0; ch<Nchannel; ch++)
          k_sqr[ch] = (  2.0*mu[ch]*((phase[0].E(iE)+10e-12)-(mm_th[0]-mm_th[ch]))

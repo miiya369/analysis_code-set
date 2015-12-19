@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Main part for fitting analysis
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 04:16:59 JST 2015
+ * @since   Thu Dec 10 21:13:05 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,19 +12,19 @@
 
 #define PROJECT FITTING_DATA   // <- Project name
 
-int     n_param;
-double* param_initial = NULL;
-double  stp_cnd;
-string  fit_func_name;
-int     fit_range_min;
-int     fit_range_max;
+static int     n_param;
+static double* param_initial = NULL;
+static double  stp_cnd;
+static string  fit_func_name;
+static int     fit_range_min;
+static int     fit_range_max;
 
-char infile_path[MAX_LEN_PATH];
-char outfile_path[MAX_LEN_PATH];
+static char infile_path[MAX_LEN_PATH];
+static char outfile_path[MAX_LEN_PATH];
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -93,7 +93,9 @@ int main(int argc, char **argv) {
    delete [] cood;
    delete [] err;
    
-   fitting::output_param( *fit, outfile_path );
+   if (chisq_mean < 2.0) fitting::output_param( *fit, outfile_path );
+   else printf(" @@@@@@ CHI SQUARE > 2.0 !\n %s is not be output.\n"
+               , outfile_path);
    
    delete fit;
    delete tmp;
@@ -105,7 +107,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -180,7 +182,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {

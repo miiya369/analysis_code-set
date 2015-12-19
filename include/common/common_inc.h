@@ -33,7 +33,7 @@ using namespace std;
 #define MAX_N_DATA    1024
 #define MAX_LEN_PATH  256
 
-typedef complex<int> cint;
+typedef complex<int>    cint;
 typedef complex<double> cdouble;
 #define COMP_IMAG cdouble(0.0,1.0)
 #define COMP_ZERO cdouble(0.0,0.0)

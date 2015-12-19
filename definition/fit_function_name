@@ -22,6 +22,7 @@
  * 1G	 : one gaussian fit
  * 2G	 : two gaussians fit
  * 3G	 : three gaussians fit
+ * 4G	 : four gaussians fit
 
  * 1SG	 : one x-shift gaussian fit
 	-> gaussian の中心をシフトする自由度を加えたもの

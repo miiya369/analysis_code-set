@@ -1,6 +1,6 @@
 
 #  Make file of the Analysis code set
-# Since : Mon Sep  7 17:40:05 JST 2015
+# Since : Wed Dec 16 07:36:56 JST 2015
 
 # You may change this for your environment
 
@@ -13,6 +13,7 @@ CXXFLAGS  = -Wall -O3 -g -fopenmp
 MAINDIR   = ./main
 SRCDIR	  = ./src
 OBJDIR	  = ./obj
+BINDIR	  = ./bin
 HEADERDIR = ./include ./include/extern
 
 INCLUDES    = $(patsubst %,-I%,$(HEADERDIR))
@@ -35,10 +36,10 @@ FIT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_FIT:.cpp=.o)))
 OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
 yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
-TERGETS	    = mas wave pot fit obs 
-FOR_MIYA    = ccp gfix zfac red ave
+TERGETS	    = mas wave pot fit obs eigen gfix jkbin ave makeJK tensor
+FOR_MIYA    = ccp zfac red
 
-### SRCDIR と MAINDIR 以下の全ての .cpp ファイルの依存関係を探す ###
+### Find the dependence with .cpp files under the SRCDIR and MAINDIR ###
 vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto
 vpath %.C $(wildcard $(SRCDIR)/extern/yukawa*)   # <- for yukawa
 
@@ -47,33 +48,61 @@ all: $(TERGETS)
 
 mas: $(OBJDIR)/effective_mass.o $(COMMON) $(CORR) $(FIT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
 wave: $(OBJDIR)/wave_function.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
 pot: $(OBJDIR)/potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
 fit: $(OBJDIR)/fitting.o $(COMMON) $(FIT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
 obs: $(OBJDIR)/observable.o $(COMMON) $(OBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
-ccp: $(OBJDIR)/coupled_channel_potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+eigen: $(OBJDIR)/eigen_energy_schrodinger.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
-zfac: $(OBJDIR)/extract_Z-factor.o $(COMMON) $(CORR)
+gfix: $(OBJDIR)/gfix_from_gmat.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
-red: $(OBJDIR)/data_reduction_check.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+jkbin: $(OBJDIR)/jack_knife_bin_check.o $(COMMON) $(CORR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
-
-gfix: $(OBJDIR)/check_coulomb_gfix.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
 ave: $(OBJDIR)/average_compress.o $(COMMON) $(yukawa)
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+makeJK: $(OBJDIR)/make_JK_samples.o $(COMMON) $(yukawa)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+tensor: $(OBJDIR)/tensor_force.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+###### For Miyamoto ######
+ccp: $(OBJDIR)/coupled_channel_potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+zfac: $(OBJDIR)/extract_Z-factor.o $(COMMON) $(CORR)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+red: $(OBJDIR)/data_reduction_check.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+##########################
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $<
@@ -82,15 +111,18 @@ $(OBJDIR)/extern/yukawa/%.o: %.C
 
 .PHONY: clean
 clean:
-	rm -f -r $(TERGETS) $(FOR_MIYA) test obj/*.o obj/extern/*/*.o *.dSYM
+	rm -f -r $(BINDIR)/* $(OBJDIR)/*.o $(OBJDIR)/extern/*/*.o *.dSYM
 #===================================================================================#
 #===================================================================================#
 #===================================================================================#
 
 ###### FOR TEST ######
 .PHONY: test
-test: $(OBJDIR)/test.o $(COMMON) $(OBS)
+test: $(OBJDIR)/test.o 
 	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
 
 .PHONY: ALL
 ALL: $(TERGETS) $(FOR_MIYA)
+######################
+

@@ -7,10 +7,10 @@ CCP_Path_to_output_dir	= ./results
 CCP_Size_of_time	= 32
 CCP_Size_of_space	= 16
 CCP_calc_time_slice	= 8
-CCP_T_shift		= 0
-CCP_X_shift		= 0
-CCP_Y_shift		= 0
-CCP_Z_shift		= 0
+CCP_T_shift		= 000
+CCP_X_shift		= 000
+CCP_Y_shift		= 000
+CCP_Z_shift		= 000
 CCP_Snk_relativistic	= CG05
 CCP_Src_relativistic	= CG05
 
@@ -18,11 +18,12 @@ CCP_Reduced_mass_00	= 0.415
 CCP_Reduced_mass_01	= 0.415
 CCP_Reduced_mass_10	= 0.422
 CCP_Reduced_mass_11	= 0.422
-CCP_Spin_projection	= 0
-CCP_Spin_z_component	= 0
-CCP_Ang_mom_projection	= 0
+CCP_Spin_projection	= S1_Sz0
 
 CCP_Endian_convert	= yes
 CCP_read_compress_NBS	= yes
+
+CCP_Use_jack_knife_data	= no
+CCP_Take_jack_knife	= yes
 
 CCP_Out_fit_data	= no

@@ -4,7 +4,7 @@
  * @ingroup phase shift
  * @brief   Header file for phase shift class
  * @author  Takaya Miyamoto
- * @since   Fri Oct  9 07:33:55 JST 2015
+ * @since   Fri Dec 11 22:25:13 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ class PHASE_SHIFT {
 private:
    string class_name, func_name;
    
-   int      data_size;
+   int      Ndata;
    cdouble *phase_shift;
    double  *energy;
    
@@ -86,21 +86,21 @@ public:
       if (E_dev < 0) for (double loop=E_max; loop>=E_min; loop/=(-E_dev)) count++;
       else for (double loop=E_min; loop<=E_max; loop+=E_dev) count++;
       
-      data_size = count;
+      Ndata = count;
       
-      if (phase_shift == NULL) phase_shift = new cdouble[data_size];
-      if (energy      == NULL) energy      = new double[ data_size];
+      if (phase_shift == NULL) phase_shift = new cdouble[Ndata];
+      if (energy      == NULL) energy      = new double[ Ndata];
       
       if (E_dev < 0) {
          double tmp_E = E_max;
-         for (int loop=data_size-1; loop>=0; loop--) {
+         for (int loop=Ndata-1; loop>=0; loop--) {
             energy[loop] = tmp_E;
             tmp_E /= (-E_dev);
          }
          
       } else {
          double tmp_E = E_min;
-         for (int loop=0; loop<data_size; loop++) {
+         for (int loop=0; loop<Ndata; loop++) {
             energy[loop] = tmp_E;
             tmp_E += E_dev;
          }
@@ -112,12 +112,12 @@ public:
       func_name = "mem_alloc_phase_shift_";
       analysis::route( class_name, func_name, 1 );
       
-      data_size = dataSIZE;
+      Ndata = dataSIZE;
       
-      if (phase_shift == NULL) phase_shift = new cdouble[data_size];
-      if (energy      == NULL) energy      = new double[ data_size];
+      if (phase_shift == NULL) phase_shift = new cdouble[Ndata];
+      if (energy      == NULL) energy      = new double[ Ndata];
       
-      for (int loop=0; loop<data_size; loop++) energy[loop] = ENERGY[loop];
+      for (int loop=0; loop<Ndata; loop++) energy[loop] = ENERGY[loop];
       
       analysis::route(class_name, func_name, 0);
    }
@@ -140,7 +140,7 @@ public:
    
 //=========================== Several functions ==========================//
    int          info_class()     { return CLASS_PHASE_SHIFT; }
-   size_t       info_data_size() { return data_size; }
+   size_t       data_size()      { return Ndata; }
    
    double E(size_t index){ return energy[index]; }
 };
@@ -149,7 +149,7 @@ namespace observable {
    
    void output_phase_shift    ( const char*, PHASE_SHIFT& );
    void output_phase_shift_all( const char*, CONFIG<PHASE_SHIFT>& );
-   void output_phase_shift_err( const char*, CONFIG<PHASE_SHIFT>& );
+   void output_phase_shift_err( const char*, CONFIG<PHASE_SHIFT>&, bool );
 
    void calc_phase_shift_dif(  PHASE_SHIFT*, double*, double*, double*
                              , int, int, int, double, double, double );

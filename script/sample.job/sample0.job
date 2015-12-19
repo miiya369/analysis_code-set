@@ -1,0 +1,39 @@
+#!/bin/sh
+
+CHECK=-check
+
+ibase=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/results_kek/results_kek_pacs-cs_ens2/compress/Ks0.13640
+obase=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/analysis_results/pacs-cs_ens2/Ks0.13640
+
+IDIR=("t_shift_ave/4src" "from_doi-san/t_shift_ave/1src" "from_doi-san/t_shift_ave/4src" \
+"from_doi-san/results.tsrc_mod00.ave" "from_doi-san/results.tsrc_mod01.ave" \
+"from_doi-san/results.tsrc_mod02.ave" "from_doi-san/results.tsrc_mod03.ave" "from_doi-san/t_shift_ave/64src")
+
+ODIR=("4src" "1src_doi-san" "4src_doi-san" "16src_doi-san_0" \
+"16src_doi-san_1" "16src_doi-san_2" "16src_doi-san_3" "64src_doi-san")
+
+SRC_T=("-04" "A01" "A04" "A00" "A01" "A02" "A03" "A64")
+
+TIME=`date`
+echo " @@@ JOB START : ${TIME}"
+
+./mas -f arg/arguments_effmass.txt -idir $ibase/${IDIR[0]} \
+-odir $obase/${ODIR[0]} $CHECK
+
+for loop in `seq 1 1 7`
+do
+   ./mas -f arg/arguments_effmass.txt -idir $ibase/${IDIR[$loop]} \
+       -odir $obase/${ODIR[$loop]} -src_t ${SRC_T[$loop]} $CHECK
+done
+
+./mas -f arg/arguments_effmass.txt -idir $ibase/${IDIR[0]} \
+-odir $obase/${ODIR[0]} -calc_R $CHECK
+
+for loop in `seq 1 1 7`
+do
+./mas -f arg/arguments_effmass.txt -idir $ibase/${IDIR[$loop]} \
+-odir $obase/${ODIR[$loop]} -src_t ${SRC_T[$loop]} -calc_R $CHECK
+done
+
+TIME=`date`
+echo " @@@ JOB END   : ${TIME}"

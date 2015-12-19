@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for extract Z-factor from PS and SS correlator
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 03:47:42 JST 2015
+ * @since   Fri Dec 11 22:53:32 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,15 +12,15 @@
 
 #define PROJECT EXTRACT_Z_FACTOR    // <- Project name
 
-int          Nhad;
-HADRON_TYPE *hadron_type = NULL;
+static int          Nhad;
+static HADRON_TYPE *hadron_type = NULL;
 
-char conf_list[MAX_LEN_PATH];
-char outfile_path[MAX_LEN_PATH];
+static char conf_list[MAX_LEN_PATH];
+static char outfile_path[MAX_LEN_PATH];
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -70,9 +70,7 @@ int set_args(int argc, char** argv) {
          if (     strcmp(argv[loop],"-f"        )==0){}
          //****** You may set additional potion in here ******//
          else if (strcmp(argv[loop],"-ifile" )==0)
-            snprintf(         analysis::data_list[MAIN_PATH]
-                     , sizeof(analysis::data_list[MAIN_PATH])
-                     , "%s", argv[loop+1]);
+            analysis::set_data_list(MAIN_PATH, "%s", argv[loop+1]);
          else if (strcmp(argv[loop],"-ofile" )==0)
             snprintf(outfile_path,sizeof(outfile_path),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-hadron")==0) {
@@ -125,7 +123,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {
@@ -149,41 +147,19 @@ int set_args_from_file(char* file_name) {
       else if (strcmp(tmp_c1,"ZFAC_Path_to_output_dir")==0)
          snprintf(outfile_path,sizeof(outfile_path),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"ZFAC_Path_to_input_dir" )==0)
-         snprintf(         analysis::data_list[MAIN_PATH]
-                  , sizeof(analysis::data_list[MAIN_PATH])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"ZFAC_T_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_T_SHIFT]
-                  , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"ZFAC_X_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_X_SHIFT]
-                  , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"ZFAC_Y_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Y_SHIFT]
-                  , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"ZFAC_Z_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Z_SHIFT]
-                  , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%03d", tmp_i);
-      }
+         analysis::set_data_list(MAIN_PATH, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"ZFAC_T_shift"           )==0)
+         analysis::set_data_list(N_T_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"ZFAC_X_shift"           )==0)
+         analysis::set_data_list(N_X_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"ZFAC_Y_shift"           )==0)
+         analysis::set_data_list(N_Y_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"ZFAC_Z_shift"           )==0)
+         analysis::set_data_list(N_Z_SHIFT, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"ZFAC_Snk_relativistic"  )==0)
-         snprintf(         analysis::data_list[SNK_RELA]
-                  , sizeof(analysis::data_list[SNK_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SNK_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"ZFAC_Src_relativistic"  )==0)
-         snprintf(         analysis::data_list[SRC_RELA]
-                  , sizeof(analysis::data_list[SRC_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"ZFAC_Calc_hadron_name"  )==0) {
          char *tmp_tok;
          char  tmp_tmp_str[MAX_N_DATA][MAX_LEN_PATH];

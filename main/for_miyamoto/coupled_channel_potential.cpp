@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for calculate coupled channel potential
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 03:45:59 JST 2015
+ * @since   Thu Dec 17 23:56:27 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -15,20 +15,22 @@
 #define IT(iii,ttt) ((iii)+ 4* (ttt))
 #define RC(Row,Colomn) ((Colomn)+ 2* (Row))
 
-int    time_slice;
-int    spin;
-int    spin_z;
-int    ang_mom;
-double mass[4];
+static int       time_slice;
+static SPIN_TYPE spin;
+static double    mass[4];
 
-char conf_list[MAX_LEN_PATH];
-char outfile_path[MAX_LEN_PATH];
+static char conf_list[MAX_LEN_PATH];
+static char outfile_path[MAX_LEN_PATH];
 
-bool endian_flg, read_cmp_flg, calc_flg_fit;
+static bool endian_flg = false;
+static bool read_cmp_flg = false;
+static bool calc_flg_fit = false;
+static bool take_JK_flg  = false;
+static bool use_JK_data  = false;
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -39,6 +41,8 @@ int main(int argc, char **argv) {
    
    time_t start_time, start_time2, end_time;
    time( &start_time );
+   
+   if (take_JK_flg) use_JK_data = true;
    
    NBSwave::rot_matrix_init();
    
@@ -94,21 +98,23 @@ int main(int argc, char **argv) {
          
          for (int loop=0; loop<4; loop++) {
             channel.set(channel_prj_name[loop]);
-            Wave[loop](conf).set( tmp_Wave_prj[loop], spin, spin_z );
-            Wave[loop](conf).projection(ang_mom);
+            NBSwave::spin_projection(tmp_Wave_prj[loop], Wave[loop](conf), spin);
+            NBSwave::LP_projection(Wave[loop](conf));
          }
          if (it==-1) {
             for (int loop=0; loop<3; loop++) {
                hadron.set(hadron_name[loop]);
-               Corr[loop](conf).set(hadron, conf, "PS");
+               Corr[loop](conf).set(hadron, conf, 0, "PS");
             }
          }
       } // conf
       
-      for (int loop=0; loop<4; loop++) Wave[loop].make_JK_sample();
+      if (take_JK_flg)
+         for (int loop=0; loop<4; loop++) Wave[loop].make_JK_sample();
       
       if (it==-1)
-         for (int loop=0; loop<3; loop++) Corr[loop].make_JK_sample();
+         if (take_JK_flg)
+            for (int loop=0; loop<3; loop++) Corr[loop].make_JK_sample();
       
       for (int conf=0; conf<analysis::Nconf; conf++) {
          Rcorr[IT(0,it+1)](conf).set(  Wave[0](conf)
@@ -197,21 +203,22 @@ int main(int argc, char **argv) {
    for (int loop=0; loop<4; loop++) {
       
       snprintf(  outfile_name, sizeof(outfile_name)
-               , "%s/%s_%s_S%dSz%d_ccp_err_t%d"
+               , "%s/%s_%s_%s_ccp_err_t%d"
                , outfile_path, channel_prj_name[loop].c_str()
-               , pot_type.c_str(), spin, spin_z, time_slice );
+               , pot_type.c_str(), spin.name.c_str(), time_slice );
       
-      analysis::output_data_err( coupled_ch_pot[loop], outfile_name );
+      analysis::output_data_err( coupled_ch_pot[loop], outfile_name, use_JK_data );
    }
    if (calc_flg_fit)
       for (int loop=0; loop<4; loop++) {
          
          snprintf(  outfile_name, sizeof(outfile_name)
-                  , "%s/%s_%s_S%dSz%d_ccp_fit_t%d"
+                  , "%s/%s_%s_%s_ccp_fit_t%d"
                   , outfile_path, channel_prj_name[loop].c_str()
-                  , pot_type.c_str(), spin, spin_z, time_slice );
+                  , pot_type.c_str(), spin.name.c_str(), time_slice );
          
-         analysis::output_data_fit( coupled_ch_pot[loop], outfile_name );
+         analysis::output_data_fit(  coupled_ch_pot[loop], outfile_name
+                                   , use_JK_data );
       }
    delete [] coupled_ch_pot;
    
@@ -222,7 +229,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -268,14 +275,14 @@ int set_args(int argc, char** argv) {
    printf(" @ z shift    = %s\n",analysis::data_list[N_Z_SHIFT]);
    printf(" @ snk rela   = %s\n",analysis::data_list[SNK_RELA]);
    printf(" @ src rela   = %s\n",analysis::data_list[SRC_RELA]);
-   printf(" @ spin       = %d\n",spin);
-   printf(" @ spin z cmp = %d\n",spin_z);
-   printf(" @ ang mom    = %d\n",ang_mom);
+   printf(" @ spin       = %s\n",spin.name.c_str());
    for(int i=0; i<4; i++) printf(" @ mass %d      = %lf\n",i,mass[i]);
    printf(" @ conf list  = %s\n",conf_list);
    printf(" @ infile     = %s\n",analysis::data_list[MAIN_PATH]);
    printf(" @ outfile    = %s\n @\n",outfile_path);
    printf(" @ out fit    = %s\n",analysis::bool_to_str(calc_flg_fit).c_str());
+   printf(" @ use JK data= %s\n",analysis::bool_to_str(use_JK_data).c_str());
+   printf(" @ take JK    = %s\n",analysis::bool_to_str(take_JK_flg).c_str());
    printf(" @ endian cnv = %s\n",analysis::bool_to_str(endian_flg).c_str());
    printf(" @ read cmp   = %s\n\n",analysis::bool_to_str(read_cmp_flg).c_str());
    fflush(stdout);
@@ -284,7 +291,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {
@@ -311,11 +318,7 @@ int set_args_from_file(char* file_name) {
       else if (strcmp(tmp_c1,"CCP_calc_time_slice"   )==0)
          time_slice = atoi(tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Spin_projection"   )==0)
-         spin = atoi(tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_Spin_z_component"  )==0)
-         spin_z = atoi(tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_Ang_mom_projection")==0)
-         ang_mom = atoi(tmp_c2);
+         spin.set(tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Gauge_confs_list"  )==0)
          snprintf(conf_list,sizeof(conf_list),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Path_to_output_dir")==0)
@@ -323,41 +326,23 @@ int set_args_from_file(char* file_name) {
       else if (strcmp(tmp_c1,"CCP_Endian_convert"    )==0)
          endian_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Path_to_input_dir" )==0)
-         snprintf(         analysis::data_list[MAIN_PATH]
-                  , sizeof(analysis::data_list[MAIN_PATH])
-                  , "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"CCP_T_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_T_SHIFT]
-                  , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"CCP_X_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_X_SHIFT]
-                  , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"CCP_Y_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Y_SHIFT]
-                  , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"CCP_Z_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Z_SHIFT]
-                  , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%03d", tmp_i);
-      }
+         analysis::set_data_list(MAIN_PATH, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"CCP_T_shift"           )==0)
+         analysis::set_data_list(N_T_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"CCP_X_shift"           )==0)
+         analysis::set_data_list(N_X_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"CCP_Y_shift"           )==0)
+         analysis::set_data_list(N_Y_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"CCP_Z_shift"           )==0)
+         analysis::set_data_list(N_Z_SHIFT, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Snk_relativistic"  )==0)
-         snprintf(         analysis::data_list[SNK_RELA]
-                  , sizeof(analysis::data_list[SNK_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SNK_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Src_relativistic"  )==0)
-         snprintf(         analysis::data_list[SRC_RELA]
-                  , sizeof(analysis::data_list[SRC_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"POT_Take_jack_knife"    )==0)
+         take_JK_flg = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"POT_Use_jack_knife_data")==0)
+         use_JK_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Reduced_mass_00"   )==0)
          mass[0] = atof(tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Reduced_mass_01"   )==0)

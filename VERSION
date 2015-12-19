@@ -8,6 +8,43 @@
  ////////////////////////////////////////////////
 
 
+ @ version 3.3 : 2015/12/18 Completion
+
+	* Add the main part for calculate 
+	   Eigen energy in the finite box 
+	   using HAL potential
+
+	* Modified the correlator input for
+	   finite momentum (For dispersion rela.)
+
+	* Add the D-wave projection
+	   ( Define, P_D = 1 - P_S )
+
+	* Add the tensor force calculation
+
+	* Modified the arguments for spin and
+	   angular momentum
+
+	* Add the main part for gauge fix
+	   using gauge fix matrix
+
+	* Add the main part for check
+	   the bin-size dependence of jack-knife
+	   samples
+
+	* Add the calculation of effective mass
+	   of NBS 2pt correlator and R-correlator
+
+	* Add the main part for create of 
+	   jack knife bin data 
+
+	* Modified the global variable of main
+	   part so that to be static variable
+
+	* execution files are put into ./bin
+	   directory when we take make command
+
+
  @ version 3.2 : 2015/10/23 Completion
 
 	* Modified the phase shift calculation

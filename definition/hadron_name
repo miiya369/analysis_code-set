@@ -8,14 +8,9 @@
  ////////////////////////////////////////////////
 
 
- ./mas の arguments file の中の
- 「MAS_Calc_hadron_name」
-
- もしくは ./mas へのオプション「-hadron」
-
- に指定する hadron name は、Hadron Force 
- の notation に準拠しています。
- 次のものを指定してください（複数可能）。
+ 各実行ファイルの arguments file もしくはオプションに
+ 指定する hadron name は、Hadron Force の notation 
+ に準拠しています。次のものを指定してください（複数可能）。
  なお、arguments ファイルに複数記入する際は
  { } で挟み、スペースで区切ってください。
  オプションで指定する際は最後に @ を入れてください。

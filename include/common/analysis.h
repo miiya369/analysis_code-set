@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Define the namespace for common variables & functions
  * @author  Takaya Miyamoto
- * @since   Fri Oct 23 05:41:35 JST 2015
+ * @since   Fri Dec 18 02:17:48 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace analysis {
    
    //! Set the path of data file
    string set_path( int );
-   string set_path_doi_san( int );
+   extern bool use_doi_san_path;
    
    void usage( int );
    
@@ -37,6 +37,7 @@ namespace analysis {
    
    //! Print the current class & function name
    void route( string, string, int );
+   extern bool do_debug;
    //! Indicate some error, and kill the job
    void error( int, const char* );
 }
@@ -51,6 +52,7 @@ namespace analysis {
    
    extern char data_list[MAX_N_DATA][MAX_LEN_PATH];
    
+   void set_data_list(  int,  const char*, ... );
    //! Setting confs. list, and return the number of confs.
    int  set_data_list(  const char* );
    //! Setting data list for path of NBS wave or correlator datas.
@@ -59,13 +61,13 @@ namespace analysis {
    //! Wrapper of above 2 functions
    int  set_data_list(  const char*, const char*, const char*, const char*
                       , const char*, const char*, const char*, const char* );
-   void set_data_list(  int,  const char*, ... );
    void set_data(       int, int, int, int, int );
    
    int  reduced_Ndata();
 }
 
 #include <common/analysis_const.h>
+#include <common/spin_type_const.h>
 #include <common/hadron_type_const.h>
 #include <common/channel_type_const.h>
 

@@ -11,13 +11,17 @@
  ############   Build   ############
  analysis_code_set のディレクトリ上で make と打てば
  obj/ 内にオブジェクトファイルが自動的に生成され、
- 各実行ファイルが生成されます。
- 全てビルドする必要がない場合は、make に次のターゲットを
- つけて実行してください。
+ bin/ 内に各実行ファイルが生成されます。
+ 全てビルドする必要がない場合は、make にターゲットを
+ つけて実行してください。よく用いるものは、例えば
+
  * pot : potential, NBSwave などの計算
  * mas : effective mass, mass fitting などの計算
  * fit : potential fitting などの計算
  * obs : phase shift, scattering length などの計算
+
+ などがあります。その他にもいろいろと機能がありますので、
+ Makefile を参照するか宮本までご連絡ください。
 
 
  #########   How to use   #########
@@ -49,10 +53,10 @@
 
 
  #######   Gauge configs list   #######
- pot, mas の実行の際には gauge configs の list
+ pot, mas などの実行の際には gauge configs の list
  を読み込ませる必要があります。sample が 
  ./arg/conf_list にありますので、
- 必要に応じて同様に作ってください。
+ 必要に応じて同様な形式のものを作ってください。
  この際、gauge configs list の行数が #.confs 
  として読み込まれますので、余分な改行を入れないように
  してください。
@@ -75,8 +79,6 @@
 
  * include/common/make_jack_knife_sample.h の
 	make_JK_sample()
- * src/observable/calc_phase_shift.cpp の
-	calc_phase_shift()
 
 
  ############   doxygen   ############
@@ -86,10 +88,10 @@
 
 
  ############ Debug の表示 ############
- src/common/misc.cpp の中の関数 route() の 
- return; をコメントアウトしてからビルドすれば、
- デバッグモードでの出力になり、どのクラス・関数に
- 入ったか・出たかの情報が出力されるようになりす。
+ 実行したい main ファイルに、do_debug = true;
+ という行を加えてからビルドすればデバッグモードでの出力に
+ なり、どのクラス・関数に入ったか・出たかの情報が出力
+ されるようになりす。
  これにより、バグが発生した際にその地点をすぐに発見する
  ことができます。
 
@@ -97,8 +99,9 @@
  ######### Fit function の追加 #########
  1) include/fitting/function_type_const.h
  2) include/fitting/fit_NR.h
- 3) include/phase_shift.h
+ 3) include/observable/observable_base.h
  4) src/observable/potential_funcs.cpp
+ 5) src/fitting/fit_data_NR.cpp
 
  にそれぞれ追加する。
  パラメータ数が10を超える場合は、

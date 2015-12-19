@@ -4,7 +4,7 @@
  * @ingroup observable
  * @brief   Main part for observable
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 04:20:24 JST 2015
+ * @since   Fri Dec 11 23:01:48 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -12,26 +12,27 @@
 
 #define PROJECT CALC_OBSERVABLE   // <- Project name
 
-double lattice_space;
-double mass;
-double ang_mom;
-double E_min;
-double E_max;
-double E_dev;
-double delta;
-double max_r;
-double V_0;
-double r_0;
-double energy_scatt_len;
+static double lattice_space;
+static double mass;
+static double ang_mom;
+static double E_min;
+static double E_max;
+static double E_dev;
+static double delta;
+static double max_r;
+static double V_0;
+static double r_0;
+static double energy_scatt_len;
 
-char infile_path[MAX_LEN_PATH];
-char outfile_path[MAX_LEN_PATH];
+static char infile_path[MAX_LEN_PATH];
+static char outfile_path[MAX_LEN_PATH];
 
-bool test_flg = false;
+static bool test_flg    = false;
+static bool use_JK_data = false;
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
                                        , lattice_space, delta, max_r );
       printf("DONE\n");
       
-      observable::output_phase_shift_err( outfile_path, test );
+      observable::output_phase_shift_err( outfile_path, test, use_JK_data );
    }
    else {
       int Nparam, func_type;
@@ -86,7 +87,7 @@ int main(int argc, char **argv) {
       } // conf
       printf("\n");
       
-      observable::output_phase_shift_err( outfile_path, phase );
+      observable::output_phase_shift_err( outfile_path, phase, use_JK_data );
       
       printf(" @ scattering length calculating |   0%%");
       double *param_tmp = new double[Nparam];
@@ -107,10 +108,17 @@ int main(int argc, char **argv) {
          fflush(stdout);
       }
       printf("\n");
+      
+      double factor;
+      if (use_JK_data)
+         factor = double(analysis::Nconf-1);
+      else
+         factor = 1.0 / double(analysis::Nconf-1);
+      
       mean     /= double(analysis::Nconf);
       sqr_mean /= double(analysis::Nconf);
       printf(" @ scatt. length = %lf +/- %lf\n", mean
-             , sqrt(double(analysis::Nconf-1) * (sqr_mean - pow(mean,2))));
+             , sqrt(factor * (sqr_mean - pow(mean,2)) ) );
 
       delete [] param_tmp;
       delete [] param;
@@ -122,7 +130,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -183,6 +191,7 @@ int set_args(int argc, char** argv) {
    printf(" @ delta      = %lf\n",delta);
    printf(" @ max_r      = %lf\n",max_r);
    printf(" @ E scat len = %lf\n",energy_scatt_len);
+   printf(" @ use JK data= %s\n",analysis::bool_to_str(use_JK_data).c_str());
    printf(" @ infile     = %s\n",infile_path);
    printf(" @ outfile    = %s\n @\n",outfile_path);
    printf(" @ calc test      = %s\n",analysis::bool_to_str(test_flg).c_str());
@@ -194,7 +203,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {
@@ -233,6 +242,8 @@ int set_args_from_file(char* file_name) {
          max_r = atof(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_energy_scatt_len"     )==0)
          energy_scatt_len = atof(tmp_c2);
+      else if (strcmp(tmp_c1,"OBS_Use_jack_knife_data")==0)
+         use_JK_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_Calc_squ_wall_pot"     )==0)
          test_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"OBS_Squ_wall_pot_V0")==0)

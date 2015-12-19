@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Header file for fitting class
  * @author  Takaya Miyamoto
- * @since   Thu Sep  3 18:29:53 JST 2015
+ * @since   Fri Nov 13 01:42:50 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ public:
 //=========================== Several functions ==========================//
    int          info_class()     { return CLASS_FITTING; }
    int          info_func_num()  { return func_type.number; }
-   size_t       info_data_size() { return func_type.Nparam; }
+   size_t       data_size()      { return func_type.Nparam; }
    
    void   print_func_gnu ();
    void   print_param    ();

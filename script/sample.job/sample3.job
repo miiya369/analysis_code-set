@@ -1,0 +1,28 @@
+#!/bin/sh
+
+CHECK=-check
+
+base=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/analysis_results/pacs-cs_ens2/Ks0.13640
+
+DIR=("4src" "1src_doi-san" "4src_doi-san" "16src_doi-san_0" \
+"16src_doi-san_1" "16src_doi-san_2" "16src_doi-san_3" "64src_doi-san")
+
+ifname=Pro-Lam_Pro-Lam_potential_S0_fitparam_t
+ofname=Pro-Lam_Pro-Lam_potential_S0_phase_shift_t
+
+MASS=("721.21538" "719.65381" "721.17615" "719.65105" "721.30632" "721.94738" "721.59274" "721.16041")
+
+TIME=`date`
+echo " @@@ JOB START : ${TIME}"
+
+for loop in `seq 0 1 7`
+do
+   for time in `seq 6 1 14`
+   do
+      ./obs -f arg/arguments_observable.txt -ifile $base/${DIR[$loop]}/${ifname}$time \
+         -ofile $base/${DIR[$loop]}/${ofname}$time -mass ${MASS[$loop]} @ $CHECK
+   done
+done
+
+TIME=`date`
+echo " @@@ JOB END   : ${TIME}"

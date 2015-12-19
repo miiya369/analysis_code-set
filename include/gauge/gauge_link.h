@@ -5,21 +5,25 @@
  * @brief   Header file for several functions of gauge link valiable
  * @brief   NOTE: gauge link valiable must be form "ildg format"
  * @author  Takaya Miyamoto
- * @since   Thu Sep 17 22:33:34 JST 2015
+ * @since   Fri Dec 18 08:19:36 JST 2015
  */
 //--------------------------------------------------------------------------
 
 #ifndef GAUGE_LINK_H
 #define GAUGE_LINK_H
 
-#include <gauge/matrix_class.h>
+#include <gauge/complex_matrix.h>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #define idx(mu,x,y,z,t) (mu+4*(x+sSIZE*(y+sSIZE*(z+sSIZE*t))))
 
-double plaquette(double *iconf, int sSIZE, int tSIZE) {
-   
-   MATRIX* conf = (MATRIX*)iconf;
-   double  ret  = 0.0;
+double plaquette(const double *iconf, const int sSIZE, const int tSIZE)
+{
+   SU3matrix* conf = (SU3matrix*)iconf;
+   double     ret  = 0.0;
    
    size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
    int    size[]   = { sSIZE, sSIZE, sSIZE, tSIZE };   // x, y, z, t
@@ -27,8 +31,9 @@ double plaquette(double *iconf, int sSIZE, int tSIZE) {
 #ifdef _OPENMP
 #pragma omp parallel for reduction (+: ret)
 #endif
-   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++) {
-      MATRIX tmp;
+   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++)
+   {
+      SU3matrix tmp;
       
       int n[4],m[4],l[4];
 //===================   Plaquette notation   ====================
@@ -41,23 +46,24 @@ double plaquette(double *iconf, int sSIZE, int tSIZE) {
 //          n         l         ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++) {
+      for (int xyzt=0; xyzt<4; xyzt++)
+      {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
       for (int mu=0; mu<4;  mu++)
-         for (int nu=0; nu<mu; nu++) {
-            
+         for (int nu=0; nu<mu; nu++)
+         {
             for (int loop=0; loop<4; loop++)
                l[loop] = m[loop] = n[loop];
             
             m[mu] = (m[mu]+1) % size[mu];
             l[nu] = (l[nu]+1) % size[nu];
             
-            tmp =  conf[idx(mu,n[0],n[1],n[2],n[3])]
-                 * conf[idx(nu,m[0],m[1],m[2],m[3])]
-                 * conf[idx(mu,l[0],l[1],l[2],l[3])].dagger()
-                 * conf[idx(nu,n[0],n[1],n[2],n[3])].dagger();
+            tmp = (  conf[idx(mu,n[0],n[1],n[2],n[3])]
+                   * conf[idx(nu,m[0],m[1],m[2],m[3])]
+                   * conf[idx(mu,l[0],l[1],l[2],l[3])].dagger()
+                   * conf[idx(nu,n[0],n[1],n[2],n[3])].dagger() );
             
             ret += tmp.trace().real();   // <- sum_n Re tr P(n)
          }
@@ -65,20 +71,22 @@ double plaquette(double *iconf, int sSIZE, int tSIZE) {
    return ret/double(xyztSIZE*18);
 }
 
-void stout_smearing(double *iconf, double param, int sSIZE, int tSIZE) {
-   
-   MATRIX* conf = (MATRIX*)iconf;
+void stout_smearing(  double *iconf
+                    , const double param, const int sSIZE, const int tSIZE )
+{
+   SU3matrix* conf = (SU3matrix*)iconf;
    
    size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
    int    size[]   = { sSIZE, sSIZE, sSIZE, tSIZE };   // x, y, z, t
    
-   MATRIX *conf_tmp = new MATRIX[xyztSIZE*4];
+   SU3matrix *conf_tmp = new SU3matrix[xyztSIZE*4];
    
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++) {
-      MATRIX staple, tmp;
+   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++)
+   {
+      SU3matrix staple, tmp;
       
       int n[4],m1[4],m2[4],l1[4],l2[4];
 //====================   Staple notation   ======================
@@ -91,13 +99,16 @@ void stout_smearing(double *iconf, double param, int sSIZE, int tSIZE) {
 //      l1     n      m1     ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++) {
+      for (int xyzt=0; xyzt<4; xyzt++)
+      {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
-      for (   int mu=0; mu<4; mu++) {
+      for (int mu=0; mu<4; mu++)
+      {
          staple.init();
-         for (int nu=0; nu<4; nu++) {
+         for (int nu=0; nu<4; nu++)
+         {
             if (mu == nu) continue;
             for (int loop=0; loop<4; loop++)
                l2[loop] = l1[loop] = m2[loop] = m1[loop] = n[loop];
@@ -111,19 +122,21 @@ void stout_smearing(double *iconf, double param, int sSIZE, int tSIZE) {
             staple += (  conf[idx(nu, n[0], n[1], n[2], n[3])]
                        * conf[idx(mu,m1[0],m1[1],m1[2],m1[3])]
                        * conf[idx(nu,m2[0],m2[1],m2[2],m2[3])].dagger()
-                      +  conf[idx(nu,l1[0],l1[1],l1[2],l1[3])].dagger()
+                       + conf[idx(nu,l1[0],l1[1],l1[2],l1[3])].dagger()
                        * conf[idx(mu,l1[0],l1[1],l1[2],l1[3])]
                        * conf[idx(nu,l2[0],l2[1],l2[2],l2[3])]
                        ) * param;
          } // nu
          staple *= conf[idx(mu,n[0],n[1],n[2],n[3])].dagger();
-         tmp = (   (staple.dagger() - staple)
-                - ((staple.dagger() - staple).trace()/3.0))
-               * std::complex<double>(0.0, 0.5);
+         tmp     = (   (staple.dagger() - staple)
+                    - ((staple.dagger() - staple).trace()/3.0)
+                    ) * std::complex<double>(0.0, 0.5);
+         
          conf_tmp[idx(mu,n[0],n[1],n[2],n[3])]
-            = tmp.exp_su3() * conf[idx(mu,n[0],n[1],n[2],n[3])];
+         = tmp.exp_su3() * conf[idx(mu,n[0],n[1],n[2],n[3])];
       } // mu
    } // site_loop
+   
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -133,10 +146,10 @@ void stout_smearing(double *iconf, double param, int sSIZE, int tSIZE) {
    delete [] conf_tmp;
 }
 
-std::complex<double> check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
-   
-   MATRIX*              conf = (MATRIX*)iconf;
-   std::complex<double> ret  = 0.0;
+double check_coulomb_gfix(const double *iconf, const int sSIZE, const int tSIZE)
+{
+   SU3matrix* conf = (SU3matrix*)iconf;
+   double     ret  = 0.0;
    
    size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
    int    size[]   = { sSIZE, sSIZE, sSIZE, tSIZE };   // x, y, z, t
@@ -144,8 +157,9 @@ std::complex<double> check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++) {
-      MATRIX tmp;
+   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++)
+   {
+      SU3matrix tmp;
       
       int n[4],m[4];
 //=========================   notation   ========================
@@ -156,32 +170,34 @@ std::complex<double> check_coulomb_gfix(double *iconf, int sSIZE, int tSIZE) {
 //                           ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++) {
+      for (int xyzt=0; xyzt<4; xyzt++)
+      {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
-      for (int mu=0; mu<3;  mu++) {
-            
-            for (int loop=0; loop<4; loop++)
-               m[loop] = n[loop];
-            
-            m[mu] = (m[mu]-1+size[mu]) % size[mu];
-            
-            tmp =  conf[idx(mu,n[0],n[1],n[2],n[3])]
-                 - conf[idx(mu,m[0],m[1],m[2],m[3])]
-                 - conf[idx(mu,n[0],n[1],n[2],n[3])].dagger()
-                 + conf[idx(mu,m[0],m[1],m[2],m[3])].dagger();
+      for (int mu=0; mu<3;  mu++)
+      {
+         for (int loop=0; loop<4; loop++)
+            m[loop] = n[loop];
          
-            ret += tmp.sum_all_elements2();
-         }
+         m[mu] = (m[mu]-1+size[mu]) % size[mu];
+         
+         tmp = (  conf[idx(mu,n[0],n[1],n[2],n[3])]
+                - conf[idx(mu,m[0],m[1],m[2],m[3])]
+                - conf[idx(mu,n[0],n[1],n[2],n[3])].dagger()
+                + conf[idx(mu,m[0],m[1],m[2],m[3])].dagger() );
+      
+         ret += tmp.sum_all_abs_elements();
+      }
    }
    return ret/double(xyztSIZE*4);
 }
 
-void gfix_by_gmat(double *iconf, double *igmat, int sSIZE, int tSIZE) {
-   
-   MATRIX* conf = (MATRIX*)iconf;
-   MATRIX* gmat = (MATRIX*)igmat;
+void gfix_by_gmat(  double *iconf, const double *igmat
+                  , const int sSIZE, const int tSIZE )
+{
+   SU3matrix* conf = (SU3matrix*)iconf;
+   SU3matrix* gmat = (SU3matrix*)igmat;
    
    size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
    int    size[]   = { sSIZE, sSIZE, sSIZE, tSIZE };   // x, y, z, t
@@ -189,8 +205,8 @@ void gfix_by_gmat(double *iconf, double *igmat, int sSIZE, int tSIZE) {
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++) {
-      
+   for (size_t site_loop=0; site_loop<xyztSIZE; site_loop++)
+   {
       int n[4],m[4];
 //=========================   notation   ========================
 //
@@ -200,20 +216,21 @@ void gfix_by_gmat(double *iconf, double *igmat, int sSIZE, int tSIZE) {
 //                           ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++) {
+      for (int xyzt=0; xyzt<4; xyzt++)
+      {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
-      for (int mu=0; mu<4;  mu++) {
-         
+      for (int mu=0; mu<4;  mu++)
+      {
          for (int loop=0; loop<4; loop++)
             m[loop] = n[loop];
          
          m[mu] = (m[mu]+1) % size[mu];
          
-           conf[idx(mu,n[0],n[1],n[2],n[3])]
+         conf  [idx(mu,n[0],n[1],n[2],n[3])  ]
          = gmat[idx(0, n[0],n[1],n[2],n[3])/4]
-         * conf[idx(mu,n[0],n[1],n[2],n[3])]
+         * conf[idx(mu,n[0],n[1],n[2],n[3])  ]
          * gmat[idx(0, m[0],m[1],m[2],m[3])/4].dagger();
       }
    } // site_loop

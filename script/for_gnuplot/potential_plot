@@ -1,13 +1,13 @@
 
-if(!exist("first_setting_pot”)) first_setting_pot=0; \
+if(!exist("first_setting_pot")) first_setting_pot=0; \
 \
 convfm=0.0907; \
 convMeV=197.327/0.0907; \
 \
 set term x11 font "arial,18,bold"; \
 set key left top; \
-set ylabel "[MeV]"; \
-set xlabel "[fm]"; \
+set ylabel "V(r) [MeV]"; \
+set xlabel "r [fm]"; \
 set xr[0:2.5]; \
 
 set yr[$0:$1]

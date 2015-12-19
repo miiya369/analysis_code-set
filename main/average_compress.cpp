@@ -4,7 +4,7 @@
  * @ingroup correlator, NBS wave function
  * @brief   Main part for average of correlator & compress NBSwave data
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 03:03:33 JST 2015
+ * @since   Fri Dec 11 04:33:12 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -21,26 +21,26 @@ typedef PH1                 Core;
 typedef four_point<Core>    Four_Point;
 typedef compress48<Core>    Compress48;
 
-int time_slice_min, time_slice_max;
+static int time_slice_min, time_slice_max;
 
-int *Tshift = NULL;
-int  N_Tshift;
+static string *Tshift = NULL;
+static int     N_Tshift;
 
-HADRON_TYPE *hadron_type = NULL;
-int          N_had;
+static HADRON_TYPE *hadron_type = NULL;
+static int          N_had;
 
-CHANNEL_TYPE *channel_type = NULL;
-int           N_ch;
+static CHANNEL_TYPE *channel_type = NULL;
+static int           N_ch;
 
-char conf_list[MAX_LEN_PATH];
-char work_dir[MAX_LEN_PATH];
+static char conf_list[MAX_LEN_PATH];
+static char work_dir[MAX_LEN_PATH];
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
-void input_corr_all( string, int, int, double*);
-void output_corr_all(string, int, int, double*);
+static void input_corr_all( string, int, string, double*);
+static void output_corr_all(string, int, int, double*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -117,17 +117,17 @@ int main(int argc, char **argv) {
          
          for (int Tslice=time_slice_min; Tslice<=time_slice_max; Tslice++) {
             analysis::set_data_list(  N_TIME, "%03d", Tslice);
-            analysis::set_data_list(  MAIN_PATH
-                                    , "%s/t_shift_%03d", work_dir, Tshift[0]);
-            analysis::set_data_list(  N_T_SHIFT, "%03d", Tshift[0]);
+            analysis::set_data_list(  MAIN_PATH, "%s/t_shift_%s"
+                                    , work_dir, Tshift[0].c_str());
+            analysis::set_data_list(  N_T_SHIFT, "%s", Tshift[0].c_str());
             
             mapping48  map;    map.read( analysis::set_path(conf).c_str());
             Compress48 comp;   comp.read(analysis::set_path(conf).c_str(), map);
             Compress48 tmp;
             for (int it=1; it<N_Tshift; it++) {
-               analysis::set_data_list(  MAIN_PATH
-                                       , "%s/t_shift_%03d", work_dir, Tshift[it]);
-               analysis::set_data_list(  N_T_SHIFT, "%03d", Tshift[it]);
+               analysis::set_data_list(  MAIN_PATH, "%s/t_shift_%s"
+                                       , work_dir, Tshift[it].c_str());
+               analysis::set_data_list(  N_T_SHIFT, "%s", Tshift[it].c_str());
                tmp.read(analysis::set_path(conf).c_str(), map);
                comp += tmp; // NBSwave ave.
             } // it
@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -192,10 +192,10 @@ int set_args(int argc, char** argv) {
             } while (strcmp(argv[loop+count_tmp],"@") != 0);
             N_Tshift = count_tmp-1;
             if (Tshift != NULL) delete [] Tshift;
-            Tshift = new int[N_Tshift];
+            Tshift = new string[N_Tshift];
             for (int n=0; n<N_Tshift; n++){
                loop++;
-               Tshift[n] = atoi(argv[loop]);
+               Tshift[n] = argv[loop];
             }
          }
          else if (strcmp(argv[loop],"-hadron")==0) {
@@ -254,7 +254,7 @@ int set_args(int argc, char** argv) {
    printf(" @ time_max   = %d\n",time_slice_max);
    printf(" @ #. t shift = %d\n @ t shift    = { ",N_Tshift);
    for(int loop=0; loop<N_Tshift; loop++)
-      printf("%d ",Tshift[loop]);
+      printf("%s ",Tshift[loop].c_str());
    printf("}\n @ #. hadron  = %d\n @ hadron     = { ",N_had);
    for(int loop=0; loop<N_had; loop++)
       printf("%s ",hadron_type[loop].name_only.c_str());
@@ -272,7 +272,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {
@@ -304,32 +304,16 @@ int set_args_from_file(char* file_name) {
          snprintf(conf_list,sizeof(conf_list),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"AVE_Path_to_working_dir")==0)
          snprintf(work_dir,sizeof(work_dir),"%s",tmp_c2);
-      else if (strcmp(tmp_c1,"AVE_X_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_X_SHIFT]
-                  , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"AVE_Y_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Y_SHIFT]
-                  , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"AVE_Z_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Z_SHIFT]
-                  , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%03d", tmp_i);
-      }
+      else if (strcmp(tmp_c1,"AVE_X_shift"           )==0)
+         analysis::set_data_list(N_X_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"AVE_Y_shift"           )==0)
+         analysis::set_data_list(N_Y_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"AVE_Z_shift"           )==0)
+         analysis::set_data_list(N_Z_SHIFT, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"AVE_Snk_relativistic"  )==0)
-         snprintf(         analysis::data_list[SNK_RELA]
-                  , sizeof(analysis::data_list[SNK_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SNK_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"AVE_Src_relativistic"  )==0)
-         snprintf(         analysis::data_list[SRC_RELA]
-                  , sizeof(analysis::data_list[SRC_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"AVE_T_shift_list"      )==0) {
          char *tmp_tok;
          char  tmp_tmp_str[MAX_N_DATA][MAX_LEN_PATH];
@@ -343,9 +327,9 @@ int set_args_from_file(char* file_name) {
             tmp_tok = strtok(NULL," \t");
          }
          N_Tshift = count_tmp;
-           Tshift = new int[N_Tshift];
+           Tshift = new string[N_Tshift];
          for (int n=0; n<N_Tshift; n++){
-            Tshift[n] = atoi(tmp_tmp_str[n]);
+            Tshift[n] = tmp_tmp_str[n];
          }
       }
       else if (strcmp(tmp_c1,"AVE_Calc_hadron_name"  )==0) {
@@ -394,10 +378,11 @@ int set_args_from_file(char* file_name) {
    return 0;
 }
 
-void input_corr_all(string CORRtype, int CONF, int TSHIFT, double *CORR) {
+static void input_corr_all(  string CORRtype, int CONF
+                           , string TSHIFT, double *CORR) {
    
-   analysis::set_data_list(MAIN_PATH, "%s/t_shift_%03d", work_dir, TSHIFT);
-   analysis::set_data_list(N_T_SHIFT, "%03d", TSHIFT);
+   analysis::set_data_list(MAIN_PATH, "%s/t_shift_%s", work_dir, TSHIFT.c_str());
+   analysis::set_data_list(N_T_SHIFT, "%s", TSHIFT.c_str());
    analysis::set_data_list(CORR_DIRECTORY, "%s", CORRtype.c_str());
    
    FILE* fp = fopen( analysis::set_path(CONF).c_str(), "r" );
@@ -419,7 +404,8 @@ void input_corr_all(string CORRtype, int CONF, int TSHIFT, double *CORR) {
    fclose(fp);
 }
 
-void output_corr_all(string CORRtype, int CONF, int N_TSHIFT, double *CORR) {
+static void output_corr_all(  string CORRtype
+                            , int CONF, int N_TSHIFT, double *CORR) {
    
    analysis::set_data_list(MAIN_PATH, "%s/t_shift_ave/%dsrc", work_dir, N_TSHIFT);
    analysis::set_data_list(N_T_SHIFT, "A%02d", N_TSHIFT);

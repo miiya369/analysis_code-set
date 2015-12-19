@@ -4,7 +4,7 @@
  * @ingroup observable
  * @brief   Definition for potentail using calculate schrodinger equation
  * @author  Takaya Miyamoto
- * @since   Fri Oct  9 01:57:20 JST 2015
+ * @since   Thu Dec 10 21:19:51 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -18,7 +18,8 @@ double observable::V( double x, double* param, int Nparam, int func_num ) {
    else if ( func_num == 2 )   v = func_exp   (x, param, Nparam);
    else if ( func_num == 3 ||
              func_num == 4 ||
-             func_num == 5 )   v = func_gauss (x, param, Nparam);
+             func_num == 5 ||
+             func_num == 8 )   v = func_gauss (x, param, Nparam);
    else if ( func_num == 6 ||
              func_num == 7 )   v = func_sgauss(x, param, Nparam);
    else if ( func_num == 0 )   v = func_test  (x, param, Nparam);

@@ -4,7 +4,7 @@
  * @ingroup correlator
  * @brief   Main part for effective mass calculation
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 04:10:27 JST 2015
+ * @since   Thu Dec 17 23:40:47 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -13,20 +13,29 @@
 
 #define PROJECT EFFECTIVEMASS    // <- Project name
 
-int          Nhad;
-HADRON_TYPE *hadron_type = NULL;
-int          fit_range_min;
-int          fit_range_max;
-double       lat_space;
+static int           Nhad;
+static int           Nch;
+static HADRON_TYPE  *hadron_type  = NULL;
+static CHANNEL_TYPE *channel_type = NULL;
+static int           fit_range_min;
+static int           fit_range_max;
+static int           momentum;
+static SPIN_TYPE     spin;
+static double        lat_space;
 
-char conf_list[MAX_LEN_PATH];
-char outfile_path[MAX_LEN_PATH];
+static char conf_list[MAX_LEN_PATH];
+static char outfile_path[MAX_LEN_PATH];
 
-bool calc_flg_fit = false;
+static bool take_JK_flg    = false;
+static bool use_JK_data    = false;
+static bool input_fit_flg  = false;
+static bool out_fit_flg    = false;
+static bool calc_flg_fit   = false;
+static bool calc_flg_Rcorr = false;
 
-bool arguments_check = false;
-int  set_args(int, char**);
-int  set_args_from_file(char*);
+static bool arguments_check = false;
+static int  set_args(int, char**);
+static int  set_args_from_file(char*);
 
 //========================================================================//
 int main(int argc, char **argv) {
@@ -34,46 +43,84 @@ int main(int argc, char **argv) {
    
    time_t start_time, end_time;
    time( &start_time );
+   
+   if (take_JK_flg) use_JK_data = true;
 
    CONFIG<CORRELATOR> *Corr     = new CONFIG<CORRELATOR>;
    CONFIG<CORRELATOR> *eff_mass = new CONFIG<CORRELATOR>;
    CONFIG<FIT>        *fit      = new CONFIG<FIT>;
    
    char    outfile_name[1024];
+   char    infile_name [1024];
    double  param_ini[2] = { 0.001, 1.0 };   // <- init. value of effmass fit
    double *data         = new double[analysis::tSIZE];
    double *cood         = new double[analysis::tSIZE];
    double *err          = new double[analysis::tSIZE];
    double *chisq        = new double[analysis::Nconf];
    double *param        = new double[analysis::Nconf];
-   double *mass         = new double[Nhad*4];
+   double *mass_had     = new double[Nhad*4];
+   double *mass_NBS     = new double[Nch *4];
+   
+   double *data_all = NULL;
+   if (input_fit_flg) data_all = new double[analysis::tSIZE * analysis::Nconf];
    
    for (int it=0; it<analysis::tSIZE; it++) cood[it] = it;
    
    for (int loop=0; loop<Nhad; loop++) {
       
-      for (int conf=0; conf<analysis::Nconf; conf++)
-         (*Corr)(conf).set( hadron_type[loop], conf, "PS" );
-      
-      Corr->make_JK_sample();
-      
-      for (int conf=0; conf<analysis::Nconf; conf++) {
-         (*eff_mass)(conf).mem_alloc();
-         for (int it=0; it<analysis::tSIZE-1; it++)
-            (*eff_mass)(conf)(it) = -log(  (*Corr)(conf)(it+1)
-                                         / (*Corr)(conf)(it) );
-      }
-      snprintf(  outfile_name, sizeof(outfile_name)
-               , "%s/%s_effmass_err"
-               , outfile_path, hadron_type[loop].name.c_str() );
-      
-      analysis::output_data_err( *eff_mass, outfile_name );
-      
-      if (calc_flg_fit) {
-         Corr->make_mean_err( data, err, true );
+      if (!input_fit_flg) {
+         for (int conf=0; conf<analysis::Nconf; conf++)
+            (*Corr)(conf).set( hadron_type[loop], conf, momentum, "PS" );
+         
+         if (take_JK_flg) Corr->make_JK_sample();
+         
          for (int conf=0; conf<analysis::Nconf; conf++) {
-            for (int it=0; it<analysis::tSIZE; it++)
-               data[it] = (*Corr)(conf)(it).real();
+            (*eff_mass)(conf).mem_alloc(analysis::tSIZE-1);
+            for (int it=0; it<analysis::tSIZE-1; it++)
+               (*eff_mass)(conf)(it) = -log(  (*Corr)(conf)(it+1)
+                                            / (*Corr)(conf)(it) );
+         }
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_effmass_err"
+                  , outfile_path, hadron_type[loop].name.c_str() );
+         
+         analysis::output_data_err( *eff_mass, outfile_name, use_JK_data );
+      }
+      else {
+         snprintf(  infile_name, sizeof(infile_name)
+                  , "%s/%s_correlator_fit"
+                  , analysis::data_list[MAIN_PATH]
+                  , hadron_type[loop].name.c_str() );
+         
+         int tmp_Ndata, tmp_Nconf;
+         fitting::input_data_binary( infile_name, tmp_Nconf, tmp_Ndata );
+         
+         if (tmp_Nconf != analysis::Nconf || tmp_Ndata != analysis::tSIZE) {
+            printf(" @@@ ERROR : Different Nconf or Ndata\n"
+                   "           : Nconf in binary = %d\n"
+                   "           : Ndata in binary = %d\n\n", tmp_Nconf, tmp_Ndata);
+            return -1;
+         }
+         fitting::input_data_binary( infile_name, cood, data_all, err );
+      }
+      
+      if (out_fit_flg && !input_fit_flg) {
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_correlator_fit"
+                  , outfile_path, hadron_type[loop].name.c_str() );
+         
+         analysis::output_data_fit( *Corr, outfile_name, use_JK_data );
+      }
+      if (calc_flg_fit) {
+         if (!input_fit_flg) Corr->make_mean_err( data, err, use_JK_data );
+         
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            if (!input_fit_flg)
+               for (int it=0; it<analysis::tSIZE; it++)
+                  data[it] = (*Corr)(conf)(it).real();
+            else
+               for (int it=0; it<analysis::tSIZE; it++)
+                  data[it] = data_all[conf+analysis::Nconf*it];
             
             (*fit)(conf).set_func( "1EXP", param_ini );
             chisq[conf] =
@@ -81,41 +128,159 @@ int main(int argc, char **argv) {
                                       , fit_range_min, fit_range_max, 0.000001 );
             param[conf] = (*fit)(conf)(1);
          }
-         analysis::make_mean_err(  param, mass[0+4*loop], mass[1+4*loop]
-                                 , analysis::Nconf, true  );
-         analysis::make_mean_err(  chisq, mass[2+4*loop], mass[3+4*loop]
+         analysis::make_mean_err(  param, mass_had[0+4*loop], mass_had[1+4*loop]
+                                 , analysis::Nconf, use_JK_data  );
+         analysis::make_mean_err(  chisq, mass_had[2+4*loop], mass_had[3+4*loop]
                                  , analysis::Nconf, false );
       }
       
    } // Nhad
+   
+   for (int loop=0; loop<Nch; loop++) {
+      
+      if (!input_fit_flg) {
+         for (int conf=0; conf<analysis::Nconf; conf++)
+            (*Corr)(conf).set( channel_type[loop], conf, spin );
+         
+         if (take_JK_flg) Corr->make_JK_sample();
+         
+         if (calc_flg_Rcorr) {
+            CONFIG<CORRELATOR> *Corr1 = new CONFIG<CORRELATOR>;
+            CONFIG<CORRELATOR> *Corr2 = new CONFIG<CORRELATOR>;
+            
+            for (int conf=0; conf<analysis::Nconf; conf++) {
+               (*Corr1)(conf).set(  channel_type[loop].hadron1
+                                  , conf, momentum, "PS" );
+               (*Corr2)(conf).set(  channel_type[loop].hadron2
+                                  , conf, momentum, "PS" );
+            }
+            if (take_JK_flg) Corr1->make_JK_sample();
+            if (take_JK_flg) Corr2->make_JK_sample();
+            
+            for (   int conf=0; conf<analysis::Nconf;   conf++)
+               for (int it  =0; it  <analysis::tSIZE/2; it++)
+                  (*Corr)(conf)(it) /= (*Corr1)(conf)(it) * (*Corr2)(conf)(it);
+            
+            delete Corr1;
+            delete Corr2;
+         }
+         
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            (*eff_mass)(conf).mem_alloc(analysis::tSIZE/2-1);
+            for (int it=0; it<analysis::tSIZE/2-1; it++)
+               (*eff_mass)(conf)(it) = -log(  (*Corr)(conf)(it+1)
+                                            / (*Corr)(conf)(it) );
+         }
+         if (calc_flg_Rcorr) snprintf(  outfile_name, sizeof(outfile_name)
+                                      , "%s/%s_Rcorr_%s_effmass_err", outfile_path
+                                      , channel_type[loop].name.c_str()
+                                      , spin.name.c_str() );
+         else snprintf(  outfile_name, sizeof(outfile_name)
+                       , "%s/%s_%s_effmass_err", outfile_path
+                       , channel_type[loop].name.c_str(), spin.name.c_str() );
+         
+         analysis::output_data_err( *eff_mass, outfile_name, use_JK_data );
+      }
+      else {
+         if (calc_flg_Rcorr) snprintf(  infile_name, sizeof(infile_name)
+                                      , "%s/%s_Rcorrelator_%s_fit"
+                                      , analysis::data_list[MAIN_PATH]
+                                      , channel_type[loop].name.c_str()
+                                      , spin.name.c_str() );
+         else snprintf(  infile_name, sizeof(infile_name)
+                       , "%s/%s_correlator_%s_fit"
+                       , analysis::data_list[MAIN_PATH]
+                       , channel_type[loop].name.c_str(), spin.name.c_str() );
+         
+         int tmp_Ndata, tmp_Nconf;
+         fitting::input_data_binary( infile_name, tmp_Nconf, tmp_Ndata );
+         
+         if (tmp_Nconf != analysis::Nconf || tmp_Ndata != analysis::tSIZE/2) {
+            printf(" @@@ ERROR : Different Nconf or Ndata\n"
+                   "           : Nconf in binary = %d\n"
+                   "           : Ndata in binary = %d\n\n", tmp_Nconf, tmp_Ndata);
+            return -1;
+         }
+         fitting::input_data_binary( infile_name, cood, data_all, err );
+      }
+      if (out_fit_flg && !input_fit_flg) {
+         if (calc_flg_Rcorr) snprintf(  outfile_name, sizeof(outfile_name)
+                                      , "%s/%s_Rcorrelator_%s_fit", outfile_path
+                                      , channel_type[loop].name.c_str()
+                                      , spin.name.c_str() );
+         else snprintf(  outfile_name, sizeof(outfile_name)
+                       , "%s/%s_correlator_%s_fit", outfile_path
+                       , channel_type[loop].name.c_str(), spin.name.c_str() );
+         
+         analysis::output_data_fit( *Corr, outfile_name, use_JK_data );
+      }
+      if (calc_flg_fit) {
+         if (!input_fit_flg) Corr->make_mean_err( data, err, use_JK_data );
+         
+         for (int conf=0; conf<analysis::Nconf; conf++) {
+            if (!input_fit_flg)
+               for (int it=0; it<analysis::tSIZE/2; it++)
+                  data[it] = (*Corr)(conf)(it).real();
+            else
+               for (int it=0; it<analysis::tSIZE/2; it++)
+                  data[it] = data_all[conf+analysis::Nconf*it];
+            
+            (*fit)(conf).set_func( "1EXP", param_ini );
+            chisq[conf] =
+            (*fit)(conf).fit_data_NR(  cood, data, err
+                                     , fit_range_min, fit_range_max, 0.000001 );
+            param[conf] = (*fit)(conf)(1);
+         }
+         analysis::make_mean_err(  param, mass_NBS[0+4*loop], mass_NBS[1+4*loop]
+                                 , analysis::Nconf, use_JK_data  );
+         analysis::make_mean_err(  chisq, mass_NBS[2+4*loop], mass_NBS[3+4*loop]
+                                 , analysis::Nconf, false );
+      }
+      
+   } // Nch
    
    delete [] data;
    delete [] cood;
    delete [] err;
    delete [] chisq;
    delete [] param;
+   
+   if (input_fit_flg) delete [] data_all;
 
    delete fit;
    delete Corr;
    delete eff_mass;
    
    if (calc_flg_fit) {
-      printf("\n @ =================================================== @\n");
-      printf(" @           EFFECTIVE MASS FITTING RESULTS            @\n");
-      printf(" @ =================================================== @\n\n");
+      printf("\n"
+             " @ =========================================================== @\n");
+      printf(" @               EFFECTIVE MASS FITTING RESULTS                @\n");
+      printf(" @ =========================================================== @\n"
+             "\n");
       for (int loop=0; loop<Nhad; loop++)
-         printf(" %9s : [Lattice Unit] %lf +/- %lf\n"
-                "           : [   MeV/c2   ] %lf +/- %lf\n"
-                "           : [ chisq/conf ] %lf +/- %lf\n\n"
+         printf(" %18s : [Lattice Unit] %lf +/- %lf\n"
+                "                    : [   MeV/c2   ] %lf +/- %lf\n"
+                "                    : [ chisq/conf ] %lf +/- %lf\n\n"
                 , hadron_type[loop].name_only.c_str()
-                , mass[0+4*loop], mass[1+4*loop]
-                , mass[0+4*loop]*197.327/lat_space
-                , mass[1+4*loop]*197.327/lat_space
-                , mass[2+4*loop], mass[3+4*loop] );
-      printf(" @ =================================================== @\n");
+                , mass_had[0+4*loop], mass_had[1+4*loop]
+                , mass_had[0+4*loop]*197.327/lat_space
+                , mass_had[1+4*loop]*197.327/lat_space
+                , mass_had[2+4*loop], mass_had[3+4*loop] );
+      for (int loop=0; loop<Nch; loop++)
+         printf(" %18s : [Lattice Unit] %lf +/- %lf\n"
+                "                    : [   MeV/c2   ] %lf +/- %lf\n"
+                "                    : [ chisq/conf ] %lf +/- %lf\n\n"
+                , channel_type[loop].name.c_str()
+                , mass_NBS[0+4*loop], mass_NBS[1+4*loop]
+                , mass_NBS[0+4*loop]*197.327/lat_space
+                , mass_NBS[1+4*loop]*197.327/lat_space
+                , mass_NBS[2+4*loop], mass_NBS[3+4*loop] );
+      printf(" @ =========================================================== @\n");
    }
-   delete [] hadron_type;
-   delete [] mass;
+   if (hadron_type  != NULL) delete [] hadron_type;
+   if (channel_type != NULL) delete [] channel_type;
+   delete [] mass_had;
+   delete [] mass_NBS;
    
    time( &end_time );
    printf("\n @ JOB END : ELAPSED TIME [s] = %d\n\n"
@@ -124,7 +289,7 @@ int main(int argc, char **argv) {
 }
 //========================================================================//
 
-int set_args(int argc, char** argv) {
+static int set_args(int argc, char** argv) {
    
    if (argc == 1) {
       analysis::usage(PROJECT);
@@ -146,18 +311,20 @@ int set_args(int argc, char** argv) {
       if (argv[loop][0] == '-'){
          if (     strcmp(argv[loop],"-f"     )==0){}
          //****** You may set additional potion in here ******//
-         else if (strcmp(argv[loop],"-ifile" )==0)
-            snprintf(         analysis::data_list[MAIN_PATH]
-                     , sizeof(analysis::data_list[MAIN_PATH])
-                     , "%s", argv[loop+1]);
-         else if (strcmp(argv[loop],"-ofile" )==0)
+         else if (strcmp(argv[loop],"-idir"  )==0)
+            analysis::set_data_list(MAIN_PATH, "%s", argv[loop+1]);
+         else if (strcmp(argv[loop],"-odir"  )==0)
             snprintf(outfile_path,sizeof(outfile_path),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-t_min" )==0)
             fit_range_min = atoi(argv[loop+1]);
          else if (strcmp(argv[loop],"-t_max" )==0)
             fit_range_max = atoi(argv[loop+1]);
+         else if (strcmp(argv[loop],"-src_t" )==0)
+            analysis::set_data_list(N_T_SHIFT, "%s", argv[loop+1]);
          else if (strcmp(argv[loop],"-fit"   )==0)
             calc_flg_fit = true;
+         else if (strcmp(argv[loop],"-calc_R")==0)
+            calc_flg_Rcorr = true;
          else if (strcmp(argv[loop],"-hadron")==0) {
             int count_tmp = 0;
             do {
@@ -175,6 +342,23 @@ int set_args(int argc, char** argv) {
                hadron_type[n].set(argv[loop]);
             }
          }
+         else if (strcmp(argv[loop],"-channel")==0) {
+            int count_tmp = 0;
+            do {
+               if (loop+count_tmp == argc-1) {
+                  printf("\n @@@@@@ Need \"@\" at the end of -hadron option\n\n");
+                  return 1;
+               }
+               count_tmp++;
+            } while (strcmp(argv[loop+count_tmp],"@") != 0);
+            Nch = count_tmp-1;
+            if (channel_type != NULL) delete [] channel_type;
+            channel_type = new CHANNEL_TYPE[Nch];
+            for (int n=0; n<Nch; n++){
+               loop++;
+               channel_type[n].set(argv[loop]);
+            }
+         }
          else if (strcmp(argv[loop],"-check" )==0)
             arguments_check = true;
          //***************************************************//
@@ -190,6 +374,8 @@ int set_args(int argc, char** argv) {
    printf("\n @ Arguments set :\n");
    printf(" @ #. conf    = %d\n",analysis::Nconf);
    printf(" @ t_size     = %d\n",analysis::tSIZE);
+   printf(" @ momentum   = %d\n",momentum);
+   printf(" @ spin proj  = %s\n",spin.name.c_str());
    printf(" @ t shift    = %s\n",analysis::data_list[N_T_SHIFT]);
    printf(" @ x shift    = %s\n",analysis::data_list[N_X_SHIFT]);
    printf(" @ y shift    = %s\n",analysis::data_list[N_Y_SHIFT]);
@@ -199,10 +385,18 @@ int set_args(int argc, char** argv) {
    printf(" @ #. hadron  = %d\n @ hadron     = { ",Nhad);
    for(int loop=0; loop<Nhad; loop++)
       printf("%s ",hadron_type[loop].name_only.c_str());
+   printf("}\n @ #. channel = %d\n @ channel    = { ",Nch);
+   for(int loop=0; loop<Nch; loop++)
+      printf("%s ",channel_type[loop].name.c_str());
    printf("}\n @ conf list  = %s\n",conf_list);
-   printf(" @ infile     = %s\n",analysis::data_list[MAIN_PATH]);
-   printf(" @ outfile    = %s\n @\n",outfile_path);
+   printf(" @ input dir  = %s\n",analysis::data_list[MAIN_PATH]);
+   printf(" @ output dir = %s\n @\n",outfile_path);
+   printf(" @ calc Rcorr = %s\n",analysis::bool_to_str(calc_flg_Rcorr).c_str());
+   printf(" @ input  bin = %s\n",analysis::bool_to_str(input_fit_flg).c_str());
+   printf(" @ output bin = %s\n",analysis::bool_to_str(out_fit_flg).c_str());
    printf(" @ calc fit   = %s\n",analysis::bool_to_str(calc_flg_fit).c_str());
+   printf(" @ use JK data= %s\n",analysis::bool_to_str(use_JK_data).c_str());
+   printf(" @ take JK    = %s\n",analysis::bool_to_str(take_JK_flg).c_str());
    printf(" @ range min  = %d\n",fit_range_min);
    printf(" @ range max  = %d\n",fit_range_max);
    printf(" @ lat space  = %lf\n\n",lat_space);
@@ -212,7 +406,7 @@ int set_args(int argc, char** argv) {
    return 0;
 }
 
-int set_args_from_file(char* file_name) {
+static int set_args_from_file(char* file_name) {
    
    ifstream ifs(file_name, ios::in);
    if (!ifs) {
@@ -232,38 +426,24 @@ int set_args_from_file(char* file_name) {
       if (     strcmp(tmp_c1,"MAS_Gauge_confs_list"  )==0)
          snprintf(conf_list,sizeof(conf_list),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Path_to_input_dir" )==0)
-         snprintf(         analysis::data_list[MAIN_PATH]
-                  , sizeof(analysis::data_list[MAIN_PATH])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(MAIN_PATH, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Path_to_output_dir")==0)
          snprintf(outfile_path,sizeof(outfile_path),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Size_of_time"      )==0)
          analysis::tSIZE = atoi(tmp_c2);
-      else if (strcmp(tmp_c1,"MAS_T_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_T_SHIFT]
-                  , sizeof(analysis::data_list[N_T_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"MAS_X_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_X_SHIFT]
-                  , sizeof(analysis::data_list[N_X_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"MAS_Y_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Y_SHIFT]
-                  , sizeof(analysis::data_list[N_Y_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"MAS_Z_shift"           )==0) {
-         int tmp_i = atoi(tmp_c2);
-         snprintf(         analysis::data_list[N_Z_SHIFT]
-                  , sizeof(analysis::data_list[N_Z_SHIFT])
-                  , "%03d", tmp_i);
-      }
-      else if (strcmp(tmp_c1,"MAS_Calc_hadron_name"  )==0     ) {
+      else if (strcmp(tmp_c1,"MAS_Momentum"          )==0)
+         momentum = atoi(tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Spin_projection"   )==0)
+         spin.set(tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_T_shift"           )==0)
+         analysis::set_data_list(N_T_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_X_shift"           )==0)
+         analysis::set_data_list(N_X_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Y_shift"           )==0)
+         analysis::set_data_list(N_Y_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Z_shift"           )==0)
+         analysis::set_data_list(N_Z_SHIFT, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Calc_hadron_name"  )==0) {
          char *tmp_tok;
          char  tmp_tmp_str[MAX_N_DATA][MAX_LEN_PATH];
          int   count_tmp = 0;
@@ -281,16 +461,40 @@ int set_args_from_file(char* file_name) {
             hadron_type[n].set(tmp_tmp_str[n]);
          }
       }
+      else if (strcmp(tmp_c1,"MAS_Calc_channel_name" )==0) {
+         char *tmp_tok;
+         char  tmp_tmp_str[MAX_N_DATA][MAX_LEN_PATH];
+         int   count_tmp = 0;
+         tmp_tok = strtok(tmp_str[loop]," \t");
+         for (int iii=0; iii<3; iii++) tmp_tok = strtok(NULL," \t");
+         while (strcmp(tmp_tok,"}") != 0) {
+            snprintf(tmp_tmp_str[count_tmp],sizeof(tmp_tmp_str[count_tmp])
+                     ,"%s",tmp_tok);
+            count_tmp++;
+            tmp_tok = strtok(NULL," \t");
+         }
+         Nch          = count_tmp;
+         channel_type = new CHANNEL_TYPE[Nch];
+         for (int n=0; n<Nch; n++){
+            channel_type[n].set(tmp_tmp_str[n]);
+         }
+      }
       else if (strcmp(tmp_c1,"MAS_Snk_relativistic"  )==0)
-         snprintf(         analysis::data_list[SNK_RELA]
-                  , sizeof(analysis::data_list[SNK_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SNK_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Src_relativistic"  )==0)
-         snprintf(         analysis::data_list[SRC_RELA]
-                  , sizeof(analysis::data_list[SRC_RELA])
-                  , "%s", tmp_c2);
+         analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Calc_Rcorrelator"  )==0)
+         calc_flg_Rcorr = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Input_fit_data"    )==0)
+         input_fit_flg = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Output_fit_data"   )==0)
+         out_fit_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Calc_fit_data"     )==0)
          calc_flg_fit = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Take_jack_knife"    )==0)
+         take_JK_flg = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"MAS_Use_jack_knife_data")==0)
+         use_JK_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Fit_range_min"     )==0)
          fit_range_min = atoi(tmp_c2);
       else if (strcmp(tmp_c1,"MAS_Fit_range_max"     )==0)

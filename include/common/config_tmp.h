@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Common header file for configuration template class
  * @author  Takaya Miyamoto
- * @since   Wed Sep 16 21:44:47 JST 2015
+ * @since   Fri Dec 11 18:21:32 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -23,9 +23,8 @@ template <class X> class CONFIG {
 private:
    string class_name, func_name;
    
+   X  *data;
    int num_conf;
-   
-   X *data;
    
 protected:
    
@@ -43,7 +42,7 @@ public:
       analysis::route(class_name, func_name, 1);
       
       data       = NULL;
-      
+      num_conf   = analysis::Nconf;
       mem_alloc();
    }
    CONFIG(int NUM_CONF) {
@@ -52,8 +51,8 @@ public:
       analysis::route(class_name, func_name, 1);
       
       data       = NULL;
-      
-      mem_alloc(NUM_CONF);
+      num_conf   = NUM_CONF;
+      mem_alloc();
    }
    ~CONFIG() {
       if (data != NULL) delete [] data;
@@ -67,10 +66,8 @@ public:
       func_name = "mem_alloc_CONFIG______";
       analysis::route( class_name, func_name, 1 );
       
-      if (data == NULL) {
-         num_conf = analysis::Nconf;
-         data = new X[num_conf];
-      }
+      if (data == NULL) data = new X[num_conf];
+      
       analysis::route(class_name, func_name, 0);
    }
    void mem_alloc(int NUM_CONF) {
@@ -78,10 +75,11 @@ public:
       func_name = "mem_alloc_CONFIG______";
       analysis::route( class_name, func_name, 1 );
       
-      if (data == NULL) {
-         num_conf = NUM_CONF;
-         data = new X[num_conf];
+      if (num_conf != NUM_CONF) {
+         mem_del();   num_conf = NUM_CONF;
       }
+      if (data == NULL) data = new X[num_conf];
+      
       analysis::route(class_name, func_name, 0);
    }
    void mem_del() {
@@ -99,9 +97,10 @@ public:
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   int  info_conf(){ return num_conf; }
+   int  Nconf(){ return num_conf; }
    
    void make_JK_sample();
+   void make_JK_sample( CONFIG<X>& );
    void make_mean_err( double*, double*, bool );
    void make_mean_err( cdouble*, cdouble*, bool );
 };
@@ -109,8 +108,8 @@ public:
 namespace analysis {
    //! The function for data output
    template <class X> void output_data_all( CONFIG<X>&, const char* );
-   template <class X> void output_data_err( CONFIG<X>&, const char* );
-   template <class X> void output_data_fit( CONFIG<X>&, const char* );
+   template <class X> void output_data_err( CONFIG<X>&, const char*, bool );
+   template <class X> void output_data_fit( CONFIG<X>&, const char*, bool );
 }
 
 #include <common/make_jack_knife_sample.h>

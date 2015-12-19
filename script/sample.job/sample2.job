@@ -1,0 +1,28 @@
+#!/bin/sh
+
+CHECK=-check
+
+base=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/analysis_results/pacs-cs_ens2/Ks0.13640
+
+DIR=("4src" "1src_doi-san" "4src_doi-san" "16src_doi-san_0" \
+"16src_doi-san_1" "16src_doi-san_2" "16src_doi-san_3" "64src_doi-san")
+
+ifname=Pro-Lam_Pro-Lam_potential_S0_fit_t
+ofname=Pro-Lam_Pro-Lam_potential_S0_fitparam_t
+
+iparam="0.350581 3.201441 1.167748 1.099678 -0.032099 8.750310"
+
+TIME=`date`
+echo " @@@ JOB START : ${TIME}"
+
+for loop in `seq 0 1 7`
+do
+    for time in `seq 6 1 14`
+    do
+	./fit -f arg/arguments_fitting.txt -ifile $base/${DIR[$loop]}/${ifname}$time \
+	    -ofile $base/${DIR[$loop]}/${ofname}$time -param $iparam @ $CHECK
+    done
+done
+
+TIME=`date`
+echo " @@@ JOB END   : ${TIME}"

@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Header File for definition of several enum
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 02:20:13 JST 2015
+ * @since   Fri Dec 18 08:00:33 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -16,11 +16,13 @@ enum {
    
    CLASS_CORRELATOR = 0,
    CLASS_NBS_WAVE_ORG,
+   CLASS_NBS_WAVE_SRC_PRJ,
    CLASS_NBS_WAVE,
    CLASS_R_CORRELATOR,
    CLASS_POTENTIAL,
    CLASS_FITTING,
    CLASS_PHASE_SHIFT,
+   CLASS_TENSOR_FORCE,
 };
 
 //! enum for the main project name
@@ -29,11 +31,25 @@ enum {
    COUPLED_CHANNEL_POT = 0,
    CALC_WAVE_FUNCTION,
    EFFECTIVEMASS,
+   CALC_TENSOR_FORCE,
    CALC_POTENTIAL,
    FITTING_DATA,
    CALC_OBSERVABLE,
    EXTRACT_Z_FACTOR,
    AVERAGE_COMPRESS,
+   EIGEN_ENERGY,
+   JACK_KNIFE_BIN_CHECK,
+   MAKE_JACK_KNIFE_SAMPLES,
+};
+
+//! enum for spin index of NBS wave function
+enum {
+   
+   SPIN_0_0   = 0,
+   SPIN_1_p1  = 1,
+   SPIN_1_0   = 2,
+   SPIN_1_m1  = 3,
+   SPIN_1_ave = 4,
 };
 
 //! enum for the path setting

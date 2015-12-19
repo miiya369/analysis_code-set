@@ -8,13 +8,9 @@
  ////////////////////////////////////////////////
 
 
- ./pot の arguments file の中の
- 「POT_Channel_name」
-
- もしくは ./pot へのオプション「-channel」
-
- に指定する channel name は、Hadron Force 
- の notation を省略したものになっています。
+ 各実行ファイルの arguments file もしくはオプションに
+ 指定する channel name は、Hadron Force の
+ notation を省略したものになっています。
  基本的に 3 文字で 1 つのバリオンを表すことにしています。 
 
  * Proton  -> Pro
