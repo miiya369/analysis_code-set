@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
          analysis::make_mean_err(  param, mass_had[0+4*loop], mass_had[1+4*loop]
                                  , analysis::Nconf, use_JK_data  );
          analysis::make_mean_err(  chisq, mass_had[2+4*loop], mass_had[3+4*loop]
-                                 , analysis::Nconf, false );
+                                 , analysis::Nconf, true );
       }
       
    } // Nhad
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
          analysis::make_mean_err(  param, mass_NBS[0+4*loop], mass_NBS[1+4*loop]
                                  , analysis::Nconf, use_JK_data  );
          analysis::make_mean_err(  chisq, mass_NBS[2+4*loop], mass_NBS[3+4*loop]
-                                 , analysis::Nconf, false );
+                                 , analysis::Nconf, true );
       }
       
    } // Nch

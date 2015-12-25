@@ -8,6 +8,14 @@
  ////////////////////////////////////////////////
 
 
+ @ version 4.1 : 2015/12/19 Completion
+
+	* Major upgrade !
+	   - Use GitHub for version control
+
+	* Add .gitkeep file in the empty directory
+
+
  @ version 3.3 : 2015/12/18 Completion
 
 	* Add the main part for calculate 

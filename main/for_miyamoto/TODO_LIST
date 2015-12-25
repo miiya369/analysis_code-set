@@ -21,6 +21,7 @@
 	   2^31-1 = 2,147,483,647 なので、
 	   NBS_org でも L = 512 まで大丈夫。
 	   gauge conf の index 以外は全て int でよい？
+	- error exit の際に flash をたく
 
  * effective_mass
 	- OK

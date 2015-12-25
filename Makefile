@@ -4,8 +4,8 @@
 
 # You may change this for your environment
 
-CXX	  = g++-5
-CXXFLAGS  = -Wall -O3 -g -fopenmp
+CXX	  = g++
+CXXFLAGS  = -Wall -O3 -g
 
 #===================================================================================#
 #============================= DON’T CHANGE FROM HERE ==============================#

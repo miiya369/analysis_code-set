@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Main part for fitting analysis
  * @author  Takaya Miyamoto
- * @since   Thu Dec 10 21:13:05 JST 2015
+ * @since   Mon Dec 21 12:06:03 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -74,12 +74,12 @@ int main(int argc, char **argv) {
    printf("\n");
    
    double param_mean, param_err, chisq_mean, chisq_err;
-   analysis::make_mean_err( chisq, chisq_mean, chisq_err, analysis::Nconf, false );
+   analysis::make_mean_err( chisq, chisq_mean, chisq_err, analysis::Nconf, true );
    printf(" @ Finished fitting : chisq/dof = %lf +/- %lf\n",chisq_mean,chisq_err);
    
    for (int loop=0; loop<n_param; loop++) {
       analysis::make_mean_err(  &param[analysis::Nconf*loop]
-                              , param_mean, param_err, analysis::Nconf, false );
+                              , param_mean, param_err, analysis::Nconf, true );
       printf(" @                  : param[%1d]  = %lf +/- %lf\n"
              , loop, param_mean, param_err);
       

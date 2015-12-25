@@ -4,7 +4,7 @@
  * @ingroup gauge
  * @brief   Header file for some function of vector & matrix
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 07:35:01 JST 2015
+ * @since   Sat Dec 19 14:44:07 JST 2015
  */
 //--------------------------------------------------------------------------
 
@@ -158,8 +158,8 @@ void solve_mat_gauss(  const double *Amat, double *Xmat, const double *Bmat
          }
       }
    }
-   for (   size_t  i=Ndim-1;  i> 0;  i--) // U -> E
-      for (size_t ii=i-1;    ii>=0; ii--)
+   for (   size_t  i=Ndim-1;  i!=0;  i--) // U -> E
+      for (size_t ii=i;      ii!=0; ii--)
       {
          tmp = mat[idx(ii,i)];
          for (size_t jj=0; jj<Ndim; jj++)
