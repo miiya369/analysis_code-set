@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Header File for definition of spin type
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 00:23:17 JST 2015
+ * @since   Tue Jan 19 15:35:12 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -62,6 +62,14 @@ public:
          name   = spin_name;
          number = SPIN_1_0;
       }
+      else if (spin_name == "S1_Sz0ud") {
+         name   = spin_name;
+         number = SPIN_1_0ud;
+      }
+      else if (spin_name == "S1_Sz0du") {
+         name   = spin_name;
+         number = SPIN_1_0du;
+      }
       else if (spin_name == "S1_Sz-1") {
          name   = spin_name;
          number = SPIN_1_m1;
@@ -89,6 +97,14 @@ public:
       }
       else if (spin_type == SPIN_1_0) {
          name   = "S1_Sz0";
+         number = spin_type;
+      }
+      else if (spin_type == SPIN_1_0ud) {
+         name   = "S1_Sz0ud";
+         number = spin_type;
+      }
+      else if (spin_type == SPIN_1_0du) {
+         name   = "S1_Sz0du";
          number = spin_type;
       }
       else if (spin_type == SPIN_1_m1) {

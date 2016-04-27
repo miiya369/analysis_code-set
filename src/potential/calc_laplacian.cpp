@@ -4,22 +4,22 @@
  * @ingroup Potential
  * @brief   Calculate laplacian term of potential
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 00:45:23 JST 2015
+ * @since   Tue Feb  2 19:47:05 JST 2016
  */
 //--------------------------------------------------------------------------
 
 #include <potential/potential.h>
 
-string potential::laplacian(  R_CORRELATOR &K_Rcorr, R_CORRELATOR &Rcorr
-                            , double reduced_mass ) {
-   
+string potential::laplacian(  R_CORRELATOR &K_Rcorr, const R_CORRELATOR &Rcorr
+                            , const double reduced_mass )
+{
    K_Rcorr.mem_alloc();
    
    int xSHIFT, ySHIFT, zSHIFT;
    for (      int z=0; z<analysis::zSIZE; z++)
       for (   int y=0; y<analysis::ySIZE; y++)
-         for (int x=0; x<analysis::xSIZE; x++) {
-            
+         for (int x=0; x<analysis::xSIZE; x++)
+         {
             xSHIFT = 0; ySHIFT = 0; zSHIFT = 0;
             if (x == 0) xSHIFT = analysis::xSIZE;
             if (y == 0) ySHIFT = analysis::ySIZE;
@@ -39,16 +39,16 @@ string potential::laplacian(  R_CORRELATOR &K_Rcorr, R_CORRELATOR &Rcorr
    return "potLapterm";
 }
 
-string potential::laplacian(  NBS_WAVE &K_NBS, NBS_WAVE &NBS
-                            , double reduced_mass ) {
-   
+string potential::laplacian(  NBS_WAVE &K_NBS, const NBS_WAVE &NBS
+                            , const double reduced_mass )
+{
    K_NBS.mem_alloc();
    
    int xSHIFT, ySHIFT, zSHIFT;
    for (      int z=0; z<analysis::zSIZE; z++)
       for (   int y=0; y<analysis::ySIZE; y++)
-         for (int x=0; x<analysis::xSIZE; x++) {
-            
+         for (int x=0; x<analysis::xSIZE; x++)
+         {
             xSHIFT = 0; ySHIFT = 0; zSHIFT = 0;
             if (x == 0) xSHIFT = analysis::xSIZE;
             if (y == 0) ySHIFT = analysis::ySIZE;
@@ -62,7 +62,8 @@ string potential::laplacian(  NBS_WAVE &K_NBS, NBS_WAVE &NBS
              + NBS(x,  y-1 + ySHIFT        , z)
              + NBS(x, y, (z+1)%analysis::zSIZE)
              + NBS(x, y,  z-1 + zSHIFT        )
-             - NBS(x, y, z) * 6.0 ) / (2.0 * reduced_mass);         }
+             - NBS(x, y, z) * 6.0 ) / (2.0 * reduced_mass);
+         }
    
    return "potLapterm";
 }

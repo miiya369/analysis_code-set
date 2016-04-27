@@ -1,30 +1,32 @@
 
 ### For Effective mass ###
 
-MAS_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin20
-MAS_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src_bin20
+MAS_Gauge_confs_list	= ./arg/conf_list/conf_list.yku_40x48.gfix
+MAS_Path_to_input_dir	= /Users/miiya/data/results.sloppy.t_mod12_0_5.x_mod10_0_5.y_mod10_0_5.z_mod10_0_5.ave.S0.S4
 MAS_Path_to_output_dir	= ./results
-MAS_Size_of_time	= 64
+MAS_Size_of_time	= 48
 MAS_Momentum		= 0
-MAS_T_shift		= A64
-MAS_X_shift		= 000
-MAS_Y_shift		= 000
-MAS_Z_shift		= 000
+MAS_T_shift		= A0_3
+MAS_X_shift		= A0_5
+MAS_Y_shift		= A0_5
+MAS_Z_shift		= A0_5
 MAS_Snk_relativistic	= CG05
 MAS_Src_relativistic	= CG05
-# MAS_Calc_hadron_name	= { Lambda Sigma proton pion phi etaSS }
+# MAS_Calc_hadron_name	= { Lambda Sigma proton pion phi }
+MAS_Calc_hadron_name    = { pion phi }
 MAS_Spin_projection	= S0_Sz0
-MAS_Calc_channel_name	= { Pro-Neu_Pro-Neu }
+# MAS_Calc_channel_name	= { Pro-Neu_Pro-Neu Pro-Lam_Pro-Lam }
+MAS_Calc_channel_name = { }
 
 MAS_Calc_Rcorrelator	= yes
 
 MAS_Input_fit_data	= no
-MAS_Output_fit_data	= no
+MAS_Output_fit_data	= yes
 MAS_Calc_fit_data	= no
 MAS_Fit_range_min	= 7
 MAS_Fit_range_max	= 12
 
-MAS_Use_jack_knife_data	= yes
-MAS_Take_jack_knife	= no
+MAS_Use_jack_knife_data	= no
+MAS_Take_jack_knife	= yes
 
 MAS_Lattice_spacing	= 0.0907

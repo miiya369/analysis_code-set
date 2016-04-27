@@ -1,6 +1,6 @@
 
 #  Make file of the Analysis code set
-# Since : Wed Dec 16 07:36:56 JST 2015
+# Since : Wed Apr 27 01:55:59 JST 2016
 
 # You may change this for your environment
 
@@ -36,11 +36,11 @@ FIT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_FIT:.cpp=.o)))
 OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
 yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
-TERGETS	    = mas wave pot fit obs eigen gfix jkbin ave makeJK tensor
+TERGETS	    = mas wave pot fit obs eigen gfix jkbin ave makeJK tensor disp param
 FOR_MIYA    = ccp zfac red
 
 ### Find the dependence with .cpp files under the SRCDIR and MAINDIR ###
-vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto
+vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto $(MAINDIR)/for_miyamoto/test
 vpath %.C $(wildcard $(SRCDIR)/extern/yukawa*)   # <- for yukawa
 
 .PHONY: all
@@ -90,6 +90,14 @@ tensor: $(OBJDIR)/tensor_force.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(P
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 
+disp: $(OBJDIR)/dispersion_relation.o $(COMMON) $(CORR) $(FIT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+param: $(OBJDIR)/analysis_fitparam.o $(COMMON) $(FIT) $(OBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
 ###### For Miyamoto ######
 ccp: $(OBJDIR)/coupled_channel_potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
@@ -119,6 +127,21 @@ clean:
 ###### FOR TEST ######
 .PHONY: test
 test: $(OBJDIR)/test.o 
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+.PHONY: test_tensor
+test_tensor: $(OBJDIR)/test_tensor.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+.PHONY: test_rot
+test_rot: $(OBJDIR)/test_rot.o $(COMMON) $(NBS) $(yukawa)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+.PHONY: test_wave
+test_wave: $(OBJDIR)/test_wave.o $(COMMON) $(NBS) $(yukawa)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 

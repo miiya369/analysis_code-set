@@ -1,0 +1,93 @@
+#!/bin/sh
+
+CHECK=-check
+
+ibase=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/results_kek
+obase=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/analysis_results
+
+IDIR=( \
+"results_kek_pacs-cs_ens1/compress/Ks0.12240/t_shift_ave/4src" \
+"results_kek_pacs-cs_ens1/compress/Ks0.13640/t_shift_ave/4src" \
+"results_kek_pacs-cs_ens2/compress/Ks0.12240/t_shift_ave/4src" \
+"results_kek_pacs-cs_ens2/compress/Ks0.13640/t_shift_ave/4src" \
+)
+
+ODIR=( \
+"pacs-cs_ens1/Ks0.12240/4src" \
+"pacs-cs_ens1/Ks0.13640/4src" \
+"pacs-cs_ens2/Ks0.12240/4src" \
+"pacs-cs_ens2/Ks0.13640/4src" \
+)
+
+CONF_LIST=( \
+"conf_list.pacs-cs_ens1" \
+"conf_list.pacs-cs_ens1" \
+"conf_list.pacs-cs_ens2" \
+"conf_list.pacs-cs_ens2" \
+)
+
+MASS1=( \
+"0.7270" \
+"0.7270" \
+"0.6411" \
+"0.6411" \
+)
+
+MASS2=( \
+"1.2456" \
+"0.7534" \
+"1.1878" \
+"0.6865" \
+)
+
+TIME=`date`
+echo " @@@ JOB START : ${TIME}"
+
+for spin in "S0_Sz0" "S1_Sz0"
+do
+   for dir in `seq 0 1 3`
+   do
+      ./bin/pot   -f          arg/arguments_potential.txt \
+                  -conf_list  arg/conf_list/${CONF_LIST[$dir]} \
+                  -idir       $ibase/${IDIR[$dir]}/org \
+                  -odir       $obase/${ODIR[$dir]}/org \
+                  -mass_had1  ${MASS1[$dir]} \
+                  -mass_had2  ${MASS2[$dir]} \
+                  -spin       $spin \
+                  -take_JK \
+                  $CHECK
+   done
+
+   for dir in `seq 0 1 1`
+   do
+      for bin in "007" "019"
+      do
+         ./bin/pot   -f          arg/arguments_potential.txt \
+                     -conf_list  arg/conf_list/${CONF_LIST[$dir]}_bin$bin \
+                     -idir       $ibase/${IDIR[$dir]}/bin$bin \
+                     -odir       $obase/${ODIR[$dir]}/bin$bin \
+                     -mass_had1  ${MASS1[$dir]} \
+                     -mass_had2  ${MASS2[$dir]} \
+                     -spin       $spin \
+                     $CHECK
+      done
+   done
+
+   for dir in `seq 2 1 3`
+   do
+      for bin in "010" "020"
+      do
+         ./bin/pot   -f          arg/arguments_potential.txt \
+                     -conf_list  arg/conf_list/${CONF_LIST[$dir]}_bin$bin \
+                     -idir       $ibase/${IDIR[$dir]}/bin$bin \
+                     -odir       $obase/${ODIR[$dir]}/bin$bin \
+                     -mass_had1  ${MASS1[$dir]} \
+                     -mass_had2  ${MASS2[$dir]} \
+                     -spin       $spin \
+                     $CHECK
+      done
+   done
+done
+
+TIME=`date`
+echo " @@@ JOB END   : ${TIME}"

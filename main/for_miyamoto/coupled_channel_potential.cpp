@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for calculate coupled channel potential
  * @author  Takaya Miyamoto
- * @since   Thu Dec 17 23:56:27 JST 2015
+ * @since   Fri Jan  8 11:51:00 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -273,6 +273,7 @@ static int set_args(int argc, char** argv) {
    printf(" @ x shift    = %s\n",analysis::data_list[N_X_SHIFT]);
    printf(" @ y shift    = %s\n",analysis::data_list[N_Y_SHIFT]);
    printf(" @ z shift    = %s\n",analysis::data_list[N_Z_SHIFT]);
+   printf(" @ time       = %d\n",time_slice);
    printf(" @ snk rela   = %s\n",analysis::data_list[SNK_RELA]);
    printf(" @ src rela   = %s\n",analysis::data_list[SRC_RELA]);
    printf(" @ spin       = %s\n",spin.name.c_str());
@@ -339,9 +340,9 @@ static int set_args_from_file(char* file_name) {
          analysis::set_data_list(SNK_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Src_relativistic"  )==0)
          analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
-      else if (strcmp(tmp_c1,"POT_Take_jack_knife"    )==0)
+      else if (strcmp(tmp_c1,"CCP_Take_jack_knife"    )==0)
          take_JK_flg = analysis::str_to_bool(tmp_c2);
-      else if (strcmp(tmp_c1,"POT_Use_jack_knife_data")==0)
+      else if (strcmp(tmp_c1,"CCP_Use_jack_knife_data")==0)
          use_JK_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"CCP_Reduced_mass_00"   )==0)
          mass[0] = atof(tmp_c2);

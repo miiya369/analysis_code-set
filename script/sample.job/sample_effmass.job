@@ -1,0 +1,124 @@
+#!/bin/sh
+
+CHECK=-check
+
+ibase=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/results_kek
+obase=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/analysis_results
+
+IDIR=( \
+"results_kek_pacs-cs_ens1/compress/Ks0.12240/t_shift_ave/4src" \
+"results_kek_pacs-cs_ens1/compress/Ks0.13640/t_shift_ave/4src" \
+"results_kek_pacs-cs_ens2/compress/Ks0.12240/t_shift_ave/4src" \
+"results_kek_pacs-cs_ens2/compress/Ks0.13640/t_shift_ave/4src" \
+)
+
+ODIR=( \
+"pacs-cs_ens1/Ks0.12240/4src" \
+"pacs-cs_ens1/Ks0.13640/4src" \
+"pacs-cs_ens2/Ks0.12240/4src" \
+"pacs-cs_ens2/Ks0.13640/4src" \
+)
+
+CONF_LIST=( \
+"conf_list.pacs-cs_ens1" \
+"conf_list.pacs-cs_ens1" \
+"conf_list.pacs-cs_ens2" \
+"conf_list.pacs-cs_ens2" \
+)
+
+HADRON="Lambda Sigma proton pion phi"
+CHANNEL="Pro-Neu_Pro-Neu Pro-Lam_Pro-Lam"
+
+TIME=`date`
+echo " @@@ JOB START : ${TIME}"
+
+for dir in `seq 0 1 3`
+do
+   ./bin/mas   -f          arg/arguments_effmass.txt \
+               -conf_list  arg/conf_list/${CONF_LIST[$dir]} \
+               -idir       $ibase/${IDIR[$dir]}/org \
+               -odir       $obase/${ODIR[$dir]}/org \
+               -take_JK \
+               -hadron     $HADRON @ \
+               -channel    @ \
+               $CHECK
+done
+
+for dir in `seq 0 1 1`
+do
+   for bin in "007" "019"
+   do
+      ./bin/mas   -f          arg/arguments_effmass.txt \
+                  -conf_list  arg/conf_list/${CONF_LIST[$dir]}_bin$bin \
+                  -idir       $ibase/${IDIR[$dir]}/bin$bin \
+                  -odir       $obase/${ODIR[$dir]}/bin$bin \
+                  -hadron     $HADRON @ \
+                  -channel    @ \
+                  $CHECK
+   done
+done
+
+for dir in `seq 2 1 3`
+do
+   for bin in "010" "020"
+   do
+      ./bin/mas   -f          arg/arguments_effmass.txt \
+                  -conf_list  arg/conf_list/${CONF_LIST[$dir]}_bin$bin \
+                  -idir       $ibase/${IDIR[$dir]}/bin$bin \
+                  -odir       $obase/${ODIR[$dir]}/bin$bin \
+                  -hadron     $HADRON @ \
+                  -channel    @ \
+                  $CHECK
+   done
+done
+
+######################################################
+
+for spin in "S0_Sz0" "S1_Sz0"
+do
+   for dir in `seq 0 1 3`
+   do
+      ./bin/mas   -f          arg/arguments_effmass.txt \
+                  -conf_list  arg/conf_list/${CONF_LIST[$dir]} \
+                  -idir       $ibase/${IDIR[$dir]}/org \
+                  -odir       $obase/${ODIR[$dir]}/org \
+                  -take_JK \
+                  -spin       $spin \
+                  -hadron     @ \
+                  -channel    $CHANNEL @ \
+                  $CHECK
+   done
+
+   for dir in `seq 0 1 1`
+   do
+      for bin in "007" "019"
+      do
+         ./bin/mas   -f          arg/arguments_effmass.txt \
+                     -conf_list  arg/conf_list/${CONF_LIST[$dir]}_bin$bin \
+                     -idir       $ibase/${IDIR[$dir]}/bin$bin \
+                     -odir       $obase/${ODIR[$dir]}/bin$bin \
+                     -spin       $spin \
+                     -hadron     @ \
+                     -channel    $CHANNEL @ \
+                     $CHECK
+      done
+   done
+
+   for dir in `seq 2 1 3`
+   do
+      for bin in "010" "020"
+      do
+         ./bin/mas   -f          arg/arguments_effmass.txt \
+                     -conf_list  arg/conf_list/${CONF_LIST[$dir]}_bin$bin \
+                     -idir       $ibase/${IDIR[$dir]}/bin$bin \
+                     -odir       $obase/${ODIR[$dir]}/bin$bin \
+                     -spin       $spin \
+                     -hadron     @ \
+                     -channel    $CHANNEL @ \
+                     $CHECK
+      done
+   done
+done
+
+TIME=`date`
+echo " @@@ JOB END   : ${TIME}"

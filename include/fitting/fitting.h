@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Header file for fitting class
  * @author  Takaya Miyamoto
- * @since   Fri Nov 13 01:42:50 JST 2015
+ * @since   Wed Apr 27 02:03:26 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -19,8 +19,8 @@
  * @brief The namespace for fitting
  */
 //--------------------------------------------------------------------------
-namespace fitting {
-   
+namespace fitting
+{
    void input_data_binary( const char*, int&, int& );   // for header
    void input_data_binary( const char*, double*, double*, double* );
 }
@@ -30,8 +30,8 @@ namespace fitting {
  * @brief The class for fitting
  */
 //--------------------------------------------------------------------------
-class FIT {
-    
+class FIT
+{
 private:
    string class_name, func_name;
    
@@ -44,38 +44,52 @@ public:
 //============================ For inner index ===========================//
    
 //============================== For writing =============================//
-   double& operator()(size_t index) {
+   double& operator()(size_t index)
+   {
       return param[index];
    }
 //============================== For reading =============================//
-   const double& operator()(size_t index) const {
+   const double& operator()(size_t index) const
+   {
       return param[index];
    }
 //======================== Constructor & Destructor ======================//
-   FIT() {
+   FIT()
+   {
       class_name = "FITTING_________________________";
       func_name = "______________________";
       analysis::route(class_name, func_name, 1);
       
       param = NULL;
    }
-   FIT( const char* FUNC_NAME, const double *PARAM ) {
+   FIT(const char* FUNC_NAME, const double *PARAM)
+   {
       class_name = "FITTING_________________________";
       func_name = "______________________";
       analysis::route(class_name, func_name, 1);
       
       param = NULL;
-      set_func( FUNC_NAME, PARAM );
+      set_func(FUNC_NAME, PARAM);
    }
-   ~FIT() {
+   FIT(const int FUNC_NUMBER, const double *PARAM)
+   {
+      class_name = "FITTING_________________________";
+      func_name = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      param = NULL;
+      set_func(FUNC_NUMBER, PARAM);
+   }
+   ~FIT()
+   {
       if (param != NULL) delete [] param;
       
       func_name = "______________________";
       analysis::route(class_name, func_name, 0);
    }
 //============================= For initialize ===========================//
-   void set_func( const char* FUNC_NAME, const double *PARAM ) {
-      
+   void set_func(const char* FUNC_NAME, const double *PARAM)
+   {
       func_name = "set_func______________";
       analysis::route(class_name, func_name, 1);
       
@@ -91,12 +105,19 @@ public:
       
       analysis::route(class_name, func_name, 0);
    }
-   void mem_del() {
-      
+   void set_func(const int FUNC_NUMBER, const double *PARAM)
+   {
+      char FUNC_NAME[16];
+      snprintf(FUNC_NAME, sizeof(FUNC_NAME), "%d", FUNC_NUMBER);
+      set_func(FUNC_NAME, PARAM);
+   }
+   void mem_del()
+   {
       func_name = "mem_delete_FIT________";
       analysis::route(class_name, func_name, 1);
       
-      if (param != NULL) {
+      if (param != NULL)
+      {
          delete [] param;   param = NULL;
       }
       analysis::route( class_name, func_name, 0 );
@@ -112,13 +133,15 @@ public:
    
    void   print_func_gnu ();
    void   print_param    ();
-   double fit_data_NR    ( double*, double*, double*, int, int, double );
-   double fit_data_NR    ( double*, double*, double*, int, double );
+   double fit_data_NR    (  const double*, const double*, const double*
+                          , const int, const int, const double );
+   double fit_data_NR    (  const double*, const double*, const double*
+                          , const int, const double );
 };
 
-namespace fitting {
-   
-   void output_param( CONFIG<FIT>&, const char* );
+namespace fitting
+{
+   void output_param(CONFIG<FIT>&, const char*);
 }
 
 #endif

@@ -64,7 +64,7 @@ void CORRELATOR::input(  HADRON_TYPE hadron, int num_conf, int momentum
       }
       fclose(fp);
    }
-   printf(" @ Finished input correlator : %s (%s), conf number=%d\n"
+   printf("Finished input correlator : %s (%s), conf number=%d\n"
           , hadron.name.c_str(), CORRtype, num_conf );
    
    analysis::route( class_name, func_name, 0 );
@@ -102,7 +102,7 @@ void CORRELATOR::input(CHANNEL_TYPE channel, int num_conf, SPIN_TYPE spin) {
    }
    fclose(fp);
 
-   printf(" @ Finished input correlator : %s, conf number=%d\n"
+   printf("Finished input correlator : %s, conf number=%d\n"
           , channel.prop_name.c_str(), num_conf );
    
    analysis::route( class_name, func_name, 0 );

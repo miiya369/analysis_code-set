@@ -4,7 +4,7 @@
  * @ingroup NBS wave function, R-correlator
  * @brief   Main part for wave function calculation
  * @author  Takaya Miyamoto
- * @since   Thu Dec 17 23:40:47 JST 2015
+ * @since   Fri Jan  8 04:59:25 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
             (*Rcorr)(conf).set( (*Wave)(conf),(*Corr1)(conf),(*Corr2)(conf), it );
          
          snprintf(  outfile_name, sizeof(outfile_name)
-                  , "%s/%s_Rcorr_%s_err_t%d"
+                  , "%s/%s_Rcorrelator_%s_err_t%d"
                   , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
          
          analysis::output_data_err( *Rcorr, outfile_name, use_JK_data );
@@ -128,12 +128,18 @@ static int set_args(int argc, char** argv) {
          //****** You may set additional potion in here ******//
          else if (strcmp(argv[loop],"-t_max"    )==0)
             time_max  = atoi(argv[loop+1]);
+         else if (strcmp(argv[loop],"-conf_list" )==0)
+            snprintf(conf_list,sizeof(conf_list),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-t_min"    )==0)
             time_min  = atoi(argv[loop+1]);
          else if (strcmp(argv[loop],"-channel"  )==0)
             channel.set(argv[loop+1]);
+         else if (strcmp(argv[loop],"-spin")==0)
+            spin.set(argv[loop+1]);
          else if (strcmp(argv[loop],"-comp"     )==0)
             read_cmp_flg = true;
+         else if (strcmp(argv[loop],"-take_JK" )==0)
+            take_JK_flg = true;
          else if (strcmp(argv[loop],"-check"    )==0)
             arguments_check = true;
          //***************************************************//

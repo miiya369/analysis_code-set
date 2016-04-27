@@ -22,6 +22,8 @@
 	   NBS_org でも L = 512 まで大丈夫。
 	   gauge conf の index 以外は全て int でよい？
 	- error exit の際に flash をたく
+	- corr-multi と NBS の空間和が同じになるか確認
+	- LAPACK を使うようにする
 
  * effective_mass
 	- OK

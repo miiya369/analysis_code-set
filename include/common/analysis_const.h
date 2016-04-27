@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Header File for definition of several enum
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 08:00:33 JST 2015
+ * @since   Tue Apr 26 21:15:13 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -19,6 +19,7 @@ enum {
    CLASS_NBS_WAVE_SRC_PRJ,
    CLASS_NBS_WAVE,
    CLASS_R_CORRELATOR,
+   CLASS_R_CORRELATOR_SRC_PRJ,
    CLASS_POTENTIAL,
    CLASS_FITTING,
    CLASS_PHASE_SHIFT,
@@ -40,6 +41,8 @@ enum {
    EIGEN_ENERGY,
    JACK_KNIFE_BIN_CHECK,
    MAKE_JACK_KNIFE_SAMPLES,
+   DISPERSION_RELATION,
+   ANALYSIS_FIT_PARAM,
 };
 
 //! enum for spin index of NBS wave function
@@ -48,8 +51,10 @@ enum {
    SPIN_0_0   = 0,
    SPIN_1_p1  = 1,
    SPIN_1_0   = 2,
-   SPIN_1_m1  = 3,
-   SPIN_1_ave = 4,
+   SPIN_1_0ud = 3,
+   SPIN_1_0du = 4,
+   SPIN_1_m1  = 5,
+   SPIN_1_ave = 6,
 };
 
 //! enum for the path setting

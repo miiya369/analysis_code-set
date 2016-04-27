@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for potential calculation
  * @author  Takaya Miyamoto
- * @since   Thu Dec 17 23:40:47 JST 2015
+ * @since   Fri Jan  8 05:36:25 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -208,6 +208,8 @@ static int set_args(int argc, char** argv) {
          //****** You may set additional potion in here ******//
          else if (strcmp(argv[loop],"-idir"     )==0)
             analysis::set_data_list(MAIN_PATH, "%s", argv[loop+1]);
+         else if (strcmp(argv[loop],"-conf_list" )==0)
+            snprintf(conf_list,sizeof(conf_list),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-odir"     )==0)
             snprintf(outfile_path,sizeof(outfile_path),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-t_max"    )==0)
@@ -216,6 +218,8 @@ static int set_args(int argc, char** argv) {
             time_min  = atoi(argv[loop+1]);
          else if (strcmp(argv[loop],"-channel"  )==0)
             channel.set(argv[loop+1]);
+         else if (strcmp(argv[loop],"-spin")==0)
+            spin.set(argv[loop+1]);
          else if (strcmp(argv[loop],"-mass_had1")==0)
             HAD1_mass = atof(argv[loop+1]);
          else if (strcmp(argv[loop],"-mass_had2")==0)
@@ -224,6 +228,8 @@ static int set_args(int argc, char** argv) {
             analysis::set_data_list(N_T_SHIFT, "%s", argv[loop+1]);
          else if (strcmp(argv[loop],"-comp"     )==0)
             read_cmp_flg = true;
+         else if (strcmp(argv[loop],"-take_JK" )==0)
+            take_JK_flg = true;
          else if (strcmp(argv[loop],"-check"    )==0)
             arguments_check = true;
          //***************************************************//

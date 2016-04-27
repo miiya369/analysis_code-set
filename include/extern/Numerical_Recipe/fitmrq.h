@@ -20,7 +20,8 @@ struct Fitmrq {
 	void hold(const Int i, const Doub val) {ia[i]=false; a[i]=val;}
 	void free(const Int i) {ia[i]=true;}
 
-	void fit() {
+	int fit() { // Modified: void fit() -> int fit()
+      // Modified by T.Miyamoto (Wed Apr 27 00:25:45 JST 2016)
 		Int j,k,l,iter,done=0;
 		Doub alamda=.001,ochisq;
 		VecDoub atry(ma),beta(ma),da(ma);
@@ -38,7 +39,7 @@ struct Fitmrq {
 				for (k=0;k<mfit;k++) temp[j][k]=covar[j][k];
 				oneda[j][0]=beta[j];
 			}
-			gaussj(temp,oneda);
+			if (gaussj(temp,oneda) == -1) return -1; // Modified: add if
 			for (j=0;j<mfit;j++) {
 				for (k=0;k<mfit;k++) covar[j][k]=temp[j][k];
 				da[j]=oneda[j][0];
@@ -46,7 +47,7 @@ struct Fitmrq {
 			if (done==NDONE) {
 				covsrt(covar);
 				covsrt(alpha);
-				return;
+				return 0; // Modified: return; -> return 0;
 			}
 			for (j=0,l=0;l<ma;l++)
 				if (ia[l]) atry[l]=a[l]+da[j++];
@@ -65,7 +66,8 @@ struct Fitmrq {
 				chisq=ochisq;
 			}
 		}
-		throw("Fitmrq too many iterations");
+//		throw("Fitmrq too many iterations"); // Modified
+      return -1;
 	}
 
 

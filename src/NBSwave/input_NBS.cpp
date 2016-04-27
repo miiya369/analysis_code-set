@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Function for Input NBS wave function files
  * @author  Takaya Miyamoto
- * @since   Sun Oct 18 04:37:52 JST 2015
+ * @since   Tue Feb  2 23:59:06 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -21,8 +21,9 @@ typedef compress48<Core>    Compress48;
 
 bool NBSwave::compress_init_flg = false;
 
-void NBS_WAVE_ORG::input( CHANNEL_TYPE ch, int it, int iconf, bool endian_FLG ) {
-   
+void NBS_WAVE_ORG::input(  const CHANNEL_TYPE ch, const int it, const int iconf
+                         , const bool endian_FLG )
+{
    func_name = "input_NBS_____________";
    analysis::route(class_name, func_name, 1);
    
@@ -47,7 +48,7 @@ void NBS_WAVE_ORG::input( CHANNEL_TYPE ch, int it, int iconf, bool endian_FLG ) 
    
    if (endian_FLG) analysis::endian_convert(wave_org, xyzSIZE * 4 * 4);
 
-   printf(" @ Finished input NBS : %s, t=%d, conf number=%d\n"
+   printf("Finished input NBS : %s, t=%d, conf number=%d\n"
           , ch.name.c_str(), it, iconf);
    
    analysis::route(class_name, func_name, 0);
@@ -59,9 +60,9 @@ void NBS_WAVE_ORG::input( CHANNEL_TYPE ch, int it, int iconf, bool endian_FLG ) 
  * @brief This function is using yuakwa library
  */
 //--------------------------------------------------------------------------
-void NBS_WAVE_ORG::input_compressed(  CHANNEL_TYPE ch
-                                    , int it, int iconf, bool endian_FLG ) {
-
+void NBS_WAVE_ORG::input_compressed(  const CHANNEL_TYPE ch, const int it
+                                    , const int iconf, const bool endian_FLG )
+{
    func_name = "input_compNBS_________";
    analysis::route(class_name, func_name, 1);
    
@@ -75,7 +76,8 @@ void NBS_WAVE_ORG::input_compressed(  CHANNEL_TYPE ch
             , sizeof(analysis::data_list[N_CHANNEL])
             , "%s", ch.number.c_str());
    
-   if (!NBSwave::compress_init_flg) {
+   if (!NBSwave::compress_init_flg)
+   {
       cubic_group::initialize();
       PH1::initialize();
       NBSwave::compress_init_flg = true;
@@ -106,7 +108,7 @@ void NBS_WAVE_ORG::input_compressed(  CHANNEL_TYPE ch
                         wave_org[idx(ix,iy,iz,alpha+2*beta,alphaP+2*betaP)]
                               = four(ix,iy,iz,sign)(alpha,beta,alphaP,betaP);
    
-   printf(" @ Finished input NBS : %s, t=%d, conf number=%d\n"
+   printf("Finished input NBS : %s, t=%d, conf number=%d\n"
           , ch.name.c_str(), it, iconf);
     
    analysis::route(class_name, func_name, 0);

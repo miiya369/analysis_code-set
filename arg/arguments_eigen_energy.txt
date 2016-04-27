@@ -1,8 +1,9 @@
 
 ### For Eigen energy ###
 
-EIGEN_Gauge_confs_list		= ./arg/conf_list/conf_list.pacs-cs_ens2_bin20
+EIGEN_Gauge_confs_list		= ./arg/conf_list/conf_list.pacs-cs_ens2_bin020
 EIGEN_Path_to_input_dir		= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src_bin20
+EIGEN_Path_to_output_name	= ./results/eigen_vector
 EIGEN_Size_of_time		= 64
 EIGEN_Size_of_space		= 32
 EIGEN_T_shift			= A64
@@ -14,12 +15,14 @@ EIGEN_Src_relativistic		= CG05
 EIGEN_calc_time_slice		= 9
 EIGEN_Had1_mass			= 1.0
 EIGEN_Had2_mass			= 1.0
-EIGEN_Channel_name		= Pro-Neu_Pro-Neu
+EIGEN_Channel_name		= Pro-Lam_Pro-Lam
 EIGEN_Spin_projection		= S0_Sz0
 
 EIGEN_Lattice_spacing		= 0.0907
-EIGEN_Number_of_eigen_E		= 15
+EIGEN_Number_of_eigen_energy	= 9
 EIGEN_Stopping_condition	= 0.000000001
+
+EIGEN_Number_of_eigen_vector	= 3
 
 EIGEN_Use_jack_knife_data	= yes
 EIGEN_Take_jack_knife		= no

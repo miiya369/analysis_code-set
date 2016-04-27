@@ -1,6 +1,6 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = “Analysis Code Set”
-PROJECT_NUMBER         = 4.1
+PROJECT_NUMBER         = 4.2
 PROJECT_BRIEF          =
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       =

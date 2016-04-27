@@ -1,0 +1,57 @@
+#!/bin/sh
+
+CHECK=-check
+
+base=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/analysis_results
+
+DIR=( \
+"pacs-cs_ens1/Ks0.12240/4src" \
+"pacs-cs_ens1/Ks0.13640/4src" \
+"pacs-cs_ens2/Ks0.12240/4src" \
+"pacs-cs_ens2/Ks0.13640/4src" \
+)
+
+fbase=Pro-Lam_Pro-Lam_potential_
+
+MASS=( \
+"998.8" \
+"805.0" \
+"905.8" \
+"721.2" \
+)
+
+TIME=`date`
+echo " @@@ JOB START : ${TIME}"
+
+for spin in "S0_Sz0" "S1_Sz0"
+do
+   for time in `seq 6 1 12`
+   do
+      for dir in `seq 0 1 1`
+      do
+         for bin in "org" "bin007" "bin019"
+         do
+            ./bin/obs   -f       arg/arguments_observable.txt \
+                        -ifile   $base/${DIR[$dir]}/$bin/${fbase}${spin}_fitparam_t$time \
+                        -ofile   $base/${DIR[$dir]}/$bin/${fbase}${spin}_phase_shift_t$time \
+                        -mass    ${MASS[$dir]} \
+                        $CHECK
+         done
+      done
+
+      for dir in `seq 2 1 3`
+      do
+         for bin in "org" "bin010" "bin020"
+         do
+            ./bin/obs   -f       arg/arguments_observable.txt \
+                        -ifile   $base/${DIR[$dir]}/$bin/${fbase}${spin}_fitparam_t$time \
+                        -ofile   $base/${DIR[$dir]}/$bin/${fbase}${spin}_phase_shift_t$time \
+                        -mass    ${MASS[$dir]} \
+                        $CHECK
+         done
+      done
+   done
+done
+
+TIME=`date`
+echo " @@@ JOB END   : ${TIME}"

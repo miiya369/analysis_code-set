@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Miscellaneous functions of analysis namespace
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 02:23:57 JST 2015
+ * @since   Tue Feb  2 03:13:01 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -91,6 +91,23 @@ void analysis::convert_xyzn(int *ix, int *iy, int *iz, int *conf, size_t xyzn){
    tmp      = (tmp-(*iy)) / analysis::ySIZE;
    (*iz)    = tmp % analysis::zSIZE;
    (*conf)  = (tmp-(*iz)) / analysis::zSIZE;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief Convert 0,1,...,L -> -L/2+1,...,L/2
+ */
+//--------------------------------------------------------------------------
+void analysis::convert_origin(int ix, int iy, int iz, int *iX, int *iY, int *iZ)
+{
+   if (ix > analysis::xSIZE/2) (*iX) = ix - analysis::xSIZE;
+   else                        (*iX) = ix;
+   
+   if (iy > analysis::ySIZE/2) (*iY) = iy - analysis::ySIZE;
+   else                        (*iY) = iy;
+   
+   if (iz > analysis::zSIZE/2) (*iZ) = iz - analysis::zSIZE;
+   else                        (*iZ) = iz;
 }
 
 void analysis::endian_convert( cdouble *DATA, size_t DATA_size ) {

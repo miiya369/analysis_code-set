@@ -4,7 +4,7 @@
  * @ingroup correlator
  * @brief   Main part for effective mass calculation
  * @author  Takaya Miyamoto
- * @since   Thu Dec 17 23:40:47 JST 2015
+ * @since   Fri Jan  8 04:59:25 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -81,16 +81,16 @@ int main(int argc, char **argv) {
                                             / (*Corr)(conf)(it) );
          }
          snprintf(  outfile_name, sizeof(outfile_name)
-                  , "%s/%s_effmass_err"
-                  , outfile_path, hadron_type[loop].name.c_str() );
+                  , "%s/%s_effmass_mom%d_err"
+                  , outfile_path, hadron_type[loop].name.c_str(), momentum );
          
          analysis::output_data_err( *eff_mass, outfile_name, use_JK_data );
       }
       else {
          snprintf(  infile_name, sizeof(infile_name)
-                  , "%s/%s_correlator_fit"
+                  , "%s/%s_correlator_mom%d_fit"
                   , analysis::data_list[MAIN_PATH]
-                  , hadron_type[loop].name.c_str() );
+                  , hadron_type[loop].name.c_str(), momentum );
          
          int tmp_Ndata, tmp_Nconf;
          fitting::input_data_binary( infile_name, tmp_Nconf, tmp_Ndata );
@@ -106,8 +106,8 @@ int main(int argc, char **argv) {
       
       if (out_fit_flg && !input_fit_flg) {
          snprintf(  outfile_name, sizeof(outfile_name)
-                  , "%s/%s_correlator_fit"
-                  , outfile_path, hadron_type[loop].name.c_str() );
+                  , "%s/%s_correlator_mom%d_fit"
+                  , outfile_path, hadron_type[loop].name.c_str(), momentum );
          
          analysis::output_data_fit( *Corr, outfile_name, use_JK_data );
       }
@@ -150,9 +150,9 @@ int main(int argc, char **argv) {
             
             for (int conf=0; conf<analysis::Nconf; conf++) {
                (*Corr1)(conf).set(  channel_type[loop].hadron1
-                                  , conf, momentum, "PS" );
+                                  , conf, 0, "PS" );
                (*Corr2)(conf).set(  channel_type[loop].hadron2
-                                  , conf, momentum, "PS" );
+                                  , conf, 0, "PS" );
             }
             if (take_JK_flg) Corr1->make_JK_sample();
             if (take_JK_flg) Corr2->make_JK_sample();
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
                                             / (*Corr)(conf)(it) );
          }
          if (calc_flg_Rcorr) snprintf(  outfile_name, sizeof(outfile_name)
-                                      , "%s/%s_Rcorr_%s_effmass_err", outfile_path
+                                      , "%s/%s_Rcorrelator_%s_effmass_err", outfile_path
                                       , channel_type[loop].name.c_str()
                                       , spin.name.c_str() );
          else snprintf(  outfile_name, sizeof(outfile_name)
@@ -313,6 +313,8 @@ static int set_args(int argc, char** argv) {
          //****** You may set additional potion in here ******//
          else if (strcmp(argv[loop],"-idir"  )==0)
             analysis::set_data_list(MAIN_PATH, "%s", argv[loop+1]);
+         else if (strcmp(argv[loop],"-conf_list" )==0)
+            snprintf(conf_list,sizeof(conf_list),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-odir"  )==0)
             snprintf(outfile_path,sizeof(outfile_path),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-t_min" )==0)
@@ -325,6 +327,10 @@ static int set_args(int argc, char** argv) {
             calc_flg_fit = true;
          else if (strcmp(argv[loop],"-calc_R")==0)
             calc_flg_Rcorr = true;
+         else if (strcmp(argv[loop],"-mom")==0)
+            momentum = atoi(argv[loop+1]);
+         else if (strcmp(argv[loop],"-spin")==0)
+            spin.set(argv[loop+1]);
          else if (strcmp(argv[loop],"-hadron")==0) {
             int count_tmp = 0;
             do {
@@ -359,6 +365,8 @@ static int set_args(int argc, char** argv) {
                channel_type[n].set(argv[loop]);
             }
          }
+         else if (strcmp(argv[loop],"-take_JK" )==0)
+            take_JK_flg = true;
          else if (strcmp(argv[loop],"-check" )==0)
             arguments_check = true;
          //***************************************************//

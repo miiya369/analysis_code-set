@@ -1,5 +1,5 @@
-void gaussj(MatDoub_IO &a, MatDoub_IO &b)
-{
+int gaussj(MatDoub_IO &a, MatDoub_IO &b) // Modified: void gaussj -> int gaussj
+{   // Modified by T.Miyamoto (Wed Apr 27 00:25:45 JST 2016)
 	Int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
 	Doub big,dum,pivinv;
 	VecInt indxc(n),indxr(n),ipiv(n);
@@ -24,7 +24,11 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 		}
 		indxr[i]=irow;
 		indxc[i]=icol;
-		if (a[icol][icol] == 0.0) throw("gaussj: Singular Matrix");
+		if (a[icol][icol] == 0.0)
+      {
+//         throw("gaussj: Singular Matrix"); // Modified
+         return -1;
+      }
 		pivinv=1.0/a[icol][icol];
 		a[icol][icol]=1.0;
 		for (l=0;l<n;l++) a[icol][l] *= pivinv;
@@ -42,6 +46,7 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 			for (k=0;k<n;k++)
 				SWAP(a[k][indxr[l]],a[k][indxc[l]]);
 	}
+   return 0; // Modified: - -> return 0;
 }
 
 void gaussj(MatDoub_IO &a)

@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Function for data fitting, according to Numerical Recipe
  * @author  Takaya Miyamoto
- * @since   Thu Dec 10 21:18:21 JST 2015
+ * @since   Wed Apr 27 00:39:34 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -16,9 +16,10 @@
  * @brief The fit for CORRELATOR-TYPE data
  */
 //--------------------------------------------------------------------------
-double FIT::fit_data_NR(  double *cood, double *data, double *err
-                        , int cood_min, int cood_max, double STP_CND ) {
-   
+double FIT::fit_data_NR(  const double *cood, const double *data, const double *err
+                        , const int cood_min, const int cood_max
+                        , const double STP_CND )
+{
    int n_data = cood_max - cood_min + 1;
    
    return FIT::fit_data_NR(  &cood[cood_min], &data[cood_min], &err[cood_min]
@@ -30,16 +31,17 @@ double FIT::fit_data_NR(  double *cood, double *data, double *err
  * @brief The fit for POTENTIAL-TYPE data
  */
 //--------------------------------------------------------------------------
-double FIT::fit_data_NR(  double *cood, double *data, double *err
-                        , int Ndata, double STP_CND ) {
-    
+double FIT::fit_data_NR(  const double *cood, const double *data, const double *err
+                        , const int Ndata, const double STP_CND )
+{
    func_name = "fit_data_NR___________";
    analysis::route(class_name, func_name, 1);
    
-   if (param == NULL) {
+   if (param == NULL)
+   {
       analysis::error(1,"Fit function has not set yet !");
       analysis::route(class_name, func_name, 0);
-      return 0.0;
+      return -999.0;
    }
    Doub    stp_cnd = STP_CND;
    VecDoub PARAM(func_type.Nparam);
@@ -49,41 +51,46 @@ double FIT::fit_data_NR(  double *cood, double *data, double *err
    
    for (int n=0; n<func_type.Nparam; n++)
       PARAM[n] = param[n];
-   for (int loop=0; loop<Ndata; loop++) {
+   for (int loop=0; loop<Ndata; loop++)
+   {
       COOD[loop] = cood[loop];
       DATA[loop] = data[loop];
        ERR[loop] =  err[loop];
    }
    double chisq = 0.0;
 //======================== Selection of fit functions ====================//
-      if        (func_type.number == 1 ) {
+      if (func_type.number == 1 )
+      {
          Fitmrq fit_NR(COOD, DATA, ERR, PARAM, &fit_funcs::func_const, stp_cnd);
-         fit_NR.fit();
+         if (fit_NR.fit() == -1) return -999.0;
          for (int n=0; n<func_type.Nparam; n++)
             param[n] = fit_NR.a[n];
          chisq = fit_NR.chisq / (Ndata-func_type.Nparam);
-      
-      } else if (func_type.number == 2 ) {
+      }
+      else if (func_type.number == 2 )
+      {
          Fitmrq fit_NR(COOD, DATA, ERR, PARAM, &fit_funcs::func_exp, stp_cnd);
-         fit_NR.fit();
+         if (fit_NR.fit() == -1) return -999.0;
          for (int n=0; n<func_type.Nparam; n++)
             param[n] = fit_NR.a[n];
          chisq = fit_NR.chisq / (Ndata-func_type.Nparam);
-      
-      } else if (func_type.number == 3 ||
-                 func_type.number == 4 ||
-                 func_type.number == 5 ||
-                 func_type.number == 8 ) {
+      }
+      else if (func_type.number == 3 ||
+               func_type.number == 4 ||
+               func_type.number == 5 ||
+               func_type.number == 8 )
+      {
          Fitmrq fit_NR(COOD, DATA, ERR, PARAM, &fit_funcs::func_gauss, stp_cnd);
-         fit_NR.fit();
+         if (fit_NR.fit() == -1) return -999.0;
          for (int n=0; n<func_type.Nparam; n++)
             param[n] = fit_NR.a[n];
          chisq = fit_NR.chisq / (Ndata-func_type.Nparam);
-      
-      } else if (func_type.number == 6 ||
-                 func_type.number == 7 ) {
+      }
+      else if (func_type.number == 6 ||
+               func_type.number == 7 )
+      {
          Fitmrq fit_NR(COOD, DATA, ERR, PARAM, &fit_funcs::func_sgauss, stp_cnd);
-         fit_NR.fit();
+         if (fit_NR.fit() == -1) return -999.0;
          for (int n=0; n<func_type.Nparam; n++)
             param[n] = fit_NR.a[n];
          chisq = fit_NR.chisq / (Ndata-func_type.Nparam);

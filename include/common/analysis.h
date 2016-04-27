@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Define the namespace for common variables & functions
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 02:17:48 JST 2015
+ * @since   Wed Apr 27 01:19:22 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -13,37 +13,40 @@
 
 #include <common/common_inc.h>
 
-namespace analysis {
-   
+namespace analysis
+{
    //! Set the path of data file
-   string set_path( int );
+   string set_path(int);
    extern bool use_doi_san_path;
    
-   void usage( int );
+   void usage(int);
    
    bool machine_is_little_endian();
-   void endian_convert( cdouble*, size_t );
-   void endian_convert( double*, size_t );
-   void endian_convert( int*, size_t );
+   void endian_convert(cdouble*, size_t);
+   void endian_convert( double*, size_t);
+   void endian_convert(    int*, size_t);
    
    //! Convert the bool to string ( yes or no )
-   string bool_to_str( bool );
+   string bool_to_str(bool);
    //! Convert the string ( yes or no ) to bool
-   bool str_to_bool( string );
+   bool str_to_bool(string);
    //! Convert index xyz -> x,y,z
-   void convert_xyz(int *ix, int *iy, int *iz, size_t xyz);
+   void convert_xyz (int *ix, int *iy, int *iz,            size_t xyz );
    //! Convert index xyzn -> x,y,z,conf
    void convert_xyzn(int *ix, int *iy, int *iz, int *conf, size_t xyzn);
    
+   //! Convert index 0,1,...,L -> -L/2+1,...,L/2
+   void convert_origin(int ix, int iy, int iz, int *iX, int *iY, int *iZ);
+   
    //! Print the current class & function name
-   void route( string, string, int );
+   void route(string, string, int);
    extern bool do_debug;
    //! Indicate some error, and kill the job
-   void error( int, const char* );
+   void error(int, const char*);
 }
 
-namespace analysis {
-   
+namespace analysis
+{
    extern int xSIZE;
    extern int ySIZE;
    extern int zSIZE;
@@ -61,7 +64,7 @@ namespace analysis {
    //! Wrapper of above 2 functions
    int  set_data_list(  const char*, const char*, const char*, const char*
                       , const char*, const char*, const char*, const char* );
-   void set_data(       int, int, int, int, int );
+   void set_data     (  int, int, int, int, int );
    
    int  reduced_Ndata();
 }
@@ -71,10 +74,10 @@ namespace analysis {
 #include <common/hadron_type_const.h>
 #include <common/channel_type_const.h>
 
-namespace analysis {
-   
-   void make_mean_err( double*, double&, double&, int, bool );
-   void make_mean_err( cdouble*, cdouble&, cdouble&, int, bool );
+namespace analysis
+{
+   void make_mean_err(const  double*,  double&,  double&, const int, const bool);
+   void make_mean_err(const cdouble*, cdouble&, cdouble&, const int, const bool);
 }
 
 #include <common/config_tmp.h>

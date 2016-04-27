@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for tensor potential calculation
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 08:00:33 JST 2015
+ * @since   Fri Jan  8 04:59:25 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -44,20 +44,17 @@ int main(int argc, char **argv) {
    
    NBSwave::rot_matrix_init();
    
-   NBS_WAVE_ORG             *Wave_org  = new NBS_WAVE_ORG;
-   CONFIG<NBS_WAVE_SRC_PRJ> *Wave_sprj = new CONFIG<NBS_WAVE_SRC_PRJ>[3];
-   CONFIG<CORRELATOR>       *Corr1     = new CONFIG<CORRELATOR>;
-   CONFIG<CORRELATOR>       *Corr2     = new CONFIG<CORRELATOR>;
+   NBS_WAVE_ORG             Wave_org;
+   NBS_WAVE_SRC_PRJ         S12Wave_sprj;
+   CONFIG<NBS_WAVE_SRC_PRJ> Wave_sprj;
+   CONFIG<CORRELATOR>       Corr1, Corr2;
    
-   NBS_WAVE     *Wave      = new NBS_WAVE;
-   NBS_WAVE     *S12_Wave  = new NBS_WAVE;
+   R_CORRELATOR_SRC_PRJ K_Rcorr_sprj, tmp;
+   CONFIG<R_CORRELATOR_SRC_PRJ> Rcorr_sprj[3], S12_Rcorr_sprj;
    
-   R_CORRELATOR *Rcorr     = new R_CORRELATOR[3];
-   R_CORRELATOR *S12_Rcorr = new R_CORRELATOR;
-   R_CORRELATOR *K_Rcorr   = new R_CORRELATOR;
+   R_CORRELATOR Rcorr[2], S12_Rcorr[2], K_Rcorr[2];
    
-   CONFIG<POTENTIAL> *V_C = new CONFIG<POTENTIAL>;
-   CONFIG<POTENTIAL> *V_T = new CONFIG<POTENTIAL>;
+   CONFIG<POTENTIAL> V_C, V_T;
    
    double reduced_mass = HAD1_mass*HAD2_mass / (HAD1_mass+HAD2_mass);
    string pot_type;
@@ -68,25 +65,28 @@ int main(int argc, char **argv) {
    {
       for (int conf=0; conf<analysis::Nconf; conf++)
       {
-         Wave_org->set( channel, it, conf, endian_flg, read_cmp_flg );
-         NBSwave::spin_projection(  (*Wave_org)
-                                  ,   Wave_sprj[count](conf), spin);
+         Wave_org.set( channel, it, conf, endian_flg, read_cmp_flg );
+         NBSwave::spin_projection( Wave_org, Wave_sprj(conf), spin );
+         
          if (it==time_min-1)
          {
-            (*Corr1)(conf).set(channel.hadron1, conf, 0, "PS");
-            (*Corr2)(conf).set(channel.hadron2, conf, 0, "PS");
+            Corr1(conf).set(channel.hadron1, conf, 0, "PS");
+            Corr2(conf).set(channel.hadron2, conf, 0, "PS");
          }
       }
       if (take_JK_flg)
       {
-         Wave_sprj[count].make_JK_sample();
+         Wave_sprj.make_JK_sample();
          
          if (it==time_min-1)
          {
-            Corr1->make_JK_sample();
-            Corr2->make_JK_sample();
+            Corr1.make_JK_sample();
+            Corr2.make_JK_sample();
          }
       }
+      for (int conf=0; conf<analysis::Nconf; conf++)
+         Rcorr_sprj[count](conf).set(  Wave_sprj(conf)
+                                     , Corr1(conf), Corr2(conf), it );
       count++;
    } // it
    
@@ -94,42 +94,58 @@ int main(int argc, char **argv) {
    {
       for (int conf=0; conf<analysis::Nconf; conf++)
       {
-         Wave_org->set( channel, it+1, conf, endian_flg, read_cmp_flg );
-         NBSwave::spin_projection(  (*Wave_org)
-                                  ,   Wave_sprj[count%3](conf), spin);
+         NBSwave::S12_psi(Wave_sprj(conf), S12Wave_sprj);
+         S12_Rcorr_sprj(conf).set(S12Wave_sprj, Corr1(conf), Corr2(conf), it);
+         
+         Wave_org.set( channel, it+1, conf, endian_flg, read_cmp_flg );
+         NBSwave::spin_projection( Wave_org, Wave_sprj(conf), spin );
       }
       
-      if (take_JK_flg) Wave_sprj[count%3].make_JK_sample();
+      if (take_JK_flg) Wave_sprj.make_JK_sample();
       
       for (int conf=0; conf<analysis::Nconf; conf++)
       {
-         for (int i=0; i<3; i++)
-         {
-            NBSwave::spin_projection(  Wave_sprj[(count+1+i)%3](conf), (*Wave)
-                                     , spin);
-            Rcorr[i].set( (*Wave), (*Corr1)(conf), (*Corr2)(conf), it-1+i );
-         }
-         NBSwave::S12_psi(Wave_sprj[(count+2)%3](conf), (*S12_Wave), spin);
-         S12_Rcorr->set( (*S12_Wave), (*Corr1)(conf), (*Corr2)(conf), it );
+         Rcorr_sprj[count%3](conf).set(  Wave_sprj(conf)
+                                       , Corr1(conf), Corr2(conf), it+1 );
          
-         pot_type = potential::kernel(  (*K_Rcorr), Rcorr[0], Rcorr[1], Rcorr[2]
+         pot_type = potential::kernel(  K_Rcorr_sprj
+                                      , Rcorr_sprj[(count+1)%3](conf)
+                                      , Rcorr_sprj[(count+2)%3](conf)
+                                      , Rcorr_sprj[(count+3)%3](conf)
                                       , reduced_mass );
          
-         potential::tensor_potential(  (*V_C)(conf), (*V_T)(conf)
-                                     , Rcorr[1], (*S12_Rcorr), (*K_Rcorr));
+         Rcorrelator::Swave_division (  Rcorr_sprj[(count+2)%3](conf), tmp );
+         Rcorrelator::spin_projection(  Rcorr_sprj[(count+2)%3](conf), Rcorr[0]
+                                      , spin );
+         Rcorrelator::mult_YDstar    (  tmp, spin );
+         Rcorrelator::spin_projection(  tmp, Rcorr[1], SPIN_1_p1 );
+         
+         Rcorrelator::Swave_division (  S12_Rcorr_sprj(conf), tmp );
+         Rcorrelator::spin_projection(  S12_Rcorr_sprj(conf), S12_Rcorr[0], spin );
+         Rcorrelator::mult_YDstar    (  tmp, spin );
+         Rcorrelator::spin_projection(  tmp, S12_Rcorr[1], SPIN_1_p1 );
+         
+         Rcorrelator::Swave_division (  K_Rcorr_sprj, tmp );
+         Rcorrelator::spin_projection(  K_Rcorr_sprj, K_Rcorr[0], spin );
+         Rcorrelator::mult_YDstar    (  tmp, spin );
+         Rcorrelator::spin_projection(  tmp, K_Rcorr[1], SPIN_1_p1 );
+         
+         potential::tensor_potential(  V_C(conf), V_T(conf)
+                                     , Rcorr[0], S12_Rcorr[0], K_Rcorr[0]
+                                     , Rcorr[1], S12_Rcorr[1], K_Rcorr[1] );
       }
       
       snprintf(  outfile_name, sizeof(outfile_name)
                , "%s/%s_center_%s_%s_err_t%d"
                , outfile_path, channel.name.c_str()
                , pot_type.c_str(), spin.name.c_str(), it );
-      analysis::output_data_err( *V_C, outfile_name, use_JK_data );
+      analysis::output_data_err( V_C, outfile_name, use_JK_data );
       
       snprintf(  outfile_name, sizeof(outfile_name)
                , "%s/%s_tensor_%s_%s_err_t%d"
                , outfile_path, channel.name.c_str()
                , pot_type.c_str(), spin.name.c_str(), it );
-      analysis::output_data_err( *V_T, outfile_name, use_JK_data );
+      analysis::output_data_err( V_T, outfile_name, use_JK_data );
       
       count++;
    } // it
@@ -165,6 +181,8 @@ static int set_args(int argc, char** argv) {
          //****** You may set additional potion in here ******//
          else if (strcmp(argv[loop],"-idir"     )==0)
             analysis::set_data_list(MAIN_PATH, "%s", argv[loop+1]);
+         else if (strcmp(argv[loop],"-conf_list" )==0)
+            snprintf(conf_list,sizeof(conf_list),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-odir"     )==0)
             snprintf(outfile_path,sizeof(outfile_path),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-t_max"    )==0)
@@ -173,6 +191,8 @@ static int set_args(int argc, char** argv) {
             time_min  = atoi(argv[loop+1]);
          else if (strcmp(argv[loop],"-channel"  )==0)
             channel.set(argv[loop+1]);
+         else if (strcmp(argv[loop],"-spin")==0)
+            spin.set(argv[loop+1]);
          else if (strcmp(argv[loop],"-mass_had1")==0)
             HAD1_mass = atof(argv[loop+1]);
          else if (strcmp(argv[loop],"-mass_had2")==0)
@@ -181,6 +201,8 @@ static int set_args(int argc, char** argv) {
             analysis::set_data_list(N_T_SHIFT, "%s", argv[loop+1]);
          else if (strcmp(argv[loop],"-comp"     )==0)
             read_cmp_flg = true;
+         else if (strcmp(argv[loop],"-take_JK" )==0)
+            take_JK_flg = true;
          else if (strcmp(argv[loop],"-check"    )==0)
             arguments_check = true;
          //***************************************************//

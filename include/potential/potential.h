@@ -4,7 +4,7 @@
  * @ingroup Potential
  * @brief   Header file for potential class
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 00:56:00 JST 2015
+ * @since   Tue Feb  2 18:57:38 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -21,24 +21,29 @@
 namespace potential {
    
    string kernel(  R_CORRELATOR&
-                 , R_CORRELATOR&
-                 , R_CORRELATOR&
-                 , R_CORRELATOR&, double );
+                 , const R_CORRELATOR&
+                 , const R_CORRELATOR&
+                 , const R_CORRELATOR&, const double );
+   
+   string kernel(  R_CORRELATOR_SRC_PRJ&
+                 , const R_CORRELATOR_SRC_PRJ&
+                 , const R_CORRELATOR_SRC_PRJ&
+                 , const R_CORRELATOR_SRC_PRJ&, const double );
    
    string laplacian(  R_CORRELATOR&
-                    , R_CORRELATOR&, double );
+                    , const R_CORRELATOR&, const double );
    
    string laplacian(  NBS_WAVE&
-                    , NBS_WAVE&, double );
+                    , const NBS_WAVE&, const double );
    
    string first_time_diff(  R_CORRELATOR&
-                          , R_CORRELATOR&
-                          , R_CORRELATOR& );
+                          , const R_CORRELATOR&
+                          , const R_CORRELATOR& );
    
    string second_time_diff(  R_CORRELATOR&
-                           , R_CORRELATOR&
-                           , R_CORRELATOR&
-                           , R_CORRELATOR&, double );
+                           , const R_CORRELATOR&
+                           , const R_CORRELATOR&
+                           , const R_CORRELATOR&, const double );
 }
 
 //--------------------------------------------------------------------------
@@ -157,8 +162,14 @@ public:
 namespace potential {
    
    void set_from_binary(   CONFIG<POTENTIAL>, const char* );
+   
    void tensor_potential(  POTENTIAL&, POTENTIAL&
                          , R_CORRELATOR&, R_CORRELATOR&, R_CORRELATOR&);
+   
+   void tensor_potential(  POTENTIAL&, POTENTIAL&
+                         , const R_CORRELATOR&, const R_CORRELATOR&
+                         , const R_CORRELATOR&, const R_CORRELATOR&
+                         , const R_CORRELATOR&, const R_CORRELATOR& );
 }
 
 #endif

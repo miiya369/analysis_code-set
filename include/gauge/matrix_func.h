@@ -89,7 +89,7 @@ double trace_mat(const double *mat, const size_t Ndim)
 
 //--------------------------------------------------------------------------
 /**
- * @brief The function for check the symmetry of the matrix
+ * @brief The function for check the symmetry of the matrix (return the un-difference)
  */
 //--------------------------------------------------------------------------
 double check_mat_symmetry(const double *mat, const size_t Ndim)
@@ -123,6 +123,41 @@ double norm_vec(const double *vec, const size_t Ndim)
    for (size_t i=0; i<Ndim; i++) ret += pow(vec[i], 2);
    
    return sqrt(ret);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief The function for calculate Ax=b using Gauss–Jordan elimination
+ * @brief This function imply to use only tridiagonal matrix
+ */
+//--------------------------------------------------------------------------
+void solve_liner_eq(  const double *alpha, const double *beta, double *x_vec
+                    , const double *b_vec, const size_t Ndim )
+{
+   double *tmp = new double[Ndim];
+   for (size_t i=0; i<Ndim; i++)
+   {
+      tmp  [i] = beta [i];
+      x_vec[i] = b_vec[i];
+   }
+   
+   x_vec[0] /= alpha[0];
+   tmp  [0] /= alpha[0];
+   
+   tmp[Ndim-1] = 0.0;
+   double tmp2;
+   for (size_t i=1; i<Ndim; i++) // A -> U
+   {
+      tmp2      =  alpha[i] - tmp  [i-1] * beta[i-1];
+      x_vec[i]  = (x_vec[i] - x_vec[i-1] * beta[i-1]) / tmp2;
+      tmp  [i] /=  tmp2;
+   }
+   for (size_t i=Ndim-1; i!=0; i--) // U -> E
+   {
+      x_vec[i-1] -= x_vec[i] * tmp[i-1];
+   }
+   
+   delete [] tmp;
 }
 
 //--------------------------------------------------------------------------
@@ -346,9 +381,6 @@ void Hamiltonian_Schrodinger(  double *mat, const double *V, const double mass
 {
    size_t Ndim = SIZE*SIZE*SIZE;
 
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
    for (      int xR=0; xR<SIZE; xR++)
       for (   int yR=0; yR<SIZE; yR++)
          for (int zR=0; zR<SIZE; zR++)
@@ -728,6 +760,45 @@ void eigenvalue_bi_section(  const double *alpha, const double *beta
       eigenvalue[loop] = (aaa+bbb) / 2.0;
       
    } // loop
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief The function for calculate eigen vector using inverse iteration method
+ * @brief This function imply to use only tridiagonal matrix (! incompleted !)
+ */
+//--------------------------------------------------------------------------
+void eigenvector_inverse_iter(  const double *alpha, const double *beta
+                              , const double eigenvalue, double *eigenvector
+                              , const size_t Ndim , const double stop_cnd )
+{
+   double *tmp_alpha = new double[Ndim];
+   for (size_t i=0; i<Ndim; i++) tmp_alpha[i] = alpha[i] - eigenvalue;
+   
+   double *tmp_v = new double[Ndim];   // initialize tmp_v = (1,0,0,0,...,0)
+   tmp_v[0] = 1.0;
+   for (size_t i=1; i<Ndim; i++) tmp_v[i] = 0.0;
+   
+   double diff_v = 999;
+   while (diff_v > stop_cnd)   // inverse iteration method
+   {
+      solve_liner_eq(tmp_alpha, beta, eigenvector, tmp_v, Ndim);
+      
+      double norm = norm_vec(eigenvector, Ndim);
+      
+      double tmp = 0.0;
+      for (size_t i=0; i<Ndim; i++)
+      {
+         eigenvector[i] /= norm;
+         tmp            += fabs(eigenvector[i] - tmp_v[i]);
+         tmp_v[i]        = eigenvector[i];
+      }
+      diff_v = tmp;
+      printf("%e\n", diff_v);   // For Debug
+   }
+   
+   delete [] tmp_alpha;
+   delete [] tmp_v;
 }
 
 #undef idx

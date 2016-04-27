@@ -1,7 +1,7 @@
 
 ### For Potential ###
 
-POT_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin20
+POT_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin020
 POT_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src_bin20
 POT_Path_to_output_dir	= ./results
 POT_Size_of_time	= 64
@@ -12,12 +12,12 @@ POT_Y_shift		= 000
 POT_Z_shift		= 000
 POT_Snk_relativistic	= CG05
 POT_Src_relativistic	= CG05
-POT_Min_time_slice	= 8
-POT_Max_time_slice	= 8
-POT_Had1_mass		= 0.641737
-POT_Had2_mass		= 0.641737
-POT_Channel_name	= Pro-Neu_Pro-Neu
-POT_Spin_projection	= S1_Sz0
+POT_Min_time_slice	= 6
+POT_Max_time_slice	= 10
+POT_Had1_mass		= 0.641060
+POT_Had2_mass		= 0.686503
+POT_Channel_name	= Pro-Lam_Pro-Lam
+POT_Spin_projection	= S0_Sz0
 
 POT_Endian_convert	= yes
 POT_read_compress_NBS	= yes

@@ -8,6 +8,23 @@
  ////////////////////////////////////////////////
 
 
+ @ version 4.2 : 2016/04/27 Completion
+
+	* Add the “const” before the each constant
+	   arguments of the function.
+
+	* Add the main part for calculation
+	   of hadron dispersion relation.
+
+	* Add the main part for analysis
+	   of fitting parameters.
+
+	* Modified the fitting so that skip
+	   the "throw" in gaussj.h.
+	   Instead of them, go to next 
+	   configuration and show the number 
+	   of skipped conf.
+
  @ version 4.1 : 2015/12/19 Completion
 
 	* Major upgrade !

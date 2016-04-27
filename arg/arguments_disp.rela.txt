@@ -1,0 +1,22 @@
+
+### For Dispersion relation ###
+
+DISP_Gauge_confs_list	  = ./arg/conf_list/conf_list.yku_40x48.gfix
+DISP_Path_to_input_dir	  = /Users/miiya/data/results.sloppy.t_mod12_0_5.x_mod10_0_5.y_mod10_0_5.z_mod10_0_5.ave.S0.S4
+DISP_Path_to_output_dir	  = ./results
+DISP_Size_of_space	  = 40
+DISP_Size_of_time	  = 48
+DISP_T_shift		  = A0_3
+DISP_X_shift		  = A0_5
+DISP_Y_shift		  = A0_5
+DISP_Z_shift		  = A0_5
+DISP_Snk_relativistic	  = CG05
+DISP_Src_relativistic	  = CG05
+DISP_Calc_hadron_name	  = { pion phi }
+
+DISP_Fit_range_min	  = 10
+DISP_Fit_range_max	  = 15
+
+DISP_Input_fit_data	  = no
+DISP_Use_jack_knife_data  = no
+DISP_Take_jack_knife	  = yes

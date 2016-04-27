@@ -4,7 +4,7 @@
  * @ingroup correlator, NBS wave function
  * @brief   Main part for create Jack-Knife samples
  * @author  Takaya Miyamoto
- * @since   Fri Dec 11 21:50:25 JST 2015
+ * @since   Wed Jan  6 02:17:08 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
    
    for (int ibin=0; ibin<Nbin; ibin++)
       analysis::set_data_list(  MAX_PATH_ARG + analysis::Nconf + ibin
-                              , "%sbin%03d.%03d", out_base, Nbin, ibin+1);
+                              , "%sbin%03d.%03d", out_base, bin_size, ibin+1);
    
    for (int ihad=0; ihad<N_had; ihad++) {
       double *corr_i = new double[10*analysis::tSIZE *analysis::Nconf];
@@ -190,6 +190,10 @@ static int set_args(int argc, char** argv) {
             snprintf(out_base,sizeof(out_base),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-src_t" )==0)
             analysis::set_data_list(N_T_SHIFT, "%s", argv[loop+1]);
+         else if (strcmp(argv[loop],"-bin_size" )==0)
+            bin_size = atoi(argv[loop+1]);
+         else if (strcmp(argv[loop],"-conf_list" )==0)
+            snprintf(conf_list,sizeof(conf_list),"%s",argv[loop+1]);
          else if (strcmp(argv[loop],"-hadron")==0) {
             int count_tmp = 0;
             do {

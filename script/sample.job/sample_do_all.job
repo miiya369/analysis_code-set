@@ -1,0 +1,6 @@
+#!/bin/sh
+
+sh sample_effmass.job > results/effmass_job.out
+sh sample_pot.job > results/potential_job.out
+sh sample_fit.job > results/fitting_job.out
+sh sample_obs.job > results/phase_shift_job.out

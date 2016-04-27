@@ -1,0 +1,39 @@
+#!/bin/sh
+
+path1=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/results_kek/results_kek_pacs-cs_ens1/compress/Ks0.
+path2=/tmp/miyamoto.jldg/disk.jldg/gfarm/pacscs/BBILQCD/miyamoto/results_kek/results_kek_pacs-cs_ens2/compress/Ks0.
+path=t_shift_ave/4src
+
+base1=RC32x64_B1900Kud01370000Ks01364000C1715-b-
+base2=RC32x64_B1900Kud01372700Ks01364000C1715-b-
+
+list1=./arg/conf_list/conf_list.pacs-cs_ens1
+list2=./arg/conf_list/conf_list.pacs-cs_ens2
+
+for kappa in 12240 13640
+do
+    for bin in 7 19
+    do
+      ./bin/makeJK \
+         -f arg/arguments_make_JK_samples.txt \
+         -idir $path1$kappa/$path/org \
+         -odir $path1$kappa/$path/bin`printf %03d $bin` \
+         -obase $base1 \
+         -bin_size $bin \
+         -conf_list $list1
+    done
+done
+
+for kappa in 12240 13640
+do
+    for bin in 10 20
+    do
+      ./bin/makeJK \
+         -f arg/arguments_make_JK_samples.txt \
+         -idir $path2$kappa/$path/org \
+         -odir $path2$kappa/$path/bin`printf %03d $bin` \
+         -obase $base2 \
+         -bin_size $bin \
+         -conf_list $list2
+    done
+done

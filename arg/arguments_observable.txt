@@ -15,6 +15,6 @@ OBS_energy_scatt_len	= 0.000000000001
 
 OBS_Use_jack_knife_data	= yes
 
-OBS_Calc_squ_wall_pot	= yes
+OBS_Calc_squ_wall_pot	= no
 OBS_Squ_wall_pot_V0	= -50
 OBS_Squ_wall_pot_r0	= 1.8

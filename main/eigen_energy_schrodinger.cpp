@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for calculate eigen energy of schrodinger equation
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 07:47:26 JST 2015
+ * @since   Fri Jan  8 04:59:25 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -16,18 +16,20 @@
 static CHANNEL_TYPE channel;
 static int          time_slice;
 static SPIN_TYPE    spin;
-static int          Neigen;
+static int          Neigen_energy;
+static int          Neigen_vector;
 static double       HAD1_mass;
 static double       HAD2_mass;
 static double       lat_a;
 static double       stp_cnd;
 
 static char conf_list[MAX_LEN_PATH];
+static char outfile_name[MAX_LEN_PATH];
 
-static bool endian_flg   = false;
-static bool read_cmp_flg = false;
-static bool take_JK_flg  = false;
-static bool use_JK_data  = false;
+static bool endian_flg    = false;
+static bool read_cmp_flg  = false;
+static bool take_JK_flg   = false;
+static bool use_JK_data   = false;
 
 static bool arguments_check = false;
 static int  set_args(int, char**);
@@ -97,7 +99,9 @@ int main(int argc, char **argv) {
    
    int     num_dim = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
    double  mass    = reduced_mass * hbar_c / lat_a;
-   double *eigen   = new double[Neigen*analysis::Nconf];
+   double *eigen   = new double[Neigen_energy*analysis::Nconf];
+   
+   Wave = new CONFIG<NBS_WAVE>[Neigen_vector];
    
    int counter = 0;
    printf(" @ eigen energy calculating |   0%%");
@@ -110,10 +114,25 @@ int main(int argc, char **argv) {
       double *pot   = new double[num_dim];
       
       for (int i=0; i<num_dim; i++) pot[i] = (*potential)(conf)(i).real();
+      
       to_tridiag_Lanczos_for_schrodinger(  alpha, beta, pot, analysis::xSIZE
                                          , mass, lat_a);
-      eigenvalue_bi_section(  alpha, beta, &eigen[conf*Neigen]
-                            , num_dim, Neigen, stp_cnd);
+      
+      eigenvalue_bi_section(  alpha, beta, &eigen[conf*Neigen_energy]
+                            , num_dim, Neigen_energy, stp_cnd);
+      
+      for (int i=0; i<Neigen_vector; i++)
+      {
+         double *tmp_v = new double[num_dim];
+         Wave[i](conf).mem_alloc();
+         
+         eigenvector_inverse_iter(  alpha, beta, eigen[i+conf*Neigen_energy]
+                                  , tmp_v, num_dim, stp_cnd );
+         
+         for (int n=0; n<num_dim; n++) Wave[i](conf)(n) = tmp_v[n];
+         
+         delete [] tmp_v;
+      }
       
       delete [] alpha;
       delete [] beta;
@@ -125,8 +144,18 @@ int main(int argc, char **argv) {
    printf("\n");
    delete potential;
    
-   double *err  = new double[Neigen];
-   double *mean = new double[Neigen];
+   for (int i=0; i<Neigen_vector; i++)
+   {
+      char OFILE_NAME[MAX_LEN_PATH];
+      snprintf(  OFILE_NAME, sizeof(OFILE_NAME)
+               , "%s_level%02d", outfile_name, i );
+      
+      analysis::output_data_err( Wave[i], OFILE_NAME, use_JK_data );
+   }
+   delete [] Wave;
+   
+   double *err  = new double[Neigen_energy];
+   double *mean = new double[Neigen_energy];
    double factor;
    if (use_JK_data)
       factor = double(analysis::Nconf-1);
@@ -139,12 +168,12 @@ int main(int argc, char **argv) {
    printf(" @ ====================================================== @\n"
           "\n");
    printf(" [dimension-less]\n");
-   for (int i=0; i<Neigen; i++) {
+   for (int i=0; i<Neigen_energy; i++) {
              mean[i]  = 0.0;
       double sqr_mean = 0.0;
       for (int conf=0; conf<analysis::Nconf; conf++) {
-         mean[i]  +=      eigen[i+conf*Neigen];
-         sqr_mean += pow( eigen[i+conf*Neigen], 2 );
+         mean[i]  +=      eigen[i+conf*Neigen_energy];
+         sqr_mean += pow( eigen[i+conf*Neigen_energy], 2 );
       }
       mean[i]  /= double(analysis::Nconf);
       sqr_mean /= double(analysis::Nconf);
@@ -152,12 +181,12 @@ int main(int argc, char **argv) {
       printf("%9d %18.9lf +/- %12.9lf\n", i, mean[i], err[i]);
    }
    printf(" [MeV]\n");
-   for (int i=0; i<Neigen; i++) {
+   for (int i=0; i<Neigen_energy; i++) {
       mean[i]  = 0.0;
       double sqr_mean = 0.0;
       for (int conf=0; conf<analysis::Nconf; conf++) {
-         mean[i]  +=      eigen[i+conf*Neigen] * hbar_c / lat_a;
-         sqr_mean += pow( eigen[i+conf*Neigen] * hbar_c / lat_a, 2 );
+         mean[i]  +=      eigen[i+conf*Neigen_energy] * hbar_c / lat_a;
+         sqr_mean += pow( eigen[i+conf*Neigen_energy] * hbar_c / lat_a, 2 );
       }
       mean[i]  /= double(analysis::Nconf);
       sqr_mean /= double(analysis::Nconf);
@@ -198,8 +227,22 @@ int set_args(int argc, char** argv) {
       if (argv[loop][0] == '-'){
          if (     strcmp(argv[loop],"-f"        )==0){}
          //****** You may set additional potion in here ******//
+         else if (strcmp(argv[loop],"-idir"     )==0)
+            analysis::set_data_list(MAIN_PATH, "%s", argv[loop+1]);
          else if (strcmp(argv[loop],"-time"    )==0)
             time_slice = atoi(argv[loop+1]);
+         else if (strcmp(argv[loop],"-ofile"  )==0)
+            snprintf(outfile_name,sizeof(outfile_name),"%s",argv[loop+1]);
+         else if (strcmp(argv[loop],"-conf_list" )==0)
+            snprintf(conf_list,sizeof(conf_list),"%s",argv[loop+1]);
+         else if (strcmp(argv[loop],"-spin")==0)
+            spin.set(argv[loop+1]);
+         else if (strcmp(argv[loop],"-mass_had1")==0)
+            HAD1_mass = atof(argv[loop+1]);
+         else if (strcmp(argv[loop],"-mass_had2")==0)
+            HAD2_mass = atof(argv[loop+1]);
+         else if (strcmp(argv[loop],"-take_JK" )==0)
+            take_JK_flg = true;
          else if (strcmp(argv[loop],"-check"    )==0)
             arguments_check = true;
          //***************************************************//
@@ -228,9 +271,11 @@ int set_args(int argc, char** argv) {
    printf(" @ HAD1 mass  = %lf\n",HAD1_mass);
    printf(" @ HAD2 mass  = %lf\n",HAD2_mass);
    printf(" @ lat space  = %lf\n",lat_a);
-   printf(" @ #.eigen E  = %d\n",Neigen);
+   printf(" @ #.eigen E  = %d\n",Neigen_energy);
+   printf(" @ #.eigen v  = %d\n",Neigen_vector);
    printf(" @ stop cnd   = %e\n",stp_cnd);
    printf(" @ conf list  = %s\n",conf_list);
+   printf(" @ ofile name = %s\n @\n",outfile_name);
    printf(" @ infile     = %s\n",analysis::data_list[MAIN_PATH]);
    printf(" @ use JK data= %s\n",analysis::bool_to_str(use_JK_data).c_str());
    printf(" @ take JK    = %s\n",analysis::bool_to_str(take_JK_flg).c_str());
@@ -276,6 +321,8 @@ int set_args_from_file(char* file_name) {
          endian_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"EIGEN_Path_to_input_dir" )==0)
          analysis::set_data_list(MAIN_PATH, "%s", tmp_c2);
+      else if (strcmp(tmp_c1,"EIGEN_Path_to_output_name")==0)
+         snprintf(outfile_name,sizeof(outfile_name),"%s",tmp_c2);
       else if (strcmp(tmp_c1,"EIGEN_T_shift"           )==0)
          analysis::set_data_list(N_T_SHIFT, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"EIGEN_X_shift"           )==0)
@@ -290,8 +337,10 @@ int set_args_from_file(char* file_name) {
          analysis::set_data_list(SRC_RELA, "%s", tmp_c2);
       else if (strcmp(tmp_c1,"EIGEN_Lattice_spacing"   )==0)
          lat_a = atof(tmp_c2);
-      else if (strcmp(tmp_c1,"EIGEN_Number_of_eigen_E" )==0)
-         Neigen = atoi(tmp_c2);
+      else if (strcmp(tmp_c1,"EIGEN_Number_of_eigen_energy" )==0)
+         Neigen_energy = atoi(tmp_c2);
+      else if (strcmp(tmp_c1,"EIGEN_Number_of_eigen_vector" )==0)
+         Neigen_vector = atoi(tmp_c2);
       else if (strcmp(tmp_c1,"EIGEN_Stopping_condition")==0)
          stp_cnd = atof(tmp_c2);
       else if (strcmp(tmp_c1,"EIGEN_Had1_mass"         )==0)
