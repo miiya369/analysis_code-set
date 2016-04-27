@@ -4,7 +4,7 @@
 
 # You may change this for your environment
 
-CXX	  = g++
+CXX	  = g++-5
 CXXFLAGS  = -Wall -O3 -g
 
 #===================================================================================#
