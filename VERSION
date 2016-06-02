@@ -8,10 +8,20 @@
  ////////////////////////////////////////////////
 
 
+ @ version 4.3 : 2016/06/02 non-Completion
+
+        * Add the main part for chack the
+	   difference of two results directory
+	   of hf-code.
+
+	* Add the main part for de-compression
+	   of NBS wave function, using 
+	   ishii-san’s libraries.
+
  @ version 4.2 : 2016/04/27 Completion
 
-	* Add the “const” before the each constant
-	   arguments of the function.
+	* Add the “const” before the each 
+	   constant arguments of the function.
 
 	* Add the main part for calculation
 	   of hadron dispersion relation.

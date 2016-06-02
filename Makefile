@@ -1,6 +1,6 @@
 
 #  Make file of the Analysis code set
-# Since : Wed Apr 27 01:55:59 JST 2016
+# Since : Thu Jun  2 13:39:16 JST 2016
 
 # You may change this for your environment
 
@@ -36,7 +36,7 @@ FIT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_FIT:.cpp=.o)))
 OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
 yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
-TERGETS	    = mas wave pot fit obs eigen gfix jkbin ave makeJK tensor disp param
+TERGETS	    = mas wave pot fit obs eigen gfix jkbin ave makeJK tensor disp param diff
 FOR_MIYA    = ccp zfac red
 
 ### Find the dependence with .cpp files under the SRCDIR and MAINDIR ###
@@ -95,6 +95,14 @@ disp: $(OBJDIR)/dispersion_relation.o $(COMMON) $(CORR) $(FIT)
 	mv $@ $(BINDIR)
 
 param: $(OBJDIR)/analysis_fitparam.o $(COMMON) $(FIT) $(OBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+diff: $(OBJDIR)/difference_chack.o $(COMMON) $(yukawa) $(NBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+deco: $(OBJDIR)/wave_decompression.o $(COMMON) $(yukawa) $(NBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 

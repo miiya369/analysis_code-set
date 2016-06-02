@@ -4,7 +4,7 @@
  * @ingroup correlator, NBS wave function
  * @brief   Main part for average of correlator & compress NBSwave data
  * @author  Takaya Miyamoto
- * @since   Fri Dec 11 04:33:12 JST 2015
+ * @since   Sat May 28 13:11:41 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
          
          for (int Tslice=time_slice_min; Tslice<=time_slice_max; Tslice++) {
             analysis::set_data_list(  N_TIME, "%03d", Tslice);
-            analysis::set_data_list(  MAIN_PATH, "%s/t_shift_%s"
+            analysis::set_data_list(  MAIN_PATH, "%s/Tshift%s"
                                     , work_dir, Tshift[0].c_str());
             analysis::set_data_list(  N_T_SHIFT, "%s", Tshift[0].c_str());
             
@@ -125,13 +125,13 @@ int main(int argc, char **argv) {
             Compress48 comp;   comp.read(analysis::set_path(conf).c_str(), map);
             Compress48 tmp;
             for (int it=1; it<N_Tshift; it++) {
-               analysis::set_data_list(  MAIN_PATH, "%s/t_shift_%s"
+               analysis::set_data_list(  MAIN_PATH, "%s/Tshift%s"
                                        , work_dir, Tshift[it].c_str());
                analysis::set_data_list(  N_T_SHIFT, "%s", Tshift[it].c_str());
                tmp.read(analysis::set_path(conf).c_str(), map);
                comp += tmp; // NBSwave ave.
             } // it
-            analysis::set_data_list(  MAIN_PATH, "%s/t_shift_ave/%dsrc"
+            analysis::set_data_list(  MAIN_PATH, "%s/TshiftAve/%dsrc"
                                     , work_dir, N_Tshift);
             analysis::set_data_list(N_T_SHIFT, "A%02d", N_Tshift);
             comp /= double(N_Tshift);
@@ -381,7 +381,7 @@ static int set_args_from_file(char* file_name) {
 static void input_corr_all(  string CORRtype, int CONF
                            , string TSHIFT, double *CORR) {
    
-   analysis::set_data_list(MAIN_PATH, "%s/t_shift_%s", work_dir, TSHIFT.c_str());
+   analysis::set_data_list(MAIN_PATH, "%s/Tshift%s", work_dir, TSHIFT.c_str());
    analysis::set_data_list(N_T_SHIFT, "%s", TSHIFT.c_str());
    analysis::set_data_list(CORR_DIRECTORY, "%s", CORRtype.c_str());
    
@@ -407,7 +407,7 @@ static void input_corr_all(  string CORRtype, int CONF
 static void output_corr_all(  string CORRtype
                             , int CONF, int N_TSHIFT, double *CORR) {
    
-   analysis::set_data_list(MAIN_PATH, "%s/t_shift_ave/%dsrc", work_dir, N_TSHIFT);
+   analysis::set_data_list(MAIN_PATH, "%s/TshiftAve/%dsrc", work_dir, N_TSHIFT);
    analysis::set_data_list(N_T_SHIFT, "A%02d", N_TSHIFT);
    analysis::set_data_list(CORR_DIRECTORY, "%s", CORRtype.c_str());
    

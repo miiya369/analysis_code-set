@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Header file for NBS wave function
  * @author  Takaya Miyamoto
- * @since   Tue Feb  2 17:31:13 JST 2016
+ * @since   Thu Jun  2 13:23:37 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -172,7 +172,8 @@ public:
       return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE * 4 * 4;
    }
    
-   void input( const CHANNEL_TYPE, const int, const int, const bool );
+   void  input( const CHANNEL_TYPE, const int, const int, const bool );
+   void output( const CHANNEL_TYPE, const int, const int, const bool );
    void input_compressed( const CHANNEL_TYPE, const int, const int, const bool );
 };
 

@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Function for usage
  * @author  Takaya Miyamoto
- * @since   Tue Apr 26 02:11:35 JST 2016
+ * @since   Thu Jun  2 13:39:16 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -207,5 +207,31 @@ void analysis::usage(int usage_type)
       printf("   -hadron    [ hadron name 1  ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
       printf("   -channel   [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
       printf("   -check       Check the arguments\n\n");
+   }
+   else if (usage_type == DIFFERENCE_CHACK)
+   {
+      printf("\n ====== Chack the difference of results of hf-code usage ======\n");
+      printf("\n");
+      printf("   -f          [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -conf_list1 [ Gauge configuration list 1 ]\n");
+      printf("   -conf_list2 [ Gauge configuration list 2 ]\n");
+      printf("   -idir1      [ Path of the input directory 1 ]\n");
+      printf("   -idir2      [ Path of the input directory 2 ]\n");
+      printf("   -t_min      [ Minimum value of time slice ]\n");
+      printf("   -t_max      [ Maximum value of time slice ]\n");
+      printf("   -hadron     [ hadron name 1  ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
+      printf("   -channel    [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
+      printf("   -comp         Read compress NBS wave\n");
+      printf("   -check        Check the arguments\n\n");
+   }
+   else if (usage_type == WAVE_DECOMPRESSION)
+   {
+      printf("\n ====== De-compression of wave function usage ======\n");
+      printf("\n");
+      printf("   -f       [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -ipath   [ Path of the input directory ]\n");
+      printf("   -opath   [ Path of the output directory ]\n");
+      printf("   -channel [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
+      printf("   -check     Check the arguments\n\n");
    }
 }
