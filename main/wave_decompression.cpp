@@ -43,10 +43,21 @@ int main(int argc, char **argv)
    
    for (int iconf=0; iconf<analysis::Nconf; iconf++)
    {
-      make_directory(iconf);
-      
       for (int ich=0; ich<N_ch; ich++)
       {
+         snprintf(         analysis::data_list[NBS_DIRECTORY]
+                  , sizeof(analysis::data_list[NBS_DIRECTORY])
+                  , "%s", channel_type[ich].directory.c_str());
+         snprintf(         analysis::data_list[N_CHANNEL]
+                  , sizeof(analysis::data_list[N_CHANNEL])
+                  , "%s", channel_type[ich].number.c_str());
+         
+         if (make_directory(iconf) != 0)
+         {
+            if (channel_type != NULL) delete [] channel_type;
+            return -1;
+         }
+         
          for (int Tslice=time_slice_min; Tslice<=time_slice_max; Tslice++)
          {
             analysis::set_data_list(MAIN_PATH, "%s", ipath);
@@ -242,15 +253,21 @@ static int set_args_from_file(char* file_name)
 
 static int make_directory(int iconf)
 {
-   char odir[1024];
-   snprintf(  odir, sizeof(odir), "%s/%s.S%s/%s", opath
+   char dir_tmp[1024];
+   snprintf(  dir_tmp, sizeof(dir_tmp), "%s/%s.S%s", opath
+            , analysis::data_list[NBS_DIRECTORY]
+            , analysis::data_list[N_CHANNEL] );
+   
+   mkdir(dir_tmp, 0755);
+   
+   snprintf(  dir_tmp, sizeof(dir_tmp), "%s/%s.S%s/%s", opath
             , analysis::data_list[NBS_DIRECTORY]
             , analysis::data_list[N_CHANNEL]
             , analysis::data_list[iconf+MAX_PATH_ARG] );
    
-   if(mkdir(odir, 0644) != 0)
+   if(mkdir(dir_tmp, 0755) != 0)
    {
-      printf("ERROR: Cannot create the directory, %s\n", odir);
+      printf("ERROR: Cannot create the directory, %s\n", dir_tmp);
       return -1;
    }
    return 0;

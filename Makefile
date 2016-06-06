@@ -1,6 +1,6 @@
 
 #  Make file of the Analysis code set
-# Since : Thu Jun  2 13:39:16 JST 2016
+# Since : Fri Jun  3 16:01:26 JST 2016
 
 # You may change this for your environment
 
@@ -99,6 +99,10 @@ param: $(OBJDIR)/analysis_fitparam.o $(COMMON) $(FIT) $(OBS)
 	mv $@ $(BINDIR)
 
 diff: $(OBJDIR)/difference_chack.o $(COMMON) $(yukawa) $(NBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+diffwave: $(OBJDIR)/difference_wave.o $(COMMON) $(yukawa) $(NBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 
