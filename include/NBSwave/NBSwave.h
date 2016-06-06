@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Header file for NBS wave function
  * @author  Takaya Miyamoto
- * @since   Thu Jun  2 13:23:37 JST 2016
+ * @since   Sat Jun  4 22:42:05 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -106,6 +106,16 @@ public:
 
       wave_org   = NULL;
    }
+   NBS_WAVE_ORG(const char* PATH)
+   {
+      class_name = "NBS_WAVE_ORG_from_path__________";
+      func_name  = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      wave_org = NULL;
+      
+      set(PATH);
+   }
    NBS_WAVE_ORG(  const CHANNEL_TYPE ch, const int it, const int iconf
                 , const bool endian_FLG, const bool compress_FLG )
    {
@@ -135,6 +145,18 @@ public:
          size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
          wave_org       = new cdouble[xyzSIZE * 4 * 4];
       }
+      analysis::route(class_name, func_name, 0);
+   }
+   void set(const char* PATH)
+   {
+      func_name = "set_NBS_ORG_from_path_";
+      analysis::route( class_name, func_name, 1 );
+      
+      mem_alloc();
+      
+      input_compressed_FromPath(PATH);
+      
+      func_name = "set_NBS_ORG_from_path_";
       analysis::route(class_name, func_name, 0);
    }
    void set(  const CHANNEL_TYPE ch, const int it, const int iconf
@@ -175,6 +197,7 @@ public:
    void  input( const CHANNEL_TYPE, const int, const int, const bool );
    void output( const CHANNEL_TYPE, const int, const int, const bool );
    void input_compressed( const CHANNEL_TYPE, const int, const int, const bool );
+   void input_compressed_FromPath( const char* );
 };
 
 //--------------------------------------------------------------------------

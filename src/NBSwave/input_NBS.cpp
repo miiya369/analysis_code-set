@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Function for Input NBS wave function files
  * @author  Takaya Miyamoto
- * @since   Tue Feb  2 23:59:06 JST 2016
+ * @since   Sat Jun  4 22:42:05 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -111,5 +111,45 @@ void NBS_WAVE_ORG::input_compressed(  const CHANNEL_TYPE ch, const int it
    printf("Finished input NBS : %s, t=%d, conf number=%d\n"
           , ch.name.c_str(), it, iconf);
     
+   analysis::route(class_name, func_name, 0);
+}
+
+void NBS_WAVE_ORG::input_compressed_FromPath(const char* path )
+{
+   func_name = "input_compNBS_FromPath";
+   analysis::route(class_name, func_name, 1);
+   
+   if (!NBSwave::compress_init_flg)
+   {
+      cubic_group::initialize();
+      PH1::initialize();
+      NBSwave::compress_init_flg = true;
+   }
+   
+   mapping48 map;
+   map.read(path);
+   Compress48 comp;
+   comp.read(path, map);
+   BC Xbc = comp.Xbc;
+   BC Ybc = comp.Ybc;
+   BC Zbc = comp.Zbc;
+   map.construct_map_and_phase(Xbc, Ybc, Zbc);
+   Four_Point four = comp.decompress48();
+   int Xsites = four.Xsites;
+   int Ysites = four.Ysites;
+   int Zsites = four.Zsites;
+   int sign   = 1;
+   for(                  int betaP =0; betaP <2;       betaP++)
+      for(               int alphaP=0; alphaP<2;       alphaP++)
+         for(            int iz    =0; iz    <Zsites;  iz++)
+            for(         int iy    =0; iy    <Ysites;  iy++)
+               for(      int ix    =0; ix    <Xsites;  ix++)
+                  for(   int beta  =0; beta  <2;       beta++)
+                     for(int alpha =0; alpha <2;       alpha++)
+                        wave_org[idx(ix,iy,iz,alpha+2*beta,alphaP+2*betaP)]
+                        = four(ix,iy,iz,sign)(alpha,beta,alphaP,betaP);
+   
+   printf("Finished input NBS : %s\n", path);
+   
    analysis::route(class_name, func_name, 0);
 }
