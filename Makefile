@@ -1,10 +1,10 @@
 
 #  Make file of the Analysis code set
-# Since : Fri Jun  3 16:01:26 JST 2016
+# Since : Wed Jun  8 18:04:40 JST 2016
 
 # You may change this for your environment
 
-CXX	  = g++-5
+CXX	  = g++
 CXXFLAGS  = -Wall -O3 -g
 
 #===================================================================================#
