@@ -4,7 +4,7 @@
  * @ingroup NBS wave function, R-correlator
  * @brief   Main part for wave function calculation
  * @author  Takaya Miyamoto
- * @since   Fri Jan  8 04:59:25 JST 2016
+ * @since   Wed Jun  8 17:34:58 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -20,12 +20,13 @@ static SPIN_TYPE    spin;
 static char conf_list[MAX_LEN_PATH];
 static char outfile_path[MAX_LEN_PATH];
 
-static bool endian_flg     = false;
-static bool calc_flg_Rcorr = false;
-static bool dev_corr_flg   = false;
-static bool read_cmp_flg   = false;
-static bool take_JK_flg  = false;
-static bool use_JK_data  = false;
+static bool endian_flg       = false;
+static bool calc_flg_Rcorr   = false;
+static bool dev_corr_flg     = false;
+static bool read_cmp_flg     = false;
+static bool take_JK_flg      = false;
+static bool use_JK_data      = false;
+static bool use_SpinPrj_data = false;
 
 static bool arguments_check = false;
 static int  set_args(int, char**);
@@ -60,8 +61,15 @@ int main(int argc, char **argv) {
    for (int it=time_min; it<=time_max; it++) {
       
       for (int conf=0; conf<analysis::Nconf; conf++) {
-         Wave_org->set( channel, it, conf, endian_flg, read_cmp_flg );
-         NBSwave::spin_projection((*Wave_org), (*Wave)(conf), spin);
+         
+         if (!use_SpinPrj_data)
+         {
+            Wave_org->set(channel, it, conf, endian_flg, read_cmp_flg);
+            NBSwave::spin_projection((*Wave_org), (*Wave)(conf), spin);
+         }
+         else
+            (*Wave)(conf).set(channel, it, conf, endian_flg);
+         
          NBSwave::LP_projection((*Wave)(conf));
          
          if (calc_flg_Rcorr)
@@ -82,16 +90,26 @@ int main(int argc, char **argv) {
          for (int conf=0; conf<analysis::Nconf; conf++)
             (*Rcorr)(conf).set( (*Wave)(conf),(*Corr1)(conf),(*Corr2)(conf), it );
          
-         snprintf(  outfile_name, sizeof(outfile_name)
-                  , "%s/%s_Rcorrelator_%s_err_t%d"
-                  , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
+         if (!use_SpinPrj_data)
+            snprintf(  outfile_name, sizeof(outfile_name)
+                     , "%s/%s_Rcorrelator_%s_err_t%d"
+                     , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
+         else
+            snprintf(  outfile_name, sizeof(outfile_name)
+                     , "%s/%s_Rcorrelator_err_t%d"
+                     , outfile_path, channel.name.c_str(), it );
          
          analysis::output_data_err( *Rcorr, outfile_name, use_JK_data );
       }
       
-      snprintf(  outfile_name, sizeof(outfile_name)
-               , "%s/%s_NBSwave_%s_err_t%d"
-               , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
+      if (!use_SpinPrj_data)
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_NBSwave_%s_err_t%d"
+                  , outfile_path, channel.name.c_str(), spin.name.c_str(), it );
+      else
+         snprintf(  outfile_name, sizeof(outfile_name)
+                  , "%s/%s_NBSwave_err_t%d"
+                  , outfile_path, channel.name.c_str(), it );
       
       analysis::output_data_err( *Wave, outfile_name, use_JK_data );
       
@@ -170,6 +188,7 @@ static int set_args(int argc, char** argv) {
    printf(" @ infile     = %s\n",analysis::data_list[MAIN_PATH]);
    printf(" @ outfile    = %s\n",outfile_path);
    printf(" @ use JK data= %s\n",analysis::bool_to_str(use_JK_data).c_str());
+   printf(" @ use Sprj W = %s\n",analysis::bool_to_str(use_SpinPrj_data).c_str());
    printf(" @ take JK    = %s\n",analysis::bool_to_str(take_JK_flg).c_str());
    printf(" @ endian cnv = %s\n",analysis::bool_to_str(endian_flg).c_str());
    printf(" @ dev corr   = %s\n",analysis::bool_to_str(dev_corr_flg).c_str());
@@ -237,6 +256,8 @@ static int set_args_from_file(char* file_name) {
          take_JK_flg = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Use_jack_knife_data")==0)
          use_JK_data = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"WAVE_Use_spin_proj_data")==0)
+         use_SpinPrj_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Out_R_correlator"  )==0)
          calc_flg_Rcorr = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"WAVE_Rcorr_NBS/corr"    )==0)

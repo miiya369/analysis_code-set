@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Function for Output NBS wave function files
  * @author  Takaya Miyamoto
- * @since   Thu Jun  2 13:23:37 JST 2016
+ * @since   Wed Jun  8 17:05:20 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -39,6 +39,9 @@ void NBS_WAVE_ORG::output(  const CHANNEL_TYPE ch, const int it, const int iconf
    snprintf(         analysis::data_list[N_CHANNEL]
             , sizeof(analysis::data_list[N_CHANNEL])
             , "%s", ch.number.c_str());
+   snprintf(         analysis::data_list[OPER_TYPE]
+            , sizeof(analysis::data_list[OPER_TYPE])
+            , "%s", ch.OperType.c_str());
             
    string NBSfile_name = analysis::set_path( iconf );   // Read NBS wave files
    ofstream ofs(NBSfile_name.c_str(), ios::out | ios::binary);
@@ -82,7 +85,10 @@ void NBS_WAVE_ORG::output_compress(  const CHANNEL_TYPE ch, const int it
    snprintf(         analysis::data_list[N_CHANNEL]
             , sizeof(analysis::data_list[N_CHANNEL])
             , "%s", ch.number.c_str());
-   
+   snprintf(         analysis::data_list[OPER_TYPE]
+            , sizeof(analysis::data_list[OPER_TYPE])
+            , "%s", ch.OperType.c_str());
+ 
    if (!NBSwave::compress_init_flg)
    {
       cubic_group::initialize();

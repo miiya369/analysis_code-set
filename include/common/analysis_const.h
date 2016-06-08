@@ -74,6 +74,7 @@ enum {
    N_Z_SHIFT,
    SNK_RELA,
    SRC_RELA,
+   OPER_TYPE,
    MAX_PATH_ARG,
 };
 

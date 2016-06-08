@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Setting path of the gauge confs.
  * @author  Takaya Miyamoto
- * @since   Fri Dec 18 02:23:57 JST 2015
+ * @since   Wed Jun  8 17:05:20 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -29,8 +29,9 @@ string analysis::set_path( int num_conf ) {
       snprintf(  dir_name, sizeof(dir_name), "%s.S%s"
                , data_list[NBS_DIRECTORY], data_list[N_CHANNEL]   );
       snprintf(  header,   sizeof(header),   "NBSwave.+%s", data_list[N_TIME] );
-      snprintf(  footer,   sizeof(footer),   ".NUC_%s.NUC_%s"
-               , data_list[SNK_RELA],      data_list[SRC_RELA] );
+      snprintf(  footer,   sizeof(footer),   ".%s_%s.%s_%s"
+               , data_list[OPER_TYPE], data_list[SNK_RELA]
+               , data_list[OPER_TYPE], data_list[SRC_RELA] );
    }
    if (!use_doi_san_path)
       snprintf(  file_name, sizeof(file_name)

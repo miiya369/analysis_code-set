@@ -92,7 +92,7 @@ int main(int argc, char** argv)
       }
    printf("\n   TOTAL SUM\t\t=\t%lu", count_sum);
    printf("\n   TOTAL CHACK\t\t=\t%lu\n\n", tot_count);
-   printf("===============================================================\n");
+   printf("===============================================================\n\n");
    
    return 0;
 }

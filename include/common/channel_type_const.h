@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Header File for definition of channel type
  * @author  Takaya Miyamoto
- * @since   Mon Sep  7 02:49:51 JST 2015
+ * @since   Wed Jun  8 17:05:20 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -23,6 +23,7 @@ public:
    string prop_name;
    string directory;
    string number;
+   string OperType;
    HADRON_TYPE hadron1;
    HADRON_TYPE hadron2;
 
@@ -31,12 +32,14 @@ public:
       prop_name = "UNKNOWN";
       directory = "UNKNOWN";
       number    = "UNKNOWN";
+      OperType  = "UNKNOWN";
    }
    CHANNEL_TYPE(const CHANNEL_TYPE& other) {
       name      = other.name;
       prop_name = other.prop_name;
       directory = other.directory;
       number    = other.number;
+      OperType  = other.OperType;
       hadron1   = other.hadron1;
       hadron2   = other.hadron2;
    }
@@ -55,7 +58,7 @@ public:
    }
 //====================== definition of channel type ======================//
    void set(const string channel_name) {
-      
+//~~~~~~~~~ Octet-Octet ~~~~~~~~~//
       if (channel_name == "Pro-Neu_Pro-Neu") {
          name      = channel_name;
          prop_name = "O01O02_O01O02";
@@ -65,6 +68,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "0.00";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("proton");
       }
@@ -78,6 +82,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.00";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Lambda");
       }
@@ -90,6 +95,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.01";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Lambda");
       }
@@ -102,6 +108,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.02";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Lambda");
       }
@@ -114,6 +121,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.03";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Sigma");
       }
@@ -126,6 +134,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.04";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Sigma");
       }
@@ -138,6 +147,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.05";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Sigma");
       }
@@ -150,6 +160,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.06";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Sigma");
       }
@@ -162,6 +173,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.07";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Sigma");
       }
@@ -174,6 +186,7 @@ public:
          prop_name += analysis::data_list[SRC_RELA];
          directory = "BBwave.dir";
          number    = "1.08";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Sigma");
       }
@@ -182,6 +195,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.00";
+         OperType  = "NUC";
          hadron1.set("Lambda");
          hadron2.set("Lambda");
       }
@@ -189,6 +203,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.01";
+         OperType  = "NUC";
          hadron1.set("Lambda");
          hadron2.set("Lambda");
       }
@@ -196,6 +211,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.02";
+         OperType  = "NUC";
          hadron1.set("Lambda");
          hadron2.set("Lambda");
       }
@@ -203,6 +219,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.03";
+         OperType  = "NUC";
          hadron1.set("Lambda");
          hadron2.set("Lambda");
       }
@@ -210,6 +227,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.04";
+         OperType  = "NUC";
          hadron1.set("Lambda");
          hadron2.set("Lambda");
       }
@@ -217,6 +235,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.05";
+         OperType  = "NUC";
          hadron1.set("Lambda");
          hadron2.set("Lambda");
       }
@@ -224,6 +243,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.06";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -231,6 +251,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.07";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -238,6 +259,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.08";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -245,6 +267,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.09";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -252,6 +275,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.10";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -259,6 +283,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.11";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -266,6 +291,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.12";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -273,6 +299,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.13";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -280,6 +307,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.14";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -287,6 +315,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.15";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -294,6 +323,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.16";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -301,6 +331,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.17";
+         OperType  = "NUC";
          hadron1.set("proton");
          hadron2.set("Xi");
       }
@@ -308,6 +339,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.18";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -315,6 +347,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.19";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -322,6 +355,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.20";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -329,6 +363,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.21";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -336,6 +371,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.22";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -343,6 +379,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.23";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -350,6 +387,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.24";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -357,6 +395,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.25";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -364,6 +403,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.26";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -371,6 +411,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.27";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -378,6 +419,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.28";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -385,6 +427,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.29";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Sigma");
       }
@@ -392,6 +435,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.30";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Lambda");
       }
@@ -399,6 +443,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.31";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Lambda");
       }
@@ -406,6 +451,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.32";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Lambda");
       }
@@ -413,6 +459,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.33";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Lambda");
       }
@@ -420,6 +467,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.34";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Lambda");
       }
@@ -427,6 +475,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "2.35";
+         OperType  = "NUC";
          hadron1.set("Sigma");
          hadron2.set("Lambda");
       }
@@ -435,6 +484,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.00";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Lambda");
       }
@@ -442,6 +492,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.01";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Lambda");
       }
@@ -449,6 +500,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.02";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Lambda");
       }
@@ -456,6 +508,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.03";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Sigma");
       }
@@ -463,6 +516,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.04";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Sigma");
       }
@@ -470,6 +524,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.05";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Sigma");
       }
@@ -477,6 +532,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.06";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Sigma");
       }
@@ -484,6 +540,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.07";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Sigma");
       }
@@ -491,6 +548,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "3.08";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Sigma");
       }
@@ -499,6 +557,7 @@ public:
          name      = channel_name;
          directory = "BBwave.dir";
          number    = "4.00";
+         OperType  = "NUC";
          hadron1.set("Xi");
          hadron2.set("Xi");
       }
@@ -553,7 +612,32 @@ public:
 //         hadron1.set("proton");
 //         hadron2.set("Sigma");
 //      }
-//---   ---//
+//~~~~~~~~~ Meson-Meson ~~~~~~~~~//
+      else if (channel_name == "PiP-PiP_PiP-PiP") {
+         name      = channel_name;
+         directory = "PPwave.dir";
+         number    = "0.00";
+         OperType  = "PP";
+         hadron1.set("pion");
+         hadron2.set("pion");
+      }
+      else if (channel_name == "PiP-KaZ_PiP-KaZ") {
+         name      = channel_name;
+         directory = "PPwave.dir";
+         number    = "1.00";
+         OperType  = "PP";
+         hadron1.set("pion");
+         hadron2.set("Kaon");
+      }
+      else if (channel_name == "KaZ-KaZ_KaZ-KaZ") {
+         name      = channel_name;
+         directory = "PPwave.dir";
+         number    = "2.00";
+         OperType  = "PP";
+         hadron1.set("Kaon");
+         hadron2.set("Kaon");
+      }
+//~~~~~~~~~ Others ~~~~~~~~~//
       else {
          name      = "UNKNOWN";
          prop_name = "UNKNOWN";

@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Header file for NBS wave function
  * @author  Takaya Miyamoto
- * @since   Sat Jun  4 22:42:05 JST 2016
+ * @since   Wed Jun  8 16:24:32 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ public:
    }
    NBS_WAVE_ORG(const char* PATH)
    {
-      class_name = "NBS_WAVE_ORG_from_path__________";
+      class_name = "NBS_WAVE_ORG____________________";
       func_name  = "______________________";
       analysis::route(class_name, func_name, 1);
       
@@ -347,6 +347,27 @@ public:
       
       wave       = NULL;
    }
+   NBS_WAVE(const char* PATH)
+   {
+      class_name = "NBS_WAVE________________________";
+      func_name  = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      wave       = NULL;
+      
+      set(PATH);
+   }
+   NBS_WAVE(  const CHANNEL_TYPE ch, const int it, const int iconf
+            , const bool endian_FLG )
+   {
+      class_name = "NBS_WAVE________________________";
+      func_name  = "______________________";
+      analysis::route(class_name, func_name, 1);
+      
+      wave       = NULL;
+      
+      set( ch, it, iconf, endian_FLG );
+   }
    ~NBS_WAVE()
    {
       if (wave != NULL) delete [] wave;
@@ -367,6 +388,31 @@ public:
       }
       analysis::route(class_name, func_name, 0);
    }
+   void set(const char* PATH)
+   {
+      func_name = "set_NBS_from_path_____";
+      analysis::route( class_name, func_name, 1 );
+      
+      mem_alloc();
+      
+      input_FromPath(PATH);
+      
+      func_name = "set_NBS_from_path_____";
+      analysis::route(class_name, func_name, 0);
+   }
+   void set(  const CHANNEL_TYPE ch, const int it, const int iconf
+            , const bool endian_FLG )
+   {
+      func_name = "set_NBS_______________";
+      analysis::route( class_name, func_name, 1 );
+      
+      mem_alloc();
+      
+      input(ch, it, iconf, endian_FLG);
+      
+      func_name = "set_NBS_______________";
+      analysis::route(class_name, func_name, 0);
+   }
    void mem_del()
    {
       func_name = "mem_delete_NBS________";
@@ -385,6 +431,9 @@ public:
 //=========================== Several functions ==========================//
    int info_class() { return CLASS_NBS_WAVE; }
    int data_size () { return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; }
+   
+   void input(const CHANNEL_TYPE, const int, const int, const bool);
+   void input_FromPath( const char* );
 };
 
 namespace NBSwave
