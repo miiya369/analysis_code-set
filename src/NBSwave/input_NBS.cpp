@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Function for Input NBS wave function files
  * @author  Takaya Miyamoto
- * @since   Tue Feb  2 23:59:06 JST 2016
+ * @since   Wed Jun  8 17:05:20 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ bool NBSwave::compress_init_flg = false;
 void NBS_WAVE_ORG::input(  const CHANNEL_TYPE ch, const int it, const int iconf
                          , const bool endian_FLG )
 {
-   func_name = "input_NBS_____________";
+   func_name = "input_NBS_ORG_________";
    analysis::route(class_name, func_name, 1);
    
    size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
@@ -38,6 +38,9 @@ void NBS_WAVE_ORG::input(  const CHANNEL_TYPE ch, const int it, const int iconf
    snprintf(         analysis::data_list[N_CHANNEL]
             , sizeof(analysis::data_list[N_CHANNEL])
             , "%s", ch.number.c_str());
+   snprintf(         analysis::data_list[OPER_TYPE]
+            , sizeof(analysis::data_list[OPER_TYPE])
+            , "%s", ch.OperType.c_str());
             
    string NBSfile_name = analysis::set_path( iconf );   // Read NBS wave files
    ifstream ifs(NBSfile_name.c_str(), ios::in | ios::binary);
@@ -54,6 +57,60 @@ void NBS_WAVE_ORG::input(  const CHANNEL_TYPE ch, const int it, const int iconf
    analysis::route(class_name, func_name, 0);
 }
 
+void NBS_WAVE::input(  const CHANNEL_TYPE ch, const int it, const int iconf
+                     , const bool endian_FLG )
+{
+   func_name = "input_NBS_____________";
+   analysis::route(class_name, func_name, 1);
+   
+   size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   
+   snprintf(         analysis::data_list[N_TIME]
+            , sizeof(analysis::data_list[N_TIME])
+            , "%03d", it);
+   snprintf(         analysis::data_list[NBS_DIRECTORY]
+            , sizeof(analysis::data_list[NBS_DIRECTORY])
+            , "%s", ch.directory.c_str());
+   snprintf(         analysis::data_list[N_CHANNEL]
+            , sizeof(analysis::data_list[N_CHANNEL])
+            , "%s", ch.number.c_str());
+   snprintf(         analysis::data_list[OPER_TYPE]
+            , sizeof(analysis::data_list[OPER_TYPE])
+            , "%s", ch.OperType.c_str());
+   
+   string NBSfile_name = analysis::set_path( iconf );   // Read NBS wave files
+   ifstream ifs(NBSfile_name.c_str(), ios::in | ios::binary);
+   if (!ifs) analysis::error(2, NBSfile_name.c_str());
+   
+   ifs.read((char*)&wave[0], sizeof(cdouble) * xyzSIZE);
+   ifs.close();
+   
+   if (endian_FLG) analysis::endian_convert(wave, xyzSIZE);
+   
+   printf("Finished input NBS : %s, t=%d, conf number=%d\n"
+          , ch.name.c_str(), it, iconf);
+   
+   analysis::route(class_name, func_name, 0);
+}
+
+void NBS_WAVE::input_FromPath(const char* path)
+{
+   func_name = "input_NBS_FromPath____";
+   analysis::route(class_name, func_name, 1);
+   
+   size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   
+   ifstream ifs(path, ios::in | ios::binary);
+   if (!ifs) analysis::error(2, path);
+   
+   ifs.read((char*)&wave[0], sizeof(cdouble) * xyzSIZE);
+   ifs.close();
+   
+   printf("Finished input NBS : %s\n", path);
+   
+   analysis::route(class_name, func_name, 0);
+}
+
 //--------------------------------------------------------------------------
 /**
  * @brief Input compressed-NBS wave function (ishii-san's format)
@@ -63,7 +120,7 @@ void NBS_WAVE_ORG::input(  const CHANNEL_TYPE ch, const int it, const int iconf
 void NBS_WAVE_ORG::input_compressed(  const CHANNEL_TYPE ch, const int it
                                     , const int iconf, const bool endian_FLG )
 {
-   func_name = "input_compNBS_________";
+   func_name = "input_compNBS_ORG_____";
    analysis::route(class_name, func_name, 1);
    
    snprintf(         analysis::data_list[N_TIME]
@@ -75,6 +132,9 @@ void NBS_WAVE_ORG::input_compressed(  const CHANNEL_TYPE ch, const int it
    snprintf(         analysis::data_list[N_CHANNEL]
             , sizeof(analysis::data_list[N_CHANNEL])
             , "%s", ch.number.c_str());
+   snprintf(         analysis::data_list[OPER_TYPE]
+            , sizeof(analysis::data_list[OPER_TYPE])
+            , "%s", ch.OperType.c_str());
    
    if (!NBSwave::compress_init_flg)
    {
@@ -111,5 +171,45 @@ void NBS_WAVE_ORG::input_compressed(  const CHANNEL_TYPE ch, const int it
    printf("Finished input NBS : %s, t=%d, conf number=%d\n"
           , ch.name.c_str(), it, iconf);
     
+   analysis::route(class_name, func_name, 0);
+}
+
+void NBS_WAVE_ORG::input_compressed_FromPath(const char* path )
+{
+   func_name = "input_compNBS_FromPath";
+   analysis::route(class_name, func_name, 1);
+   
+   if (!NBSwave::compress_init_flg)
+   {
+      cubic_group::initialize();
+      PH1::initialize();
+      NBSwave::compress_init_flg = true;
+   }
+   
+   mapping48 map;
+   map.read(path);
+   Compress48 comp;
+   comp.read(path, map);
+   BC Xbc = comp.Xbc;
+   BC Ybc = comp.Ybc;
+   BC Zbc = comp.Zbc;
+   map.construct_map_and_phase(Xbc, Ybc, Zbc);
+   Four_Point four = comp.decompress48();
+   int Xsites = four.Xsites;
+   int Ysites = four.Ysites;
+   int Zsites = four.Zsites;
+   int sign   = 1;
+   for(                  int betaP =0; betaP <2;       betaP++)
+      for(               int alphaP=0; alphaP<2;       alphaP++)
+         for(            int iz    =0; iz    <Zsites;  iz++)
+            for(         int iy    =0; iy    <Ysites;  iy++)
+               for(      int ix    =0; ix    <Xsites;  ix++)
+                  for(   int beta  =0; beta  <2;       beta++)
+                     for(int alpha =0; alpha <2;       alpha++)
+                        wave_org[idx(ix,iy,iz,alpha+2*beta,alphaP+2*betaP)]
+                        = four(ix,iy,iz,sign)(alpha,beta,alphaP,betaP);
+   
+   printf("Finished input NBS : %s\n", path);
+   
    analysis::route(class_name, func_name, 0);
 }

@@ -24,4 +24,6 @@ WAVE_Endian_convert	= yes
 WAVE_read_compress_NBS	= yes
 WAVE_Rcorr_NBS/corr	= yes
 
+WAVE_Use_spin_proj_data	= no
+
 WAVE_Out_R_correlator	= no

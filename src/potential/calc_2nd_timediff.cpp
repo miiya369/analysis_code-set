@@ -26,7 +26,7 @@ string potential::second_time_diff(  R_CORRELATOR &K_Rcorr
             
             (  Rcorr1(x,y,z)
              + Rcorr3(x,y,z)
-             - Rcorr2(x,y,z) * 2.0 ) / (4.0 * reduced_mass);
+             - Rcorr2(x,y,z) * 2.0 ) / (8.0 * reduced_mass);
          }
    
    return "potT2term";

@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Header File for definition of several enum
  * @author  Takaya Miyamoto
- * @since   Tue Apr 26 21:15:13 JST 2016
+ * @since   Thu Jun  2 13:39:16 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -43,6 +43,8 @@ enum {
    MAKE_JACK_KNIFE_SAMPLES,
    DISPERSION_RELATION,
    ANALYSIS_FIT_PARAM,
+   DIFFERENCE_CHACK,
+   WAVE_DECOMPRESSION,
 };
 
 //! enum for spin index of NBS wave function
@@ -72,6 +74,7 @@ enum {
    N_Z_SHIFT,
    SNK_RELA,
    SRC_RELA,
+   OPER_TYPE,
    MAX_PATH_ARG,
 };
 

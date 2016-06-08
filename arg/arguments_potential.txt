@@ -23,6 +23,8 @@ POT_Endian_convert	= yes
 POT_read_compress_NBS	= yes
 POT_Rcorr_NBS/corr	= yes
 
+POT_Use_spin_proj_data	= no
+
 POT_Use_jack_knife_data	= yes
 POT_Take_jack_knife	= no
 
