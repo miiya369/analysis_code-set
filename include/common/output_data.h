@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Common header file for definition of data output
  * @author  Takaya Miyamoto
- * @since   Fri Dec 11 18:26:38 JST 2015
+ * @since   Sat Jul 16 17:50:35 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -21,47 +21,96 @@
  */
 //--------------------------------------------------------------------------
 template <class X> void analysis::output_data_all(  CONFIG<X> &data
-                                                  , const char* outfile_name ) {
-   
+                                                  , const char* outfile_name )
+{
    string class_name = "________________________________";
    string func_name  = "output_data_all_______";
    analysis::route(class_name, func_name, 1);
    
-   ofstream ofs( outfile_name, ios::out | ios::binary );
+   ofstream ofs(outfile_name, ios::out | ios::binary);
    
    int     itmp1, itmp2;
    int     num_conf  = data.Nconf();
    size_t  data_size = data(0).data_size();
-   cdouble tmp;
+   double  ftmp;
+   cdouble ctmp;
 //======================== miyamoto-format notation =======================//
 //
 //                        !! ALWAYS LITTLE ENDIAN !!
 //
-//      1) #.conf   (int)
-//      2) #.data   (int)
+//      1) #.conf                   (int)
+//      2) #.data/conf              (int)
+//      3) bytes of data coordinate (int)
 //
-//      3) data     (complex double float (16 bytes))
+//      3) data coordinates         ((2)*(3) bytes)
+//         -> for n = 0 to #.data
+//               crd[n]
 //
+//      4) datas (complex double float(8+8 bytes) * (1)*(2))
 //         -> for    i = 0 to #.conf
 //               for n = 0 to #.data
 //                  data[n+#.data*i]
 //
 //=========================================================================//
    itmp1 = num_conf;
-   itmp2 = data_size;
-   if (!analysis::machine_is_little_endian()) {
+   if (!analysis::machine_is_little_endian())
       analysis::endian_convert(&itmp1, 1);
-      analysis::endian_convert(&itmp2, 1);
-   }
    ofs.write((char*)&itmp1, sizeof(int));
-   ofs.write((char*)&itmp2, sizeof(int));
    
-   for(    int    i=0; i<num_conf;  i++)
-      for (size_t n=0; n<data_size; n++) {
-         tmp = data(i)(n);
+   if (data(0).info_class()==CLASS_CORRELATOR) { // for CORRELATOR-TYPE datas
+      itmp1 = data_size;
+      itmp2 = sizeof(int);
+      if (!analysis::machine_is_little_endian()) {
+         analysis::endian_convert(&itmp1, 1);
+         analysis::endian_convert(&itmp2, 1);
+      }
+      ofs.write((char*)&itmp1, sizeof(int));
+      ofs.write((char*)&itmp2, sizeof(int));
+      
+      for(size_t t=0; t<data_size; t++) {
+         itmp1 = t;
          if (!analysis::machine_is_little_endian())
-            analysis::endian_convert(&tmp, 1);
-         ofs.write((char*)&tmp, sizeof(cdouble));
+            analysis::endian_convert(&itmp1, 1);
+         ofs.write((char*)&itmp1, sizeof(int));
+      }
+      for(    int    i=0; i<num_conf;  i++)
+         for (size_t n=0; n<data_size; n++) {
+            ctmp = data(i)(n);
+            if (!analysis::machine_is_little_endian())
+               analysis::endian_convert(&ctmp, 1);
+            ofs.write((char*)&ctmp, sizeof(cdouble));
+         }
+   } else {   // for POTENTIAL-TYPE datas
+      itmp1 = analysis::reduced_Ndata();
+      itmp2 = sizeof(double);
+      if (!analysis::machine_is_little_endian()) {
+         analysis::endian_convert(&itmp1, 1);
+         analysis::endian_convert(&itmp2, 1);
+      }
+      ofs.write((char*)&itmp1, sizeof(int));
+      ofs.write((char*)&itmp2, sizeof(int));
+      
+      for (      int z=0; z<analysis::zSIZE; z++)
+         for (   int y=0; y<analysis::ySIZE; y++)
+            for (int x=0; x<analysis::xSIZE; x++) {
+               if (x>analysis::xSIZE/2 || y>x || z>y) continue;
+               
+               ftmp = sqrt( x*x + y*y + z*z );
+               if (!analysis::machine_is_little_endian())
+                  analysis::endian_convert(&ftmp, 1);
+               ofs.write((char*)&ftmp, sizeof(double));
+      }
+      for(          int i=0; i<num_conf;        i++)
+         for (      int z=0; z<analysis::zSIZE; z++)
+            for (   int y=0; y<analysis::ySIZE; y++)
+               for (int x=0; x<analysis::xSIZE; x++) {
+                  if (x>analysis::xSIZE/2 || y>x || z>y) continue;
+                  
+                  ctmp = data(i)(idx(x,y,z));
+                  if (!analysis::machine_is_little_endian())
+                     analysis::endian_convert(&ctmp, 1);
+                  ofs.write((char*)&ctmp, sizeof(cdouble));
+               }
    }
    ofs.close();
    

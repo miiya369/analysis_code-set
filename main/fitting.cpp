@@ -4,7 +4,7 @@
  * @ingroup fitting
  * @brief   Main part for fitting analysis
  * @author  Takaya Miyamoto
- * @since   Wed Apr 27 01:19:22 JST 2016
+ * @since   Sun Jul 17 11:50:49 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -129,8 +129,8 @@ int main(int argc, char **argv)
       for (int loop=0; loop<n_param; loop++)
          (*fit)(conf)(loop) = param_new[conf+analysis::Nconf*loop];
    }
-   if (chisq_mean < 2.0) fitting::output_param(*fit, outfile_path);
-   else printf("\n @@@@@@ CHI SQUARE > 2.0 !\n %s will not be output.\n"
+   if (chisq_mean < 3.0) fitting::output_param(*fit, outfile_path);
+   else printf("\n @@@@@@ CHI SQUARE > 3.0 !\n %s will not be output.\n"
                , outfile_path);
    
    delete [] param_initial;

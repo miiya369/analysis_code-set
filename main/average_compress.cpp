@@ -4,7 +4,7 @@
  * @ingroup correlator, NBS wave function
  * @brief   Main part for average of correlator & compress NBSwave data
  * @author  Takaya Miyamoto
- * @since   Sat May 28 13:11:41 JST 2016
+ * @since   Thu Jun  9 17:59:42 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
    cubic_group::initialize();
    PH1::initialize();
    analysis::set_data_list(NBS_DIRECTORY, "BBwave.dir");
+   analysis::set_data_list(OPER_TYPE,     "NUC");
    string corr_dir[2] = {"PS", "SS"};
    
    for (int conf=0; conf<analysis::Nconf; conf++) {

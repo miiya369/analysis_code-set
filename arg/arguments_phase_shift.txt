@@ -1,0 +1,20 @@
+
+### For phase shift calculation ###
+
+OBS_Parameter_list	= /Users/miiya/tmp/Pro-Lam_Pro-Lam_potential_S0_Sz0_fitparam_t9
+OBS_Output_file_name	= ./results/phase_shift
+OBS_Lattice_spacing	= 0.0907
+OBS_Reduced_mass	= 1000
+OBS_Angular_momentum	= 0
+OBS_Calc_energy_min	= -100
+OBS_Calc_energy_max	= 100
+OBS_Calc_energy_dev	= 1
+OBS_Runge_kutta_delta	= 0.0005
+OBS_Runge_kutta_max_r	= 6
+OBS_energy_scatt_len	= 0.000000000001
+
+OBS_Use_jack_knife_data	= yes
+
+OBS_Calc_squ_wall_pot	= no
+OBS_Squ_wall_pot_V0	= -50
+OBS_Squ_wall_pot_r0	= 1.8

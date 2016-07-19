@@ -4,7 +4,7 @@
  * @ingroup gauge
  * @brief   Header file for some function of vector & matrix
  * @author  Takaya Miyamoto
- * @since   Sat Dec 19 14:44:07 JST 2015
+ * @since   Sun Jul 17 09:29:16 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ void print_mat(const double *mat, const size_t Ndim)
 {
    for (size_t i=0; i<Ndim; i++)
    {
-      for (size_t j=0; j<Ndim; j++) printf(" %1.1lf",mat[idx(i,j)]);
+      for (size_t j=0; j<Ndim; j++) printf(" %1.1e",mat[idx(i,j)]);
       printf("\n");
    }
    printf("\n");
@@ -68,7 +68,7 @@ void print_mat(const std::complex<double> *mat, const size_t Ndim)
    for (size_t i=0; i<Ndim; i++)
    {
       for (size_t j=0; j<Ndim; j++)
-         printf(" (%1.1lf,%1.1lf)", mat[idx(i,j)].real(), mat[idx(i,j)].imag());
+         printf(" (%1.1e,%1.1e)", mat[idx(i,j)].real(), mat[idx(i,j)].imag());
       printf("\n");
    }
    printf("\n");
@@ -196,15 +196,15 @@ void solve_mat_gauss(  const double *Amat, double *Xmat, const double *Bmat
    for (   size_t  i=Ndim-1;  i!=0;  i--) // U -> E
       for (size_t ii=i;      ii!=0; ii--)
       {
-         tmp = mat[idx(ii,i)];
+         tmp = mat[idx(ii-1,i)];
          for (size_t jj=0; jj<Ndim; jj++)
          {
-            Xmat[idx(ii,jj)] -= Xmat[idx(i,jj)] * tmp;
-            mat[ idx(ii,jj)] -= mat[ idx(i,jj)] * tmp;
+            Xmat[idx(ii-1,jj)] -= Xmat[idx(i,jj)] * tmp;
+            mat [idx(ii-1,jj)] -= mat [idx(i,jj)] * tmp;
          }
       }
    
-//   print_mat(mat, Ndim);   // For Debug
+//   print_mat(mat, Ndim);   // For Debug; It Should be E
    
    delete [] mat;
 }
@@ -230,25 +230,25 @@ void solve_mat_gauss(  const std::complex<double> *Amat, std::complex<double> *X
       for (size_t ii=i+1; ii<Ndim; ii++)
       {
          tmp = mat[idx(ii,i)];
-         for (size_t jj=0;   jj<Ndim; jj++)
-         {
-            Xmat[idx(ii,jj)] -= Xmat[idx(i,jj)] * tmp;
-            mat [idx(ii,jj)] -= mat [idx(i,jj)] * tmp;
-         }
-      }
-   }
-   for (   size_t  i=Ndim-1;  i>0;   i--) // U -> E
-      for (size_t ii=i-1;    ii>=0; ii--)
-      {
-         tmp = mat[idx(ii,i)];
          for (size_t jj=0; jj<Ndim; jj++)
          {
             Xmat[idx(ii,jj)] -= Xmat[idx(i,jj)] * tmp;
             mat [idx(ii,jj)] -= mat [idx(i,jj)] * tmp;
          }
       }
+   }
+   for (   size_t  i=Ndim-1;  i!=0;  i--) // U -> E
+      for (size_t ii=i;      ii!=0; ii--)
+      {
+         tmp = mat[idx(ii-1,i)];
+         for (size_t jj=0; jj<Ndim; jj++)
+         {
+            Xmat[idx(ii-1,jj)] -= Xmat[idx(i,jj)] * tmp;
+            mat [idx(ii-1,jj)] -= mat [idx(i,jj)] * tmp;
+         }
+      }
 
-//   print_mat(mat, Ndim);   // For Debug
+//   print_mat(mat, Ndim);   // For Debug; It Should be E
 
    delete [] mat;
 }

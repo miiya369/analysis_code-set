@@ -10,8 +10,8 @@
 
 #include <common/analysis.h>
 
-int analysis::reduced_Ndata() {
-   
+int analysis::reduced_Ndata()
+{   
    int ret;
    
    if (analysis::xSIZE == 16) ret = 165;

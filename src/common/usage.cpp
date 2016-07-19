@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Function for usage
  * @author  Takaya Miyamoto
- * @since   Thu Jun  2 13:39:16 JST 2016
+ * @since   Sun Jul 17 04:08:32 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -73,14 +73,25 @@ void analysis::usage(int usage_type)
       printf("   -conf_list [ Gauge configuration list ]\n");
       printf("   -idir      [ Path of the input directory ]\n");
       printf("   -odir      [ Path of the output directory ]\n");
-      printf("   -t_min     [ Minimum value of time slice ]\n");
-      printf("   -t_max     [ Maximum value of time slice ]\n");
+      printf("   -time      [ The value of time slice ]\n");
       printf("   -channel   [ Channel name to calculate ]\n");
-      printf("   -spin      [ Spin type to calculate ]\n");
       printf("   -mass_had1 [ Mass of hadron 1 ]\n");
       printf("   -mass_had2 [ Mass of hadron 2 ]\n");
       printf("   -src_t     [ time slice of src point ]\n");
       printf("   -take_JK     Take Jack-Knife average after input the data\n");
+      printf("   -comp        Read compress NBS wave\n");
+      printf("   -check       Check the arguments\n\n");
+   }
+   else if (usage_type == CALC_TENSOR_FORCE_2x2)
+   {
+      printf("\n ====== Calculation & Output 2x2 coupled channel tensor potential usage ======\n");
+      printf("\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -conf_list [ Gauge configuration list ]\n");
+      printf("   -idir      [ Path of the input directory ]\n");
+      printf("   -odir      [ Path of the output directory ]\n");
+      printf("   -time      [ The value of time slice ]\n");
+      printf("   -src_t     [ time slice of src point ]\n");
       printf("   -comp        Read compress NBS wave\n");
       printf("   -check       Check the arguments\n\n");
    }
@@ -97,17 +108,30 @@ void analysis::usage(int usage_type)
       printf("   -param     [ Parameter ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
       printf("   -check       Check the arguments\n\n");
    }
-   else if (usage_type == CALC_OBSERVABLE)
+   else if (usage_type == CALC_PHASE_SHIFT)
    {
-      printf("\n ======   Observable calculation usage   ======\n");
+      printf("\n ======   Phase shift calculation usage   ======\n");
       printf("\n");
       printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
       printf("   -ifile     [ Path of the input parameter file ]\n");
-      printf("   -ofile     [ Path of the output file]\n");
+      printf("   -ofile     [ Path of the output file ]\n");
+      printf("   -E_min     [ Minimum Enargy (MeV) for output ]\n");
+      printf("   -E_max     [ Maximum Enargy (MeV) for output ]\n");
+      printf("   -E_div     [ Enargy devision (MeV) for output ]\n");
       printf("   -mass      [ Reduced mass [Mev/c2] ]\n\n");
       printf("   -test        Calculate test potential ( Square wall )\n");
       printf("   -V0        [ Energy of Square wall potential ( For test ) ]\n");
       printf("   -r0        [ Range  of Square wall potential ( For test ) ]\n");
+      printf("   -check       Check the arguments\n\n");
+   }
+   else if (usage_type == CALC_PHASE_SHIFT_2x2)
+   {
+      printf("\n ======   2x2 coupled channel phase shift calculation usage   ======\n");
+      printf("\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -E_min     [ Minimum Enargy (MeV) for output ]\n");
+      printf("   -E_max     [ Maximum Enargy (MeV) for output ]\n");
+      printf("   -E_div     [ Enargy devision (MeV) for output ]\n\n");
       printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == EIGEN_ENERGY)
@@ -151,23 +175,13 @@ void analysis::usage(int usage_type)
       printf("   -phys        Output physical unit function\n");
       printf("   -check       Check the arguments\n\n");
    }
-   else if (usage_type == COUPLED_CHANNEL_POT)
+   else if (usage_type == COUPLED_CHANNEL_POT_2x2)
    {
-      printf("\n ====== Calculation & Output coupled channel potential usage ======\n");
+      printf("\n ====== Calculation & Output 2x2 coupled channel potential usage ======\n");
       printf("\n");
       printf("   -f    [ Path of the input arguments file ] <- Must be required !\n");
       printf("   -time [ Value of time slice for calculate ]\n");
       printf("   -check  Check the arguments\n\n");
-   }
-   else if (usage_type == EXTRACT_Z_FACTOR)
-   {
-      printf("\n ====== Calculation & Output Z-factor usage ======\n");
-      printf("\n");
-      printf("   -f      [ Path of the input arguments file ] <- Must be required !\n");
-      printf("   -ifile  [ Path of the input file ]\n");
-      printf("   -ofile  [ Path of the output file ]\n");
-      printf("   -hadron [ hadron name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
-      printf("   -check    Check the arguments\n\n");
    }
    else if (usage_type == AVERAGE_COMPRESS)
    {

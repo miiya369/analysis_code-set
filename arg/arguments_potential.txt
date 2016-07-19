@@ -1,8 +1,8 @@
 
 ### For Potential ###
 
-POT_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin020
-POT_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src_bin20
+POT_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2
+POT_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src
 POT_Path_to_output_dir	= ./results
 POT_Size_of_time	= 64
 POT_Size_of_space	= 32
@@ -34,3 +34,5 @@ POT_Out_1st_t_diff	= no
 POT_Out_2nd_t_diff	= no
 
 POT_Out_fit_data	= no
+
+POT_Out_all_datas	= yes

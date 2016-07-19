@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Header File for definition of several enum
  * @author  Takaya Miyamoto
- * @since   Thu Jun  2 13:39:16 JST 2016
+ * @since   Sun Jul 17 01:07:30 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -29,14 +29,14 @@ enum {
 //! enum for the main project name
 enum {
     
-   COUPLED_CHANNEL_POT = 0,
+   COUPLED_CHANNEL_POT_2x2 = 0,
    CALC_WAVE_FUNCTION,
    EFFECTIVEMASS,
    CALC_TENSOR_FORCE,
+   CALC_TENSOR_FORCE_2x2,
    CALC_POTENTIAL,
    FITTING_DATA,
-   CALC_OBSERVABLE,
-   EXTRACT_Z_FACTOR,
+   CALC_PHASE_SHIFT,
    AVERAGE_COMPRESS,
    EIGEN_ENERGY,
    JACK_KNIFE_BIN_CHECK,
@@ -45,6 +45,7 @@ enum {
    ANALYSIS_FIT_PARAM,
    DIFFERENCE_CHACK,
    WAVE_DECOMPRESSION,
+   CALC_PHASE_SHIFT_2x2,
 };
 
 //! enum for spin index of NBS wave function

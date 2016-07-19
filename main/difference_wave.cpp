@@ -91,7 +91,7 @@ int main(int argc, char** argv)
          count_sum += count_m[i];
       }
    printf("\n   TOTAL SUM\t\t=\t%lu", count_sum);
-   printf("\n   TOTAL CHACK\t\t=\t%lu\n\n", tot_count);
+   printf("\n   TOTAL CHACK\t\t=\t%lu\n", tot_count);
    printf("===============================================================\n\n");
    
    return 0;

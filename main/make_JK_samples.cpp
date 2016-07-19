@@ -4,7 +4,7 @@
  * @ingroup correlator, NBS wave function
  * @brief   Main part for create Jack-Knife samples
  * @author  Takaya Miyamoto
- * @since   Wed Jan  6 02:17:08 JST 2016
+ * @since   Fri Jun 10 23:53:16 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -56,6 +56,7 @@ int main(int argc, char **argv) {
    cubic_group::initialize();
    PH1::initialize();
    analysis::set_data_list(NBS_DIRECTORY, "BBwave.dir");
+   analysis::set_data_list(OPER_TYPE,     "NUC");
    string corr_dir[2] = {"PS", "SS"};
    
    Nbin = analysis::Nconf / bin_size;

@@ -4,7 +4,7 @@
  * @ingroup potential
  * @brief   Main part for potential calculation
  * @author  Takaya Miyamoto
- * @since   Wed Jun  8 17:49:41 JST 2016
+ * @since   Sat Jul 16 17:11:41 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -33,6 +33,7 @@ static bool calc_flg_t2      = false;
 static bool take_JK_flg      = false;
 static bool use_JK_data      = false;
 static bool use_SpinPrj_data = false;
+static bool out_all_datas    = false;
 
 static bool arguments_check = false;
 static int  set_args(int, char**);
@@ -131,7 +132,17 @@ int main(int argc, char **argv) {
                      , "%s/%s_%s_err_t%d"
                      , outfile_path, channel.name.c_str()
                      , pot_type.c_str(), it );
-         analysis::output_data_err( *potential, outfile_name, use_JK_data );
+         
+         analysis::output_data_err(*potential, outfile_name, use_JK_data);
+         
+         if (out_all_datas) {
+            snprintf(  outfile_name, sizeof(outfile_name)
+                     , "%s/%s_%s_%s_all_t%d"
+                     , outfile_path, channel.name.c_str()
+                     , pot_type.c_str(), spin.name.c_str(), it );
+            
+            analysis::output_data_all(*potential, outfile_name);
+         }
       }
       if (calc_flg_t1) {
          for (int conf=0; conf<analysis::Nconf; conf++) {
@@ -150,7 +161,17 @@ int main(int argc, char **argv) {
                      , "%s/%s_%s_err_t%d"
                      , outfile_path, channel.name.c_str()
                      , pot_type.c_str(), it );
-         analysis::output_data_err( *potential, outfile_name, use_JK_data );
+         
+         analysis::output_data_err(*potential, outfile_name, use_JK_data);
+         
+         if (out_all_datas) {
+            snprintf(  outfile_name, sizeof(outfile_name)
+                     , "%s/%s_%s_%s_all_t%d"
+                     , outfile_path, channel.name.c_str()
+                     , pot_type.c_str(), spin.name.c_str(), it );
+            
+            analysis::output_data_all(*potential, outfile_name);
+         }
       }
       if (calc_flg_t2) {
          for (int conf=0; conf<analysis::Nconf; conf++) {
@@ -171,7 +192,17 @@ int main(int argc, char **argv) {
                      , "%s/%s_%s_err_t%d"
                      , outfile_path, channel.name.c_str()
                      , pot_type.c_str(), it );
-         analysis::output_data_err( *potential, outfile_name, use_JK_data );
+         
+         analysis::output_data_err(*potential, outfile_name, use_JK_data);
+         
+         if (out_all_datas) {
+            snprintf(  outfile_name, sizeof(outfile_name)
+                     , "%s/%s_%s_%s_all_t%d"
+                     , outfile_path, channel.name.c_str()
+                     , pot_type.c_str(), spin.name.c_str(), it );
+            
+            analysis::output_data_all(*potential, outfile_name);
+         }
       }
       if (calc_flg_pot) {
          for (int conf=0; conf<analysis::Nconf; conf++) {
@@ -192,7 +223,17 @@ int main(int argc, char **argv) {
                      , "%s/%s_%s_err_t%d"
                      , outfile_path, channel.name.c_str()
                      , pot_type.c_str(), it );
-         analysis::output_data_err( *potential, outfile_name, use_JK_data );
+         
+         analysis::output_data_err(*potential, outfile_name, use_JK_data);
+         
+         if (out_all_datas) {
+            snprintf(  outfile_name, sizeof(outfile_name)
+                     , "%s/%s_%s_%s_all_t%d"
+                     , outfile_path, channel.name.c_str()
+                     , pot_type.c_str(), spin.name.c_str(), it );
+            
+            analysis::output_data_all(*potential, outfile_name);
+         }
       }
       if (calc_flg_fit) {
          for (int conf=0; conf<analysis::Nconf; conf++) {
@@ -314,7 +355,8 @@ static int set_args(int argc, char** argv) {
    printf(" @ out lap    = %s\n",analysis::bool_to_str(calc_flg_lap).c_str());
    printf(" @ out t1 dif = %s\n",analysis::bool_to_str(calc_flg_t1).c_str());
    printf(" @ out t2 dif = %s\n",analysis::bool_to_str(calc_flg_t2).c_str());
-   printf(" @ out fit    = %s\n\n",analysis::bool_to_str(calc_flg_fit).c_str());
+   printf(" @ out fit    = %s\n",analysis::bool_to_str(calc_flg_fit).c_str());
+   printf(" @ out all    = %s\n\n",analysis::bool_to_str(out_all_datas).c_str());
    fflush(stdout);
    
    if (arguments_check) return 1;
@@ -393,6 +435,8 @@ static int set_args_from_file(char* file_name) {
          use_JK_data = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Use_spin_proj_data")==0)
          use_SpinPrj_data = analysis::str_to_bool(tmp_c2);
+      else if (strcmp(tmp_c1,"POT_Out_all_datas")==0)
+         out_all_datas = analysis::str_to_bool(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Had1_mass"         )==0)
          HAD1_mass = atof(tmp_c2);
       else if (strcmp(tmp_c1,"POT_Had2_mass"         )==0)

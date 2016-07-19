@@ -1,11 +1,11 @@
 
 #  Make file of the Analysis code set
-# Since : Wed Jun  8 18:04:40 JST 2016
+# Since : Sun Jul 17 01:07:30 JST 2016
 
 # You may change this for your environment
 
-CXX	  = g++
-CXXFLAGS  = -Wall -O3 -g
+CXX	  = g++-5
+CXXFLAGS  = -Wall -O3 -g -fopenmp
 
 #===================================================================================#
 #============================= DON’T CHANGE FROM HERE ==============================#
@@ -36,15 +36,16 @@ FIT         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_FIT:.cpp=.o)))
 OBS         = $(patsubst %,$(OBJDIR)/%,$(notdir $(SRCS_OBS:.cpp=.o)))
 yukawa	    = $(patsubst %,$(OBJDIR)/extern/yukawa/%,$(notdir $(SRCS_yukawa:.C=.o)))
 
-TERGETS	    = mas wave pot fit obs eigen gfix jkbin ave makeJK tensor disp param diff
-FOR_MIYA    = ccp zfac red
+TERGETS1    = mas wave pot fit phase eigen gfix jkbin ave makeJK tensor disp param
+TERGETS2    = diff diffwave waveave deco pot2 phase2 tensor2
+FOR_MIYA    = 
 
 ### Find the dependence with .cpp files under the SRCDIR and MAINDIR ###
 vpath %.cpp $(wildcard $(SRCDIR)/*) $(MAINDIR) $(MAINDIR)/for_miyamoto $(MAINDIR)/for_miyamoto/test
 vpath %.C $(wildcard $(SRCDIR)/extern/yukawa*)   # <- for yukawa
 
 .PHONY: all
-all: $(TERGETS)
+all: $(TERGETS1) $(TERGETS2)
 
 mas: $(OBJDIR)/effective_mass.o $(COMMON) $(CORR) $(FIT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
@@ -62,7 +63,7 @@ fit: $(OBJDIR)/fitting.o $(COMMON) $(FIT)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 
-obs: $(OBJDIR)/observable.o $(COMMON) $(OBS)
+phase: $(OBJDIR)/phase_shift.o $(COMMON) $(OBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 
@@ -106,22 +107,28 @@ diffwave: $(OBJDIR)/difference_wave.o $(COMMON) $(yukawa) $(NBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 
+waveave: $(OBJDIR)/wave_average_compress.o $(COMMON) $(yukawa)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
 deco: $(OBJDIR)/wave_decompression.o $(COMMON) $(yukawa) $(NBS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 	mv $@ $(BINDIR)
 
+phase2: $(OBJDIR)/phase_shfit.2x2.o $(COMMON) $(OBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+pot2: $(OBJDIR)/potential.2x2.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
+tensor2: $(OBJDIR)/tensor_force.2x2.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+	mv $@ $(BINDIR)
+
 ###### For Miyamoto ######
-ccp: $(OBJDIR)/coupled_channel_potential.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-	mv $@ $(BINDIR)
 
-zfac: $(OBJDIR)/extract_Z-factor.o $(COMMON) $(CORR)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-	mv $@ $(BINDIR)
-
-red: $(OBJDIR)/data_reduction_check.o $(COMMON) $(CORR) $(NBS) $(yukawa) $(RCORR) $(POT)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-	mv $@ $(BINDIR)
 ##########################
 
 $(OBJDIR)/%.o: %.cpp
@@ -158,6 +165,6 @@ test_wave: $(OBJDIR)/test_wave.o $(COMMON) $(NBS) $(yukawa)
 	mv $@ $(BINDIR)
 
 .PHONY: ALL
-ALL: $(TERGETS) $(FOR_MIYA)
+ALL: $(TERGETS1) $(TERGETS2) $(FOR_MIYA)
 ######################
 

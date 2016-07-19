@@ -561,57 +561,64 @@ public:
          hadron1.set("Xi");
          hadron2.set("Xi");
       }
-////--- isospin base S=1, I=1/2 ---//
-//      else if (channel_name == "Nuc-Lam12_Nuc-Lam12") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.00";
-//         hadron1.set("proton");
-//         hadron2.set("Lambda");
-//      }
-//      else if (channel_name == "Nuc-Lam12_Nuc-Sig12") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.01";
-//         hadron1.set("proton");
-//         hadron2.set("Lambda");
-//      }
-//      else if (channel_name == "Nuc-Sig12_Nuc-Lam12") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.02";
-//         hadron1.set("proton");
-//         hadron2.set("Sigma");
-//      }
-//      else if (channel_name == "Nuc-Sig12_Nuc-Sig12") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.03";
-//         hadron1.set("proton");
-//         hadron2.set("Sigma");
-//      }
-////--- isospin base S=1, I=3/2 ---//
-//      else if (channel_name == "Nuc-Lam12_Nuc-Sig32") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.04";
-//         hadron1.set("proton");
-//         hadron2.set("Lambda");
-//      }
-//      else if (channel_name == "Nuc-Sig32_Nuc-Lam12") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.05";
-//         hadron1.set("proton");
-//         hadron2.set("Sigma");
-//      }
-//      else if (channel_name == "Nuc-Sig32_Nuc-Sig32") {
-//         name      = channel_name;
-//         directory = "BBwave.prj";
-//         number    = "1.06";
-//         hadron1.set("proton");
-//         hadron2.set("Sigma");
-//      }
+//--- isospin base S=1, I=1/2 ---//
+      else if (channel_name == "Nuc-Lam12_Nuc-Lam12") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.00";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Lambda");
+      }
+      else if (channel_name == "Nuc-Lam12_Nuc-Sig12") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.01";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Lambda");
+      }
+      else if (channel_name == "Nuc-Sig12_Nuc-Lam12") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.02";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Sigma");
+      }
+      else if (channel_name == "Nuc-Sig12_Nuc-Sig12") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.03";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Sigma");
+      }
+//--- isospin base S=1, I=3/2 ---//
+      else if (channel_name == "Nuc-Sig32_Nuc-Sig32") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.04";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Sigma");
+      }
+      else if (channel_name == "Nuc-Lam12_Nuc-Sig32") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.05";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Lambda");
+      }
+      else if (channel_name == "Nuc-Sig32_Nuc-Lam12") {
+         name      = channel_name;
+         directory = "BBwave.prj";
+         number    = "1.06";
+         OperType  = "NUC";
+         hadron1.set("proton");
+         hadron2.set("Sigma");
+      }
 //~~~~~~~~~ Meson-Meson ~~~~~~~~~//
       else if (channel_name == "PiP-PiP_PiP-PiP") {
          name      = channel_name;

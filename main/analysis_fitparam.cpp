@@ -4,7 +4,7 @@
  * @ingroup observable
  * @brief   Main part for analysis of fit parameter
  * @author  Takaya Miyamoto
- * @since   Tue Apr 26 21:15:13 JST 2016
+ * @since   Sun Jun 19 03:43:29 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -127,6 +127,7 @@ int main(int argc, char **argv)
    
    ofstream ofs(outfile_path);
    ofs << "# function type = " << fit_func.name << endl;
+   ofs << "# r | Func Max | Func Min | Func Mean | Func Error" << endl;
    for (int Np=0; Np<Npoint; Np++)
    {
       double r = Np * div_r;

@@ -1,0 +1,32 @@
+
+### For 2x2 Coupled channel potential ###
+
+CCP_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin020
+CCP_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_64src_bin020
+CCP_Path_to_output_dir	= ./results
+CCP_Size_of_time	= 64
+CCP_Size_of_space	= 32
+CCP_calc_time_slice	= 9
+CCP_T_shift		= A64
+CCP_X_shift		= 000
+CCP_Y_shift		= 000
+CCP_Z_shift		= 000
+CCP_Snk_relativistic	= CG05
+CCP_Src_relativistic	= CG05
+
+CCP_Reduced_mass_00	= 0.331476
+CCP_Reduced_mass_01	= 0.331476
+CCP_Reduced_mass_10	= 0.334543
+CCP_Reduced_mass_11	= 0.334543
+
+CCP_Z_factor_01		= 1.0
+
+CCP_Spin_projection	= S0_Sz0
+
+CCP_Endian_convert	= yes
+CCP_read_compress_NBS	= yes
+
+CCP_Use_jack_knife_data	= yes
+CCP_Take_jack_knife	= no
+
+CCP_Out_fit_data	= yes

@@ -4,7 +4,7 @@
  * @ingroup phase shift
  * @brief   Header file for phase shift class
  * @author  Takaya Miyamoto
- * @since   Fri Dec 11 22:25:13 JST 2015
+ * @since   Tue Jul  5 03:35:27 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ public:
       Ndata = count;
       
       if (phase_shift == NULL) phase_shift = new cdouble[Ndata];
-      if (energy      == NULL) energy      = new double[ Ndata];
+      if (energy      == NULL) energy      = new double [Ndata];
       
       if (E_dev < 0) {
          double tmp_E = E_max;
@@ -115,7 +115,7 @@ public:
       Ndata = dataSIZE;
       
       if (phase_shift == NULL) phase_shift = new cdouble[Ndata];
-      if (energy      == NULL) energy      = new double[ Ndata];
+      if (energy      == NULL) energy      = new double [Ndata];
       
       for (int loop=0; loop<Ndata; loop++) energy[loop] = ENERGY[loop];
       
@@ -152,7 +152,7 @@ namespace observable {
    void output_phase_shift_err( const char*, CONFIG<PHASE_SHIFT>&, bool );
 
    void calc_phase_shift_dif(  PHASE_SHIFT*, double*, double*, double*
-                             , int, int, int, double, double, double );
+                             , int, int*, int*, double, double, double );
    void calc_phase_shift_int(  PHASE_SHIFT*, double*, double*, double*
                              , int, int, int, double, int );
 }

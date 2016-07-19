@@ -73,7 +73,7 @@
 	* Major upgrade ! 
 		- Rewrite the code using namespace
 		- Improve independency of class
-		- Simplify the input arguments setting for main()
+		- Simplify the input arguments setting for main()
 		- Standardize the form of code
 		   -> Indent = 3
 		   -> put space on if () { , and for () {
@@ -197,4 +197,16 @@
 	* Add the input part for Meson-Meson NBSwave funcs.
 
 	* Change the order of the version numbers.
+
+
+ @ version 4.4 : 2016/07/16 non-Completion
+
+	* Modified the main part of potential so that it can be output ALL (each conf.) data
+	   as (Miyamoto-format) binary.
+
+	* Add some scripts and single (independent) programs for convenience.
+
+	* Add the main part for 2x2 coupled channel phase shift.
+
+	* Add the main part for 2x2 coupled channel tensor potential.
 

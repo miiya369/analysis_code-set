@@ -1,7 +1,7 @@
 
 ### For Difference check ###
 
-DIFF_Gauge_confs_list1	= ./arg/conf_list/conf_list.pacs-cs_ens2_10confs
+DIFF_Gauge_confs_list1	= ./arg/conf_list/conf_list.pacs-cs_ens2
 DIFF_Gauge_confs_list2	= ./arg/conf_list/conf_list.pacs-cs_ens2
 DIFF_Path_to_input_dir1	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_comp_10conf
 DIFF_Path_to_input_dir2	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_comp_10conf

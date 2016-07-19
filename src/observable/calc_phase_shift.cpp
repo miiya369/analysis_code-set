@@ -15,12 +15,12 @@
 
 void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *mu
                                       , double *mass_threshold
-                                      , int Nchannel, int Nparam, int func_type
+                                      , int Nchannel, int *Nparam, int *func_type
                                       , double lat_space, double del
                                       , double r_max ) {
    
    string class_name = "________________________________";
-   string func_name  = "calc_phase_shift______";
+   string func_name  = "calc_phase_shift_diff_";
    analysis::route(class_name, func_name, 1);
    
    srand((unsigned int)time(NULL));   // for random initialize
@@ -38,9 +38,8 @@ void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *
    cdouble *phi[3];
    for (int i=0; i<3; i++) phi[i] = new cdouble[Nchannel*Nchannel];
    
-   for (int ch=1; ch<Nchannel; ch++)
+   for (int ch=0; ch<Nchannel; ch++)
       delta_E[ch] = mass_threshold[ch] - mass_threshold[0];
-   delta_E[0] = 0.0;
    
 #define mat(R,C)  (C + Nchannel * R)
    for (size_t iE=0; iE<phase[0].data_size(); iE++) {
@@ -57,9 +56,11 @@ void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *
       }
       for (double r=del; r<=r_max; r+=del) {
          
-         for (int i=0; i<Nchannel*Nchannel; i++)
-            v[i] = V(r/lat_space, &aa[i*Nparam], Nparam, func_type) * hc_api;
-         
+         int tmpN = 0;
+         for (int i=0; i<Nchannel*Nchannel; i++) {
+            v[i]  = V(r/lat_space, &aa[tmpN], Nparam[i], func_type[i]) * hc_api;
+            tmpN += Nparam[i];
+         }
          for (int ch=0; ch<Nchannel; ch++) for (int src=0; src<Nchannel; src++) {
             cdouble Vphi;
             for (int k=0; k<Nchannel; k++) Vphi += v[mat(ch,k)]*phi[1][mat(k,src)];
@@ -79,25 +80,26 @@ void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *
          
 //         for( int ch=0; ch<Nchannel; ch++) for (int src=0; src<Nchannel; src++) {
 //            Coe[mat(ch,src)] = ( (  phi_diff[mat(ch,src)]
-//                                  - phi[0][  mat(ch,src)] * kk[ch] * COMP_IMAG )
+//                                  - phi  [0][mat(ch,src)] * kk[ch] * COMP_IMAG )
 //                                / 2.0 * exp(COMP_IMAG*kk[ch]*r) );
 //            XY[mat(ch,src)]  = ( (  phi_diff[mat(ch,src)]
-//                                  + phi[0][  mat(ch,src)] * kk[ch] * COMP_IMAG )
+//                                  + phi  [0][mat(ch,src)] * kk[ch] * COMP_IMAG )
 //                                / 2.0 * exp(-COMP_IMAG*kk[ch]*r) );
 //         }
 //         printf("%lf %lf %lf %lf %lf %lf %lf %lf %lf\n", r
-//                , Coe[mat(0,0)].real(), Coe[mat(0,0)].imag()   // For Debug
-//                , Coe[mat(1,0)].real(), Coe[mat(1,0)].imag()   // of Coe & XY
-//                , XY[mat(0,0)].real(), XY[mat(0,0)].imag()
-//                , XY[mat(1,0)].real(), XY[mat(1,0)].imag() );
+//                , Coe[mat(0,1)].real(), Coe[mat(0,1)].imag()   // For Debug
+//                , Coe[mat(1,1)].real(), Coe[mat(1,1)].imag()   // of Coe & XY
+//                , XY[mat(0,1)].real(), XY[mat(0,1)].imag()
+//                , XY[mat(1,1)].real(), XY[mat(1,1)].imag() );
       } // r
+//      exit(0);
       
       for (int ch=0; ch<Nchannel; ch++) for (int src=0; src<Nchannel; src++) {
          Coe[mat(ch,src)] = ( (  phi_diff[mat(ch,src)]
-                               - phi[0][  mat(ch,src)] * kk[ch] * COMP_IMAG )
+                               - phi  [0][mat(ch,src)] * kk[ch] * COMP_IMAG )
                              / 2.0 * exp(COMP_IMAG*kk[ch]*r_max) );
          XY[mat(ch,src)]  = ( (  phi_diff[mat(ch,src)]
-                               + phi[0][  mat(ch,src)] * kk[ch] * COMP_IMAG )
+                               + phi  [0][mat(ch,src)] * kk[ch] * COMP_IMAG )
                              / 2.0 * exp(-COMP_IMAG*kk[ch]*r_max) );
       }
 ///////////////////////////   1 channel case   ///////////////////////////
@@ -149,12 +151,18 @@ void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *
 //         cdouble B_BB    = (Smat[mat(1,0)] + Smat[mat(0,1)]) / sin2_BB;
 //         cdouble del1_BB = log( (A_BB+B_BB)/2.0 ) / (2.0*COMP_IMAG) * 180.0/PI;
 //         cdouble del2_BB = log( (A_BB-B_BB)/2.0 ) / (2.0*COMP_IMAG) * 180.0/PI;
+//         
+//         phase[0](iE) = del1_BB;
+//         phase[1](iE) = del2_BB;
          
          cdouble tan2_SYM = (- (Smat[mat(1,0)] * Smat[mat(0,1)])
                              / (Smat[mat(0,0)] * Smat[mat(1,1)]) );   // For SYM
          cdouble cos2_SYM = 1.0/sqrt(1.0+tan2_SYM);
          cdouble del1_SYM = log(Smat[mat(0,0)]/cos2_SYM)/(2.0*COMP_IMAG)*180.0/PI;
          cdouble del2_SYM = log(Smat[mat(1,1)]/cos2_SYM)/(2.0*COMP_IMAG)*180.0/PI;
+         
+         phase[0](iE) = del1_SYM;
+         phase[1](iE) = del2_SYM;
          
 //         printf("%lf %lf %lf %lf %lf\n",phase[0].E(iE)   // For Debug
 //                , tan2_BB.real(), tan2_BB.imag()
@@ -165,9 +173,6 @@ void observable::calc_phase_shift_dif(  PHASE_SHIFT *phase, double *aa, double *
 //                                 * cos((del1_SYM-del2_SYM).real() * PI/180.0) );
 //         double del1_SYMtoBB = (A_SYMtoBB + B_SYMtoBB) * 0.5 * 180.0/PI;
 //         double del2_SYMtoBB = (A_SYMtoBB - B_SYMtoBB) * 0.5 * 180.0/PI;
-         
-         phase[0](iE) = del1_SYM;
-         phase[1](iE) = del2_SYM;
       }
 //////////////////////////////////////////////////////////////////////////
    } // iE

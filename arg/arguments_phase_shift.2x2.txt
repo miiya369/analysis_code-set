@@ -1,0 +1,22 @@
+
+### For observable calculation ###
+
+PH2_Parameter_list00	= /Users/miiya/tmp/Nuc-Lam12_Nuc-Lam12_potLapterm_S0_Sz0_ccp_fitparam_t10
+PH2_Parameter_list01	= /Users/miiya/tmp/Nuc-Sig12_Nuc-Lam12_potLapterm_S0_Sz0_ccp_fitparam_t10
+PH2_Parameter_list10	= /Users/miiya/tmp/Nuc-Sig12_Nuc-Lam12_potLapterm_S0_Sz0_ccp_fitparam_t10
+PH2_Parameter_list11	= /Users/miiya/tmp/Nuc-Sig12_Nuc-Sig12_potLapterm_S0_Sz0_ccp_fitparam_t10
+PH2_Output_file_name1	= ./results/phase_shift1_4
+PH2_Output_file_name2	= ./results/phase_shift2_4
+PH2_Lattice_spacing	= 0.0907
+PH2_mass_ch1-1		= 1578.342355
+PH2_mass_ch1-2		= 2688.802102
+PH2_mass_ch2-1		= 1578.342355
+PH2_mass_ch2-2		= 2700.364241
+PH2_Angular_momentum	= 0
+PH2_Calc_energy_min	= 0
+PH2_Calc_energy_max	= 50
+PH2_Calc_energy_dev	= 1
+PH2_Runge_kutta_delta	= 0.00005
+PH2_Runge_kutta_max_r	= 6
+
+PH2_Use_jack_knife_data	= yes
