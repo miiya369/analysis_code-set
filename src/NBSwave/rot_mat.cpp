@@ -12,8 +12,8 @@
 
 int NBSwave::rot_matrix[384];
 
-void NBSwave::rot_matrix_init() {
-   
+void NBSwave::rot_matrix_init()
+{
    int R[384] = {
       
       1, 0, 0, 0,                 // E

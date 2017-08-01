@@ -1,3 +1,6 @@
+#ifndef EXT_NR__GAUSSJ_H
+#define EXT_NR__GAUSSJ_H
+
 int gaussj(MatDoub_IO &a, MatDoub_IO &b) // Modified: void gaussj -> int gaussj
 {   // Modified by T.Miyamoto (Wed Apr 27 00:25:45 JST 2016)
 	Int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
@@ -54,3 +57,5 @@ void gaussj(MatDoub_IO &a)
 	MatDoub b(a.nrows(),0);
 	gaussj(a,b);
 }
+
+#endif

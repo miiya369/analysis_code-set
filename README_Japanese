@@ -9,13 +9,14 @@
 
 
  ############   Build   ############
- analysis_code_set のディレクトリ上で make と打てば
- obj/ 内にオブジェクトファイルが自動的に生成され、
+ analysis_code_set の Makefile があるディレクトリ上で
+ make と打てば obj/ 内にオブジェクトファイルが自動的に生成され
+  ( ただし、gnu make のインストールが必要 )、
  bin/ 内に各実行ファイルが生成されます。
  全てビルドする必要がない場合は、make にターゲットを
  つけて実行してください。よく用いるものは、例えば
 
- * pot : potential, NBSwave などの計算
+ * pot : potential の計算
  * mas : effective mass, mass fitting などの計算
  * fit : potential fitting などの計算
  * obs : phase shift, scattering length などの計算
@@ -60,15 +61,7 @@
  この際、gauge configs list の行数が #.confs 
  として読み込まれますので、余分な改行を入れないように
  してください。
-
- なお、作成のための簡単な script を ./script に
- 用意してあります (make_conf_list.sh)。
- confs の ディレクトリが入っているディレクトリを
- 指定することで、/ を抜いた形で表示されます。
- sh make_conf_list.sh BBwave.dir.S0.00/ > list
- のように使ってください。
-
-
+ 
  ############   OpenMP   ############
  Default では全て逐次処理となっています。
  OpenMP を使う場合は、Makefile 内の CXXFLAGS に
@@ -79,26 +72,40 @@
 
  * include/common/make_jack_knife_sample.h の
 	make_JK_sample()
-
+ * include/gauge/gauge_link.h
+ * include/gauge/matrix_func.h
+ * main/main_eigen_energy_schrodinger.cpp
+ * main/main_folding_potential.cpp
+ * main/main_phase_shift.cpp
+ * main/main_potential.2x2.cpp
+ * main/main_potential.3x3.cpp
+ 
 
  ############   doxygen   ############
- analysis_code_set のディレクトリ上で doxygen
- と打てば html/ の中にファイルが自動的に生成されます
- ( ただし、doxygen のインストールが必要 )
+ analysis_code_set の Doxyfile があるディレクトリ上で
+ doxygen と打てば html/ の中にファイルが自動的に生成されます
+ ( ただし、doxygen のインストールが必要 )。
+
+
+ ##########  Libraty の作成  ##########
+ Makefile のあるディレクトリで make lib とすれば、
+ 同じディレクトリに analysisHAL.a というライブラリが
+ 作成されます。これをリンクすれば、analysis_code_set
+ のすべての関数が使用できます。
 
 
  ############ Debug の表示 ############
- 実行したい main ファイルに、do_debug = true;
- という行を加えてからビルドすればデバッグモードでの出力に
- なり、どのクラス・関数に入ったか・出たかの情報が出力
+ Makefile の CXXFLAGS に -DDEBUG_MODE という
+ オプションを加えてからビルドすればデバッグモードでの出力に
+ なり、どのクラス・関数に入ったかの情報が出力
  されるようになりす。
  これにより、バグが発生した際にその地点をすぐに発見する
  ことができます。
 
 
  ######### Fit function の追加 #########
- 1) include/fitting/function_type_const.h
- 2) include/fitting/fit_NR.h
+ 1) src/fitting/function_type.cpp
+ 2) include/fitting/fit_function_NR.h
  3) include/observable/observable_base.h
  4) src/observable/potential_funcs.cpp
  5) src/fitting/fit_data_NR.cpp

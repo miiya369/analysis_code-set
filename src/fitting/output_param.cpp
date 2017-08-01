@@ -11,10 +11,7 @@
 #include <fitting/fitting.h>
 
 void fitting::output_param( CONFIG<FIT> &data, const char* outFILE_name ) {
-   
-   string class_name = "________________________________";
-   string func_name = "output_param__________";
-   analysis::route(class_name, func_name, 1);
+   DEBUG_LOG
    
    ofstream ofs(outFILE_name, ios::out | ios::binary);
    
@@ -25,12 +22,12 @@ void fitting::output_param( CONFIG<FIT> &data, const char* outFILE_name ) {
       analysis::endian_convert(&tmp_Nconf,    1);
       analysis::endian_convert(&tmp_func_num, 1);
    }
-   ofs.write( (char*)&tmp_Nconf,    sizeof(int) );   // write file header
-   ofs.write( (char*)&tmp_func_num, sizeof(int) );
+   ofs.write((char*)&tmp_Nconf,    sizeof(int));   // write file header
+   ofs.write((char*)&tmp_func_num, sizeof(int));
    
    double tmp;
-   for (   size_t loop=0; loop<data(0).data_size(); loop++)
-      for (int    conf=0; conf<data.Nconf();        conf++) {
+   for (   int loop=0; loop<data(0).data_size(); loop++)
+      for (int conf=0; conf<data.Nconf();        conf++) {
          
          tmp = data(conf)(loop);
          if (!analysis::machine_is_little_endian())
@@ -38,6 +35,4 @@ void fitting::output_param( CONFIG<FIT> &data, const char* outFILE_name ) {
          ofs.write((char*)&tmp, sizeof(double));
       }
    ofs.close();
-   
-   analysis::route(class_name, func_name, 0);
 }

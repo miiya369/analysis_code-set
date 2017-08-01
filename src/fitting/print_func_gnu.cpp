@@ -11,13 +11,10 @@
 #include <fitting/fitting.h>
 
 void FIT::print_func_gnu() {
-   
-   func_name = "print_func_gnu________";
-   analysis::route(class_name, func_name, 1);
+   DEBUG_LOG
    
    if (param == NULL) {
-      analysis::error(1,"Fit function has not set yet !");
-      analysis::route(class_name, func_name, 0);
+      WORNING_COMMENTS("Fit function has not set yet !");
       return;
    }
    printf(" @ For gnuplot function :\n @ ");
@@ -60,6 +57,4 @@ void FIT::print_func_gnu() {
    else printf(" @ UNKOWN \n");
    
    printf("\n");
-
-   analysis::route(class_name, func_name, 0);
 }

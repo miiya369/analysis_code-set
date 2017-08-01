@@ -15,16 +15,13 @@
  * @brief The function for input binary-fitting data (for header)
  */
 //--------------------------------------------------------------------------
-void fitting::input_data_binary(const char *infile_name,int &n_conf,int &n_data) {
-   
-   string class_name = "________________________________";
-   string func_name = "input_data_binary_head";
-   analysis::route(class_name, func_name, 1);
+int fitting::input_data_binary(const char *infile_name,int &n_conf,int &n_data) {
+   DEBUG_LOG
    
    int fit_type, n_conf_tmp, n_data_tmp;
    
    ifstream ifs(infile_name, ios::in | ios::binary);
-   if (!ifs) analysis::error(2, infile_name);
+   if (!ifs) ERROR_FOPEN(infile_name);
 
    ifs.read((char*)&fit_type,   sizeof(int));
    ifs.read((char*)&n_conf_tmp, sizeof(int));   // read file header
@@ -45,14 +42,14 @@ void fitting::input_data_binary(const char *infile_name,int &n_conf,int &n_data)
       printf(" @ #.confs          = %d\n", n_conf_tmp);
       printf(" @ #.data size      = %d\n", n_data_tmp);
       ifs.close();
-      analysis::error(3,"This file is not miyamoto-format fit data");
+      ERROR_COMMENTS("This file is not miyamoto-format fit data");
    }
    ifs.close();
    
    n_conf = n_conf_tmp;
    n_data = n_data_tmp;
    
-   analysis::route(class_name, func_name, 0);
+   return fit_type;
 }
 
 //--------------------------------------------------------------------------
@@ -60,17 +57,14 @@ void fitting::input_data_binary(const char *infile_name,int &n_conf,int &n_data)
  * @brief The function for input binary-fitting data
  */
 //--------------------------------------------------------------------------
-void fitting::input_data_binary(  const char *infile_name
+int fitting::input_data_binary(  const char *infile_name
                                 , double *cood, double *data, double *err ) {
-   
-   string class_name = "________________________________";
-   string func_name = "input_data_binary_body";
-   analysis::route(class_name, func_name, 1);
+   DEBUG_LOG
    
    int fit_type, n_conf_tmp, n_data_tmp;
    
    ifstream ifs(infile_name, ios::in | ios::binary);
-   if (!ifs) analysis::error(2, infile_name);
+   if (!ifs) ERROR_FOPEN(infile_name);
 //======================== miyamoto-format notation =======================//
 //
 //                        !! ALWAYS LITTLE ENDIAN !!
@@ -128,8 +122,8 @@ void fitting::input_data_binary(  const char *infile_name
    }
 //========================================================================//
    else printf("This file is not miyamoto-format fit data\n");
-      
+   
    ifs.close();
    
-   analysis::route(class_name, func_name, 0);
+   return fit_type;
 }

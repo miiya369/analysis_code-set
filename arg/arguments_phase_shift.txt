@@ -1,0 +1,26 @@
+
+### For phase shift calculation ###
+
+OBS_Parameter_list	= ./tmpp.bin
+OBS_Output_file_name	= ./tmpp.phase
+
+OBS_Lattice_spacing	= 0.0907
+# OBS_Lattice_spacing	= 0.0845808
+OBS_Reduced_mass	= 879.427153
+# OBS_Reduced_mass	= 1303.282466
+OBS_Angular_momentum	= 0
+
+OBS_Calc_energy_min	= 0
+OBS_Calc_energy_max	= 100
+OBS_Calc_energy_div	= 0.1
+
+OBS_Runge_kutta_delta	= 0.001
+OBS_Runge_kutta_max_r	= 10
+
+OBS_energy_scatt_len	= 0.000000000001
+
+OBS_Use_jack_knife_data	= yes
+
+OBS_Calc_squ_wall_pot	= no
+OBS_Squ_wall_pot_V0	= -50
+OBS_Squ_wall_pot_r0	= 1.8

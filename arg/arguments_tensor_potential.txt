@@ -1,27 +1,26 @@
 
 ### For Tensor Potential ###
 
-V_T_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin20
-V_T_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src_bin20
-V_T_Path_to_output_dir	= ./results
+V_T_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2
 V_T_Size_of_time	= 64
 V_T_Size_of_space	= 32
-V_T_T_shift		= -04
+
+V_T_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data
+V_T_T_shift		= A04
 V_T_X_shift		= 000
 V_T_Y_shift		= 000
 V_T_Z_shift		= 000
 V_T_Snk_relativistic	= CG05
 V_T_Src_relativistic	= CG05
-V_T_Min_time_slice	= 6
-V_T_Max_time_slice	= 12
+V_T_Channel_name	= Pro-Lam_Pro-Lam
+
+V_T_Path_to_output_dir	= ./results
+V_T_calc_time_slice	= 9
+
 V_T_Had1_mass		= 0.641060
 V_T_Had2_mass		= 0.686503
-V_T_Channel_name	= Pro-Lam_Pro-Lam
-V_T_Spin_projection	= S1_Sz0
-
-V_T_Endian_convert	= yes
-V_T_read_compress_NBS	= yes
-V_T_Rcorr_NBS/corr	= yes
 
 V_T_Use_jack_knife_data	= yes
 V_T_Take_jack_knife	= no
+
+V_T_Out_all_datas       = yes

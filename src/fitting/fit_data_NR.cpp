@@ -4,12 +4,12 @@
  * @ingroup fitting
  * @brief   Function for data fitting, according to Numerical Recipe
  * @author  Takaya Miyamoto
- * @since   Wed Apr 27 00:39:34 JST 2016
+ * @since   Sat Nov 12 03:33:54 JST 2016
  */
 //--------------------------------------------------------------------------
 
 #include <fitting/fitting.h>
-#include <fitting/fit_NR.h>
+#include <fitting/fit_function_NR.h>
 
 //--------------------------------------------------------------------------
 /**
@@ -17,12 +17,31 @@
  */
 //--------------------------------------------------------------------------
 double FIT::fit_data_NR(  const double *cood, const double *data, const double *err
-                        , const int cood_min, const int cood_max
+                        , const int Ndata, const int cood_min, const int cood_max
                         , const double STP_CND )
 {
-   int n_data = cood_max - cood_min + 1;
+   int idx_min = -1, idx_max = -1;
+   for (int n=0; n<Ndata; n++) {
+      if (cood[n] >= cood_min && idx_min == -1) idx_min = n;
+      if (cood[n] >= cood_max && idx_max == -1) idx_max = n;
+   }
+   int n_data = idx_max - idx_min + 1;
    
-   return FIT::fit_data_NR(  &cood[cood_min], &data[cood_min], &err[cood_min]
+   return FIT::fit_data_NR(  &cood[idx_min], &data[idx_min], &err[idx_min]
+                           , n_data, STP_CND );
+}
+double FIT::fit_data_NR(  const double *cood, const double *data, const double *err
+                        , const int Ndata, const double cood_min
+                        , const double cood_max, const double STP_CND )
+{
+   int idx_min = -999, idx_max = -999;
+   for (int n=0; n<Ndata; n++) {
+      if (cood[n] >= cood_min && idx_min == -999) idx_min = n;
+      if (cood[n] >= cood_max && idx_max == -999) idx_max = n;
+   }
+   int n_data = idx_max - idx_min + 1;
+   
+   return FIT::fit_data_NR(  &cood[idx_min], &data[idx_min], &err[idx_min]
                            , n_data, STP_CND );
 }
 
@@ -32,15 +51,12 @@ double FIT::fit_data_NR(  const double *cood, const double *data, const double *
  */
 //--------------------------------------------------------------------------
 double FIT::fit_data_NR(  const double *cood, const double *data, const double *err
-                        , const int Ndata, const double STP_CND )
-{
-   func_name = "fit_data_NR___________";
-   analysis::route(class_name, func_name, 1);
+                        , const int Ndata, const double STP_CND ) {
+   DEBUG_LOG
    
    if (param == NULL)
    {
-      analysis::error(1,"Fit function has not set yet !");
-      analysis::route(class_name, func_name, 0);
+      WORNING_COMMENTS("Fit function has not set yet !");
       return -999.0;
    }
    Doub    stp_cnd = STP_CND;
@@ -95,7 +111,14 @@ double FIT::fit_data_NR(  const double *cood, const double *data, const double *
             param[n] = fit_NR.a[n];
          chisq = fit_NR.chisq / (Ndata-func_type.Nparam);
       }
+      else if (func_type.number == 9)
+      {
+         Fitmrq fit_NR(COOD, DATA, ERR, PARAM, &fit_funcs::func_1g1y, stp_cnd);
+         if (fit_NR.fit() == -1) return -999.0;
+         for (int n=0; n<func_type.Nparam; n++)
+            param[n] = fit_NR.a[n];
+         chisq = fit_NR.chisq / (Ndata-func_type.Nparam);
+      }
 //========================================================================//
-   analysis::route(class_name, func_name, 0);
    return chisq;
 }

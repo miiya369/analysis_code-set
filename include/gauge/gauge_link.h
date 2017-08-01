@@ -12,7 +12,7 @@
 #ifndef GAUGE_LINK_H
 #define GAUGE_LINK_H
 
-#include <gauge/complex_matrix.h>
+#include <common/complex_matrix.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -20,8 +20,7 @@
 
 #define idx(mu,x,y,z,t) (mu+4*(x+sSIZE*(y+sSIZE*(z+sSIZE*t))))
 
-double plaquette(const double *iconf, const int sSIZE, const int tSIZE)
-{
+double plaquette(const double *iconf, const int sSIZE, const int tSIZE) {
    SU3matrix* conf = (SU3matrix*)iconf;
    double     ret  = 0.0;
    
@@ -46,8 +45,7 @@ double plaquette(const double *iconf, const int sSIZE, const int tSIZE)
 //          n         l         ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++)
-      {
+      for (int xyzt=0; xyzt<4; xyzt++) {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
@@ -68,12 +66,11 @@ double plaquette(const double *iconf, const int sSIZE, const int tSIZE)
             ret += tmp.trace().real();   // <- sum_n Re tr P(n)
          }
    }
-   return ret/double(xyztSIZE*18);
+   return ret / double(xyztSIZE*18);
 }
 
 void stout_smearing(  double *iconf
-                    , const double param, const int sSIZE, const int tSIZE )
-{
+                    , const double param, const int sSIZE, const int tSIZE ) {
    SU3matrix* conf = (SU3matrix*)iconf;
    
    size_t xyztSIZE =   sSIZE* sSIZE* sSIZE* tSIZE;
@@ -99,8 +96,7 @@ void stout_smearing(  double *iconf
 //      l1     n      m1     ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++)
-      {
+      for (int xyzt=0; xyzt<4; xyzt++) {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
@@ -129,7 +125,7 @@ void stout_smearing(  double *iconf
          } // nu
          staple *= conf[idx(mu,n[0],n[1],n[2],n[3])].dagger();
          tmp     = (   (staple.dagger() - staple)
-                    - ((staple.dagger() - staple).trace()/3.0)
+                    - ((staple.dagger() - staple).trace() / 3.0)
                     ) * std::complex<double>(0.0, 0.5);
          
          conf_tmp[idx(mu,n[0],n[1],n[2],n[3])]
@@ -146,8 +142,7 @@ void stout_smearing(  double *iconf
    delete [] conf_tmp;
 }
 
-double check_coulomb_gfix(const double *iconf, const int sSIZE, const int tSIZE)
-{
+double check_coulomb_gfix(const double *iconf, const int sSIZE, const int tSIZE) {
    SU3matrix* conf = (SU3matrix*)iconf;
    double     ret  = 0.0;
    
@@ -170,8 +165,7 @@ double check_coulomb_gfix(const double *iconf, const int sSIZE, const int tSIZE)
 //                           ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++)
-      {
+      for (int xyzt=0; xyzt<4; xyzt++) {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }
@@ -190,12 +184,11 @@ double check_coulomb_gfix(const double *iconf, const int sSIZE, const int tSIZE)
          ret += tmp.sum_all_abs_elements();
       }
    }
-   return ret/double(xyztSIZE*4);
+   return ret / double(xyztSIZE*4);
 }
 
 void gfix_by_gmat(  double *iconf, const double *igmat
-                  , const int sSIZE, const int tSIZE )
-{
+                  , const int sSIZE, const int tSIZE ) {
    SU3matrix* conf = (SU3matrix*)iconf;
    SU3matrix* gmat = (SU3matrix*)igmat;
    
@@ -216,8 +209,7 @@ void gfix_by_gmat(  double *iconf, const double *igmat
 //                           ( n[0]=x, n[1]=y, n[2]=z, n[3]=t )
 //===============================================================
       size_t tmp_site = site_loop;
-      for (int xyzt=0; xyzt<4; xyzt++)
-      {
+      for (int xyzt=0; xyzt<4; xyzt++) {
          n[xyzt]  =  tmp_site          % size[xyzt];
          tmp_site = (tmp_site-n[xyzt]) / size[xyzt];
       }

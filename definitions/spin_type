@@ -1,0 +1,21 @@
+
+ ////////////////////////////////////////////////
+ ///                                          ///
+            Definition of spin type
+
+             Author : Takaya Miyamoto
+ ///                                          ///
+ ////////////////////////////////////////////////
+
+
+ 計算するハドロンの全スピン、スピンの z 成分を指定するには、
+ 次のような定義で各実行ファイルの arguments file
+ もしくはオプションに入力してください。
+
+ また、各 output file 名も下の定義で出力されます。
+
+ * S0_Sz0	= Total spin 0, z-component 0
+ * S1_Sz+1	= Total spin 1, z-component +1
+ * S1_Sz0	= Total spin 1, z-component 0
+ * S1_Sz-1	= Total spin 1, z-component -1
+ * S1_SzAve	= Average data of total spin 1

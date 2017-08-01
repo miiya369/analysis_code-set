@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Setting path of the gauge confs.
  * @author  Takaya Miyamoto
- * @since   Wed Jun  8 17:05:20 JST 2016
+ * @since   Wed Sep 14 17:34:31 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -12,22 +12,21 @@
 
 bool analysis::use_doi_san_path = false;
 
-string analysis::set_path( int num_conf ) {
-   
+string analysis::set_path(int num_conf)
+{
    char file_name[1024];
-   char dir_name[30];
-   char header[60];
-   char footer[30] = "\0";
+   char dir_name[1024];
+   char header[1024];
+   char footer[1024] = "\0";
    
-   if(strcmp(data_list[N_TIME],"-1")==0){
+   if(strcmp(data_list[N_TIME], "-1") == 0) {
       snprintf(  dir_name, sizeof(dir_name), "correlator.%s.dir"
                , data_list[CORR_DIRECTORY] );
       snprintf(  header,   sizeof(header),   "%s_correlator."
                , data_list[HADRON_NAME]    );
    }
    else{
-      snprintf(  dir_name, sizeof(dir_name), "%s.S%s"
-               , data_list[NBS_DIRECTORY], data_list[N_CHANNEL]   );
+      snprintf(  dir_name, sizeof(dir_name), "%s", data_list[NBS_DIRECTORY]);
       snprintf(  header,   sizeof(header),   "NBSwave.+%s", data_list[N_TIME] );
       snprintf(  footer,   sizeof(footer),   ".%s_%s.%s_%s"
                , data_list[OPER_TYPE], data_list[SNK_RELA]
@@ -49,6 +48,6 @@ string analysis::set_path( int num_conf ) {
                , header, data_list[N_T_SHIFT]
                , data_list[num_conf+MAX_PATH_ARG], footer );
    
-   string FILE_NAME( file_name );
+   string FILE_NAME(file_name);
    return FILE_NAME;
 }

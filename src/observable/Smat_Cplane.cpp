@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------
+ //--------------------------------------------------------------------------
 /**
  * @file
  * @ingroup observable
@@ -14,10 +14,7 @@
 cdouble observable::Smat_Cplane(  double Re_k, double Im_k, double *aa, double mu
                                 , int Nparam, int func_type
                                 , double lat_space, double del, double r_max ) {
-   
-   string class_name = "________________________________";
-   string func_name  = "calc_Smat_Cplane______";
-   analysis::route(class_name, func_name, 1);
+   DEBUG_LOG
    
    double hc_api = hbar_c / lat_space;
    
@@ -46,6 +43,5 @@ cdouble observable::Smat_Cplane(  double Re_k, double Im_k, double *aa, double m
 //   printf("%lf %lf\n", Coe.real(), Coe.imag());   // For Debug
 //   printf("%lf %lf\n", XY.real(),  XY.imag());    // For Debug
    
-   analysis::route(class_name, func_name, 0);
    return XY/Coe;
 }

@@ -73,7 +73,7 @@
 	* Major upgrade ! 
 		- Rewrite the code using namespace
 		- Improve independency of class
-		- Simplify the input arguments setting for main()
+		- Simplify the input arguments setting for main()
 		- Standardize the form of code
 		   -> Indent = 3
 		   -> put space on if () { , and for () {
@@ -197,4 +197,49 @@
 	* Add the input part for Meson-Meson NBSwave funcs.
 
 	* Change the order of the version numbers.
+
+
+ @ version 5.1 : 2016/07/16 non-Completion
+
+	* Major upgrade !
+
+	* Modified the main part of potential so that it can be output ALL (each conf.) data
+	   as (Miyamoto-format) binary.
+
+	* Add some scripts and single (independent) programs for convenience.
+
+	* Add the main part for 2x2 coupled channel phase shift.
+
+	* Add the main part for 2x2 coupled channel tensor potential.
+
+	* Delete the main file
+	   - wave_average_compress.cpp
+	   - average_compress.cpp
+	   
+	   Note: WaveAve_compress.cpp in main/indep_code can be substitute for above programs.
+
+	   - make_JK_samples.cpp
+
+           Note: CorrJKbin.cpp and WaveJKbin_compress.cpp in main/indep_code can be substitute for above programs.
+	   
+	   - difference_chack.cpp
+	   - difference_wave.cpp
+
+	   Note: diff_hal.py in scripts/for_other-code/hf-code can be substitute for above programs.
+
+	* Add Meson-Meson & Dec-Dec & Oct-Dec for NBS wave function (Channel-type).
+	
+	* Delete few arguments for potential.
+
+	* Change the way of output the message of debug and of error, so that using function -> preprocessor.
+
+	* Add the copy constructor for the correlator, the NBSwave, the R-correlator and the potential classes.
+
+	* Add the new class and main-part for the single-folding potentials.
+	   Also add the nucleus-density class.
+
+	* Change the way of calculation for the phase shift, 
+	   so that pre-calculate S-(T-)matrix instead of direct-calculation of phase shift.
+
+	* Change the unit for the output of mas and potential: Lattice Unit -> Physical Unit [MeV, fm]
 
