@@ -1,29 +1,27 @@
 
 ### For Potential ###
 
-POT_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2
-POT_Path_to_input_dir	= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src
-POT_Path_to_output_dir	= ./results
+POT_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens3.gfix_bin045
 POT_Size_of_time	= 64
 POT_Size_of_space	= 32
-POT_T_shift		= A64
+
+POT_Path_to_input_dir	= /Users/miiya/Dropbox/programs/data/OmgOmg_PACS-CS/c_quark/ens3/results.bin045
+POT_T_shift		= A32
 POT_X_shift		= 000
 POT_Y_shift		= 000
 POT_Z_shift		= 000
-POT_Snk_relativistic	= CG05
-POT_Src_relativistic	= CG05
-POT_Min_time_slice	= 6
-POT_Max_time_slice	= 10
-POT_Had1_mass		= 0.641060
-POT_Had2_mass		= 0.686503
-POT_Channel_name	= Pro-Lam_Pro-Lam
+POT_Snk_relativistic	= NR
+POT_Src_relativistic	= NR
+POT_Channel_name	= Proj.DDwave.dir.S6.00/spin0z+0.0z+0
+
+POT_Path_to_output_dir	= /Users/miiya/Dropbox/programs/data/OmgOmg_PACS-CS/c_quark/ens3/results.bin045/Analysis/pot
+POT_Min_time_slice	= 7
+POT_Max_time_slice	= 17
+
+POT_Had1_mass		= 2.211455
+POT_Had2_mass		= 2.211455
+
 POT_Spin_projection	= S0_Sz0
-
-POT_Endian_convert	= yes
-POT_read_compress_NBS	= yes
-POT_Rcorr_NBS/corr	= yes
-
-POT_Use_spin_proj_data	= no
 
 POT_Use_jack_knife_data	= yes
 POT_Take_jack_knife	= no
@@ -33,6 +31,5 @@ POT_Out_laplacian	= no
 POT_Out_1st_t_diff	= no
 POT_Out_2nd_t_diff	= no
 
-POT_Out_fit_data	= no
-
+POT_Out_fit_data	= yes
 POT_Out_all_datas	= yes

@@ -1,3 +1,6 @@
+#ifndef EXT_NR__FITMRQ_H
+#define EXT_NR__FITMRQ_H
+
 struct Fitmrq {
 	static const Int NDONE=4, ITMAX=1000;
 	Int ndat, ma, mfit;
@@ -113,3 +116,5 @@ struct Fitmrq {
 	}
 
 };
+
+#endif

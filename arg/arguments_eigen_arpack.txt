@@ -1,0 +1,30 @@
+
+### For Eigen energy ###
+
+ARP_Gauge_confs_list		= ./arg/conf_list/conf_list.pacs-cs_ens1.gfix_bin057
+ARP_Size_of_time		= 64
+ARP_Size_of_space_for_pot	= 32
+ARP_Lattice_spacing		= 0.0907
+
+ARP_Path_to_input_dir		= /Users/miiya/data/OmgOmg_PACS-CS/s_quark/ens1/results.bin057
+ARP_T_shift			= A32
+ARP_X_shift			= 000
+ARP_Y_shift			= 000
+ARP_Z_shift			= 000
+ARP_Snk_relativistic		= NR
+ARP_Src_relativistic		= NR
+ARP_Channel_name		= OmgM-OmgM_OmgM-OmgM
+
+ARP_Path_to_output_dir		= ./results
+ARP_calc_time_slice		= 15
+ARP_Size_of_space_for_sch	= 32
+
+ARP_Had1_mass			= 0.909819
+ARP_Had2_mass			= 0.909819
+
+ARP_Spin_projection		= S0_Sz0
+
+ARP_Number_of_eigen_energy	= 9
+
+ARP_Use_jack_knife_data		= yes
+ARP_Take_jack_knife		= no

@@ -11,8 +11,7 @@
 #include <common/analysis.h>
 
 void analysis::make_mean_err(  const double *data, double &mean, double &err
-                             , const int Ndata, const bool is_jack_knife_data )
-{
+                             , const int Ndata, const bool is_jack_knife_data ) {
    double factor;
    
    if (is_jack_knife_data) factor = double(Ndata-1);
@@ -32,8 +31,7 @@ void analysis::make_mean_err(  const double *data, double &mean, double &err
 }
 
 void analysis::make_mean_err(  const cdouble *data, cdouble &mean, cdouble &err
-                             , const int Ndata, const bool is_jack_knife_data )
-{
+                             , const int Ndata, const bool is_jack_knife_data ) {
    double factor;
    
    if (is_jack_knife_data) factor = double(Ndata-1);

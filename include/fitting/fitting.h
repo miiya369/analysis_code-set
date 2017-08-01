@@ -12,7 +12,7 @@
 #define FITTING_H
 
 #include <common/analysis.h>
-#include <fitting/function_type_const.h>
+#include <fitting/function_type.h>
 
 //--------------------------------------------------------------------------
 /**
@@ -21,8 +21,8 @@
 //--------------------------------------------------------------------------
 namespace fitting
 {
-   void input_data_binary( const char*, int&, int& );   // for header
-   void input_data_binary( const char*, double*, double*, double* );
+   int input_data_binary( const char*, int&, int& );   // for header
+   int input_data_binary( const char*, double*, double*, double* );
 }
 
 //--------------------------------------------------------------------------
@@ -33,8 +33,6 @@ namespace fitting
 class FIT
 {
 private:
-   string class_name, func_name;
-   
    double       *param;
    FIT_FUNCTION  func_type;
    
@@ -44,97 +42,41 @@ public:
 //============================ For inner index ===========================//
    
 //============================== For writing =============================//
-   double& operator()(size_t index)
-   {
+   double& operator()(int index) {
       return param[index];
    }
 //============================== For reading =============================//
-   const double& operator()(size_t index) const
-   {
+   const double& operator()(int index) const {
       return param[index];
    }
 //======================== Constructor & Destructor ======================//
-   FIT()
-   {
-      class_name = "FITTING_________________________";
-      func_name = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      param = NULL;
-   }
-   FIT(const char* FUNC_NAME, const double *PARAM)
-   {
-      class_name = "FITTING_________________________";
-      func_name = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      param = NULL;
-      set_func(FUNC_NAME, PARAM);
-   }
-   FIT(const int FUNC_NUMBER, const double *PARAM)
-   {
-      class_name = "FITTING_________________________";
-      func_name = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      param = NULL;
-      set_func(FUNC_NUMBER, PARAM);
-   }
-   ~FIT()
-   {
-      if (param != NULL) delete [] param;
-      
-      func_name = "______________________";
-      analysis::route(class_name, func_name, 0);
-   }
+   FIT();
+   FIT(const FIT&);
+   FIT(const char*, const double*);
+   FIT(const int,   const double*);
+   ~FIT();
 //============================= For initialize ===========================//
-   void set_func(const char* FUNC_NAME, const double *PARAM)
-   {
-      func_name = "set_func______________";
-      analysis::route(class_name, func_name, 1);
-      
-      func_type.set(FUNC_NAME);
-      
-      if (param != NULL) delete [] param;
-      param = new double[func_type.Nparam];
-      
-//      printf(" @ fit function = %s\n", func_type.name.c_str());
-      
-      for (int loop=0; loop<func_type.Nparam; loop++)
-         param[loop] = PARAM[loop];
-      
-      analysis::route(class_name, func_name, 0);
-   }
-   void set_func(const int FUNC_NUMBER, const double *PARAM)
-   {
-      char FUNC_NAME[16];
-      snprintf(FUNC_NAME, sizeof(FUNC_NAME), "%d", FUNC_NUMBER);
-      set_func(FUNC_NAME, PARAM);
-   }
-   void mem_del()
-   {
-      func_name = "mem_delete_FIT________";
-      analysis::route(class_name, func_name, 1);
-      
-      if (param != NULL)
-      {
-         delete [] param;   param = NULL;
-      }
-      analysis::route( class_name, func_name, 0 );
-   }
+   void set_func(const char*, const double*);
+   void set_func(const int  , const double*);
+   void mem_del();
 //============================ Operator define ===========================//
    
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
-   int          info_class()     { return CLASS_FITTING; }
-   int          info_func_num()  { return func_type.number; }
-   size_t       data_size()      { return func_type.Nparam; }
+   int info_class()    { return CLASS_FITTING; }
+   int info_func_num() { return func_type.number; }
+   int data_size()     { return func_type.Nparam; }
+   const int info_class()    const { return CLASS_FITTING; }
+   const int info_func_num() const { return func_type.number; }
+   const int data_size()     const { return func_type.Nparam; }
    
    void   print_func_gnu ();
    void   print_param    ();
    double fit_data_NR    (  const double*, const double*, const double*
-                          , const int, const int, const double );
+                          , const int, const int, const int, const double );
+   double fit_data_NR    (  const double*, const double*, const double*
+                          , const int, const double, const double, const double );
    double fit_data_NR    (  const double*, const double*, const double*
                           , const int, const double );
 };

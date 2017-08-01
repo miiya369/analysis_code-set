@@ -9,7 +9,7 @@
 //--------------------------------------------------------------------------
 
 #include <observable/observable_base.h>
-#include <fitting/function_type_const.h>
+#include <fitting/function_type.h>
 
 //--------------------------------------------------------------------------
 /**
@@ -17,14 +17,11 @@
  */
 //--------------------------------------------------------------------------
 void observable::input_param(  const char *infile_name
-                             , int &n_conf, int &n_param, int &n_func )
-{
-   string class_name = "________________________________";
-   string func_name = "input_param_header____";
-   analysis::route(class_name, func_name, 1);
+                             , int &n_conf, int &n_param, int &n_func ) {
+   DEBUG_LOG
    
    ifstream ifs(infile_name, ios::in | ios::binary);
-   if(!ifs) analysis::error(2, infile_name);
+   if(!ifs) ERROR_FOPEN(infile_name);
    
    int          tmp_Nconf;
    int          func_type_number;
@@ -40,21 +37,16 @@ void observable::input_param(  const char *infile_name
    }
    func_type.set(func_type_number);
    
-//   printf(" @ #.confs       = %d\n", tmp_Nconf);
-//   printf(" @ function type = %s\n", func_type.name.c_str());
+   printf("# @ #.confs       = %d\n", tmp_Nconf);
+   printf("# @ function type = %s\n", func_type.name.c_str());
    ifs.close();
    if (strcmp(func_type.name.c_str(), "UNKNOWN") == 0)
-   {
-      printf("WARNIG: Function type = UNKNOWN\n");
-      printf("WARNIG: May be this is not correct "
-             "(Miyamoto-format) fit-parameter file.\n\n");
-      exit(1);
-   }
+      ERROR_COMMENTS("Function type = UNKNOWN\n"
+                     "May be this is not correct "
+                     "(Miyamoto-format) fit-parameter file.\n");
    n_conf  = tmp_Nconf;
    n_param = func_type.Nparam;
    n_func  = func_type_number;
-   
-   analysis::route(class_name, func_name, 0);
 }
 
 //--------------------------------------------------------------------------
@@ -62,14 +54,11 @@ void observable::input_param(  const char *infile_name
  * @brief The function for input binary-parameter data (for body)
  */
 //--------------------------------------------------------------------------
-void observable::input_param( const char *infile_name, double *param )
-{
-   string class_name = "________________________________";
-   string func_name = "input_param_body______";
-   analysis::route(class_name, func_name, 1);
+void observable::input_param(const char *infile_name, double *param) {
+   DEBUG_LOG
    
    ifstream ifs(infile_name, ios::in | ios::binary);
-   if(!ifs) analysis::error(2, infile_name);
+   if(!ifs) ERROR_FOPEN(infile_name);
    
    int          tmp_Nconf;
    int          func_type_number;
@@ -93,6 +82,4 @@ void observable::input_param( const char *infile_name, double *param )
       analysis::endian_convert(param, tmp_Nconf * func_type.Nparam);
    
    ifs.close();
-   
-   analysis::route(class_name, func_name, 0);
 }

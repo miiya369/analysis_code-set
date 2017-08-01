@@ -1,0 +1,46 @@
+
+### For 3x3 Coupled channel potential ###
+
+CCP3_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2_bin020
+CCP3_Size_of_time	= 64
+CCP3_Size_of_space	= 32
+
+CCP3_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_64src_bin020
+CCP3_T_shift		= A64
+CCP3_X_shift		= 000
+CCP3_Y_shift		= 000
+CCP3_Z_shift		= 000
+CCP3_Snk_relativistic	= CG05
+CCP3_Src_relativistic	= CG05
+
+CCP3_channel_00		= BBwave.iso.S2.00
+CCP3_channel_01		= BBwave.iso.S2.01
+CCP3_channel_02		= BBwave.iso.S2.02
+CCP3_channel_10		= BBwave.iso.S2.03
+CCP3_channel_11		= BBwave.iso.S2.04
+CCP3_channel_12		= BBwave.iso.S2.05
+CCP3_channel_20		= BBwave.iso.S2.06
+CCP3_channel_21		= BBwave.iso.S2.07
+CCP3_channel_22		= BBwave.iso.S2.08
+
+CCP3_Path_to_output_dir	= ./results
+CCP3_calc_time_slice	= 9
+
+CCP3_mass_ch0-0		= 0.1
+CCP3_mass_ch0-1		= 0.12
+CCP3_mass_ch1-0		= 0.1
+CCP3_mass_ch1-1		= 0.14
+CCP3_mass_ch2-0		= 0.1
+CCP3_mass_ch2-1		= 0.18
+
+CCP3_Z_factor_01	= 1.0
+CCP3_Z_factor_02	= 1.0
+CCP3_Z_factor_12	= 1.0
+
+CCP3_Spin_projection	= S0_Sz0
+
+CCP3_Use_jack_knife_data = yes
+CCP3_Take_jack_knife	= no
+
+CCP3_Out_fit_data	= yes
+CCP3_Out_all_data	= no

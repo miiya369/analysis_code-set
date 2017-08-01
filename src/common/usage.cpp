@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Function for usage
  * @author  Takaya Miyamoto
- * @since   Sun Jul 17 04:08:32 JST 2016
+ * @since   Mon Jan 30 08:58:23 JST 2017
  */
 //--------------------------------------------------------------------------
 
@@ -23,13 +23,15 @@ void analysis::usage(int usage_type)
       printf("   -take_JK     Take Jack-Knife average after input the data\n");
       printf("   -calc_R      Calculate R-correlator effective mass\n");
       printf("   -fit         Do fitting effective mass\n");
+      printf("   -in_fit      Input correlator-fit data\n");
       printf("   -t_min     [ Minimum range of fitting [t] ] : For effective mass fitting\n");
       printf("   -t_max     [ Maximum range of fitting [t] ] : For effective mass fitting\n");
-      printf("   -hadron    [ hadron  name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
-      printf("   -channel   [ channel name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
+      printf("   -hadron    [ Hadron  name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
+      printf("   -channel   [ Channel name ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
       printf("   -mom       [ Momentum of (Hadron) correlator ]\n");
       printf("   -spin      [ Spin type of (NBS) correlator ]\n");
-      printf("   -src_t     [ time slice of src point ]\n");
+      printf("   -src_t     [ Time slice of src point ]\n");
+      printf("   -dir_type  [ Directory type (PS or SS) to read ]\n");
       printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == CALC_WAVE_FUNCTION)
@@ -43,7 +45,6 @@ void analysis::usage(int usage_type)
       printf("   -channel   [ Channel name to calculate ]\n");
       printf("   -spin      [ Spin type to calculate ]\n");
       printf("   -take_JK     Take Jack-Knife average after input the data\n");
-      printf("   -comp        Read compress NBS wave\n");
       printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == CALC_POTENTIAL)
@@ -61,8 +62,9 @@ void analysis::usage(int usage_type)
       printf("   -mass_had1 [ Mass of hadron 1 ]\n");
       printf("   -mass_had2 [ Mass of hadron 2 ]\n");
       printf("   -src_t     [ time slice of src point ]\n");
+      printf("   -src_rela  [ Relativistic of src ]\n");
+      printf("   -snk_rela  [ Relativistic of snk ]\n");
       printf("   -take_JK     Take Jack-Knife average after input the data\n");
-      printf("   -comp        Read compress NBS wave\n");
       printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == CALC_TENSOR_FORCE)
@@ -79,7 +81,6 @@ void analysis::usage(int usage_type)
       printf("   -mass_had2 [ Mass of hadron 2 ]\n");
       printf("   -src_t     [ time slice of src point ]\n");
       printf("   -take_JK     Take Jack-Knife average after input the data\n");
-      printf("   -comp        Read compress NBS wave\n");
       printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == CALC_TENSOR_FORCE_2x2)
@@ -92,7 +93,6 @@ void analysis::usage(int usage_type)
       printf("   -odir      [ Path of the output directory ]\n");
       printf("   -time      [ The value of time slice ]\n");
       printf("   -src_t     [ time slice of src point ]\n");
-      printf("   -comp        Read compress NBS wave\n");
       printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == FITTING_DATA)
@@ -102,8 +102,8 @@ void analysis::usage(int usage_type)
       printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
       printf("   -ifile     [ Path of the input fit data file ]\n");
       printf("   -ofile     [ Path of the output parameter data file ]\n");
-      printf("   -t_min     [ Minimum range of fitting [t] ] : For correlator\n");
-      printf("   -t_max     [ Maximum range of fitting [t] ] : For correlator\n");
+      printf("   -r_min     [ Minimum range of fitting ]\n");
+      printf("   -r_max     [ Maximum range of fitting ]\n");
       printf("   -fit_func  [ Fit function type ]\n");
       printf("   -param     [ Parameter ] [ ] [ ] ... [ ] @ <- Need \"@\" at the end\n");
       printf("   -check       Check the arguments\n\n");
@@ -124,9 +124,9 @@ void analysis::usage(int usage_type)
       printf("   -r0        [ Range  of Square wall potential ( For test ) ]\n");
       printf("   -check       Check the arguments\n\n");
    }
-   else if (usage_type == CALC_PHASE_SHIFT_2x2)
+   else if (usage_type == CALC_T_MATRIX_2x2)
    {
-      printf("\n ======   2x2 coupled channel phase shift calculation usage   ======\n");
+      printf("\n ======   2x2 coupled channel T matrix calculation usage   ======\n");
       printf("\n");
       printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
       printf("   -E_min     [ Minimum Enargy (MeV) for output ]\n");
@@ -137,6 +137,20 @@ void analysis::usage(int usage_type)
    else if (usage_type == EIGEN_ENERGY)
    {
       printf("\n ====== Calculation eigen energy for finite box usage ======\n");
+      printf("\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -idir      [ Path of the input directory ]\n");
+      printf("   -conf_list [ Gauge configuration list ]\n");
+      printf("   -time      [ Value of time slice for calculate ]\n");
+      printf("   -spin      [ Spin type to calculate ]\n");
+      printf("   -mass_had1 [ Mass of hadron 1 ]\n");
+      printf("   -mass_had2 [ Mass of hadron 2 ]\n");
+      printf("   -take_JK     Take Jack-Knife average after input the data\n");
+      printf("   -check       Check the arguments\n\n");
+   }
+   else if (usage_type == EIGEN_ARPACK)
+   {
+      printf("\n ====== Calculation eigenenergy & eigenvector for finite box by using ARPACK ======\n");
       printf("\n");
       printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
       printf("   -idir      [ Path of the input directory ]\n");
@@ -163,80 +177,72 @@ void analysis::usage(int usage_type)
       printf("   -src_t     [ time slice of src point ]\n");
       printf("   -check       Check the arguments\n\n");
    }
-   if (usage_type == ANALYSIS_FIT_PARAM)
-   {
-      printf("\n ====== Calculation & Output analysis of fit parameter usage   ======\n");
-      printf("\n");
-      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
-      printf("   -ifile     [ Path of the input file ]\n");
-      printf("   -ofile     [ Path of the output file ]\n");
-      printf("   -max_r     [ The value of max r for calculate ]\n");
-      printf("   -div_r     [ The value of step size of r ]\n");
-      printf("   -phys        Output physical unit function\n");
-      printf("   -check       Check the arguments\n\n");
-   }
    else if (usage_type == COUPLED_CHANNEL_POT_2x2)
    {
       printf("\n ====== Calculation & Output 2x2 coupled channel potential usage ======\n");
-      printf("\n");
-      printf("   -f    [ Path of the input arguments file ] <- Must be required !\n");
-      printf("   -time [ Value of time slice for calculate ]\n");
-      printf("   -check  Check the arguments\n\n");
-   }
-   else if (usage_type == AVERAGE_COMPRESS)
-   {
-      printf("\n ====== Calculation of average (Compressed) NBS wave function usage ======\n");
-      printf("\n");
-      printf("   -f       [ Path of the input arguments file ] <- Must be required !\n");
-      printf("   -wdir    [ Path of the working directory ]\n");
-      printf("   -t_shift [ time shift 1   ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
-      printf("   -hadron  [ hadron name 1  ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
-      printf("   -channel [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
-      printf("   -check     Check the arguments\n\n");
-   }
-   else if (usage_type == JACK_KNIFE_BIN_CHECK)
-   {
-      printf("\n ====== Check the bin-size dependence of Jack Knife samples usage ======\n");
-      printf("\n");
-      printf("   -f       [ Path of the input arguments file ] <- Must be required !\n");
-      printf("   -idir    [ Path of the input directory ]\n");
-      printf("   -ofile   [ Path of the output file ]\n");
-      printf("   -hadron  [ hadron name ]\n");
-      printf("   -t_min   [ Minimum value of time slice ]\n");
-      printf("   -t_max   [ Maximum value of time slice ]\n");
-      printf("   -src_t   [ time slice of src point ]\n");
-      printf("   -check     Check the arguments\n\n");
-   }
-   else if (usage_type == MAKE_JACK_KNIFE_SAMPLES)
-   {
-      printf("\n ====== Make Jack-Knife samples usage ======\n");
       printf("\n");
       printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
       printf("   -conf_list [ Gauge configuration list ]\n");
       printf("   -idir      [ Path of the input directory ]\n");
       printf("   -odir      [ Path of the output directory ]\n");
-      printf("   -obase     [ The base name of output configurations ]\n");
+      printf("   -time      [ Value of time slice for calculate ]\n");
+      printf("   -spin      [ Spin type to calculate ]\n");
+      printf("   -channel00 [ Channel name of (0, 0) component ]\n");
+      printf("   -channel01 [ Channel name of (0, 1) component ]\n");
+      printf("   -channel10 [ Channel name of (1, 0) component ]\n");
+      printf("   -channel11 [ Channel name of (1, 1) component ]\n");
+      printf("   -mass0_0   [ 1st-hadron mass of 1st-channel (Lattice Unit) ]\n");
+      printf("   -mass0_1   [ 2nd-hadron mass of 1st-channel (Lattice Unit) ]\n");
+      printf("   -mass1_0   [ 1st-hadron mass of 2nd-channel (Lattice Unit) ]\n");
+      printf("   -mass1_1   [ 2nd-hadron mass of 2nd-channel (Lattice Unit) ]\n");
+      printf("   -Zfactor01 [ Sqrt ratio of point Z-factor (=sqrt[Z_1/Z_2]) of (0, 1) component ]\n");
       printf("   -src_t     [ time slice of src point ]\n");
-      printf("   -bin_size  [ Bin size ]\n");
-      printf("   -hadron    [ hadron name 1  ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
-      printf("   -channel   [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
       printf("   -check       Check the arguments\n\n");
    }
-   else if (usage_type == DIFFERENCE_CHACK)
+   else if (usage_type == COUPLED_CHANNEL_POT_3x3)
    {
-      printf("\n ====== Chack the difference of results of hf-code usage ======\n");
+      printf("\n ====== Calculation & Output 3x3 coupled channel potential usage ======\n");
       printf("\n");
-      printf("   -f          [ Path of the input arguments file ] <- Must be required !\n");
-      printf("   -conf_list1 [ Gauge configuration list 1 ]\n");
-      printf("   -conf_list2 [ Gauge configuration list 2 ]\n");
-      printf("   -idir1      [ Path of the input directory 1 ]\n");
-      printf("   -idir2      [ Path of the input directory 2 ]\n");
-      printf("   -t_min      [ Minimum value of time slice ]\n");
-      printf("   -t_max      [ Maximum value of time slice ]\n");
-      printf("   -hadron     [ hadron name 1  ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
-      printf("   -channel    [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
-      printf("   -comp         Read compress NBS wave\n");
-      printf("   -check        Check the arguments\n\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -conf_list [ Gauge configuration list ]\n");
+      printf("   -idir      [ Path of the input directory ]\n");
+      printf("   -odir      [ Path of the output directory ]\n");
+      printf("   -time      [ Value of time slice for calculate ]\n");
+      printf("   -spin      [ Spin type to calculate ]\n");
+      printf("   -channel00 [ Channel name of (0, 0) component ]\n");
+      printf("   -channel01 [ Channel name of (0, 1) component ]\n");
+      printf("   -channel02 [ Channel name of (0, 2) component ]\n");
+      printf("   -channel10 [ Channel name of (1, 0) component ]\n");
+      printf("   -channel11 [ Channel name of (1, 1) component ]\n");
+      printf("   -channel12 [ Channel name of (1, 2) component ]\n");
+      printf("   -channel20 [ Channel name of (2, 0) component ]\n");
+      printf("   -channel21 [ Channel name of (2, 1) component ]\n");
+      printf("   -channel22 [ Channel name of (2, 2) component ]\n");
+      printf("   -mass0_0   [ 1st-hadron mass of 1st-channel (Lattice Unit) ]\n");
+      printf("   -mass0_1   [ 2nd-hadron mass of 1st-channel (Lattice Unit) ]\n");
+      printf("   -mass1_0   [ 1st-hadron mass of 2nd-channel (Lattice Unit) ]\n");
+      printf("   -mass1_1   [ 2nd-hadron mass of 2nd-channel (Lattice Unit) ]\n");
+      printf("   -mass2_0   [ 1st-hadron mass of 3rd-channel (Lattice Unit) ]\n");
+      printf("   -mass2_1   [ 2nd-hadron mass of 3rd-channel (Lattice Unit) ]\n");
+      printf("   -Zfactor01 [ Sqrt ratio of point Z-factor (=sqrt[Z_1/Z_2]) of (0, 1) component ]\n");
+      printf("   -Zfactor02 [ Sqrt ratio of point Z-factor (=sqrt[Z_1/Z_2]) of (0, 2) component ]\n");
+      printf("   -Zfactor12 [ Sqrt ratio of point Z-factor (=sqrt[Z_1/Z_2]) of (1, 2) component ]\n");
+      printf("   -src_t     [ time slice of src point ]\n");
+      printf("   -check       Check the arguments\n\n");
+   }
+   else if (usage_type == JACK_KNIFE_BIN_CHECK)
+   {
+      printf("\n ====== Check the bin-size dependence of Jack Knife samples usage ======\n");
+      printf("\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -conf_list [ Gauge configuration list ]\n");
+      printf("   -idir      [ Path of the input directory ]\n");
+      printf("   -ofile     [ Path of the output file ]\n");
+      printf("   -hadron    [ hadron name ]\n");
+      printf("   -t_min     [ Minimum value of time slice ]\n");
+      printf("   -t_max     [ Maximum value of time slice ]\n");
+      printf("   -src_t     [ time slice of src point ]\n");
+      printf("   -check       Check the arguments\n\n");
    }
    else if (usage_type == WAVE_DECOMPRESSION)
    {
@@ -247,5 +253,23 @@ void analysis::usage(int usage_type)
       printf("   -opath   [ Path of the output directory ]\n");
       printf("   -channel [ channel name 1 ] [2] [3] ... [n] @ <- Need \"@\" at the end\n");
       printf("   -check     Check the arguments\n\n");
+   }
+   else if (usage_type == FOLDING_POTENTIAL_GAUSS)
+   {
+      printf("\n ======   Calculation of the folding potential (Gaussian-type) usage   ======\n");
+      printf("\n");
+      printf("   -f         [ Path of the input arguments file ] <- Must be required !\n");
+      printf("   -ifile     [ Path of the input fit data file ]\n");
+      printf("   -ofile     [ Path of the output data file ]\n");
+      printf("   -A         [ #.nucleus ]\n");
+      printf("   -DensName  [ The name of density-type ]\n");
+      printf("   -Nplot     [ #.plot for output potential ]\n");
+      printf("   -max_r     [ Max range for output potential ]\n\n");
+      printf("   -phase       Calculate the phase shift\n");
+      printf("   -E_min     [ Minimum Enargy (MeV) for output ]  <- For phase shift\n");
+      printf("   -E_max     [ Maximum Enargy (MeV) for output ]  <- For phase shift\n");
+      printf("   -E_div     [ Enargy devision (MeV) for output ] <- For phase shift\n");
+      printf("   -mass      [ Reduced mass [Mev/c2] ]            <- For phase shift\n\n");
+      printf("   -check       Check the arguments\n\n");
    }
 }

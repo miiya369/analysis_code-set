@@ -1,0 +1,34 @@
+
+ ////////////////////////////////////////////////
+ ///                                          ///
+         Definition of fit function name
+
+             Author : Takaya Miyamoto
+ ///                                          ///
+ ////////////////////////////////////////////////
+
+
+ ./fit の arguments file の中の
+ 「FIT_Function_name」
+
+ もしくは ./fit へのオプション「-fit_func」
+
+ には、次のうちいずれかを指定してください。
+
+ * const : Constant fit
+
+ * 1EXP  : One exponential fit
+
+ * 1G	 : One Gaussian fit
+ * 2G	 : Two Gaussians fit
+ * 3G	 : Three Gaussians fit
+ * 4G	 : Four Gaussians fit
+
+ * 1G1Y	 : One Gaussian + one Yukawa fit
+
+ * 1SG	 : One x-shift Gaussian fit
+	-> Gaussian の中心をシフトする自由度を加えたもの
+ * 2SG	 : Two x-shift Gaussians fit
+
+ fit function の追加は容易にできます。ご連絡ください。
+

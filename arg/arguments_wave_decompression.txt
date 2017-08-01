@@ -2,18 +2,18 @@
 ### For Decompression of NBSwave ###
 
 DECO_Gauge_confs_list	= ./arg/conf_list/conf_list.pacs-cs_ens2
-DECO_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_comp
-DECO_Path_to_output_dir	= ./results
 DECO_Size_of_time	= 64
 DECO_Size_of_space	= 32
+
+DECO_Path_to_input_dir	= /Users/miiya/Desktop/work_kyoto/test_data/pacs-cs_ens2_comp
 DECO_T_shift		= 000
 DECO_X_shift		= 000
 DECO_Y_shift		= 000
 DECO_Z_shift		= 000
 DECO_Snk_relativistic	= CG05
 DECO_Src_relativistic	= CG05
-DECO_Min_time_slice	= 6
-DECO_Max_time_slice	= 8
 DECO_Calc_channel_name	= { Pro-Lam_Pro-Lam }
 
-DECO_Endian_convert	= yes
+DECO_Path_to_output_dir	= ./results
+DECO_Min_time_slice	= 6
+DECO_Max_time_slice	= 8

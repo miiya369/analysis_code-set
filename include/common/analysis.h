@@ -4,7 +4,7 @@
  * @ingroup All
  * @brief   Define the namespace for common variables & functions
  * @author  Takaya Miyamoto
- * @since   Wed Apr 27 01:19:22 JST 2016
+ * @since   Mon Nov  7 16:14:42 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -22,27 +22,21 @@ namespace analysis
    void usage(int);
    
    bool machine_is_little_endian();
-   void endian_convert(cdouble*, size_t);
-   void endian_convert( double*, size_t);
-   void endian_convert(    int*, size_t);
+   void endian_convert(cdouble*, int);
+   void endian_convert( double*, int);
+   void endian_convert(    int*, int);
    
    //! Convert the bool to string ( yes or no )
    string bool_to_str(bool);
    //! Convert the string ( yes or no ) to bool
    bool str_to_bool(string);
    //! Convert index xyz -> x,y,z
-   void convert_xyz (int *ix, int *iy, int *iz,            size_t xyz );
+   void convert_xyz (int*, int*, int*,       int);
    //! Convert index xyzn -> x,y,z,conf
-   void convert_xyzn(int *ix, int *iy, int *iz, int *conf, size_t xyzn);
+   void convert_xyzn(int*, int*, int*, int*, int);
    
    //! Convert index 0,1,...,L -> -L/2+1,...,L/2
-   void convert_origin(int ix, int iy, int iz, int *iX, int *iY, int *iZ);
-   
-   //! Print the current class & function name
-   void route(string, string, int);
-   extern bool do_debug;
-   //! Indicate some error, and kill the job
-   void error(int, const char*);
+   void convert_origin(int, int, int, int*, int*, int*);
 }
 
 namespace analysis
@@ -70,9 +64,9 @@ namespace analysis
 }
 
 #include <common/analysis_const.h>
-#include <common/spin_type_const.h>
-#include <common/hadron_type_const.h>
-#include <common/channel_type_const.h>
+#include <common/spin_type.h>
+#include <common/hadron_type.h>
+#include <common/channel_type.h>
 
 namespace analysis
 {

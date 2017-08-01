@@ -10,7 +10,7 @@ if __name__ == "__main__":
     argc = len(argv)
     
     if (argc != 2):
-        print "usage: %s [Data]" % argv[0]
+        print "usage: %s [Data_all]" % argv[0]
         quit()
     
     ifile = open(argv[1].strip(), 'rb')
@@ -22,8 +22,8 @@ if __name__ == "__main__":
     
     factor = Nconf - 1
     
-    print("# #.conf=%d" % Nconf)
-    print("# #.data=%d" % Ndata)
+    print("# N.conf=%d" % Nconf)
+    print("# N.data=%d" % Ndata)
     print("# coordinate | mean (real) | error (real) | mean (imag) | error (imag)")
     
     CheckFsize = 12 + Bytes*Ndata + 16*Nconf*Ndata

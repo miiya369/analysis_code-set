@@ -4,14 +4,14 @@
  * @ingroup observable
  * @brief   Definition for potentail using calculate schrodinger equation
  * @author  Takaya Miyamoto
- * @since   Thu Dec 10 21:19:51 JST 2015
+ * @since   Sat Nov 12 03:33:54 JST 2016
  */
 //--------------------------------------------------------------------------
 
 #include <observable/phase_shift.h>
 
-double observable::V( double x, double* param, int Nparam, int func_num ) {
-   
+double observable::V(  const double x, const double* param
+                     , const int Nparam, const int func_num ) {
    double v = 0.0;
    
         if ( func_num == 1 )   v = func_const (x, param, Nparam);
@@ -22,31 +22,32 @@ double observable::V( double x, double* param, int Nparam, int func_num ) {
              func_num == 8 )   v = func_gauss (x, param, Nparam);
    else if ( func_num == 6 ||
              func_num == 7 )   v = func_sgauss(x, param, Nparam);
+   else if ( func_num == 9 )   v = func_1g1y  (x, param, Nparam);
    else if ( func_num == 0 )   v = func_test  (x, param, Nparam);
    
    return v;
 }
 
-double observable::Vp(  double p1, double p2, double* param
-                      , int Nparam, int func_num ) {
-   
+double observable::Vp(  const double p1, const double p2, const double* param
+                      , const int Nparam, const int func_num ) {
    double v = 0.0;
    
    if( func_num == 3 ||
        func_num == 4 ||
-       func_num == 5 )   v = func_gauss_mom (p1, p2, param, Nparam);
-   else analysis::error(3, "invalid function type !");
+       func_num == 5 ||
+       func_num == 8 )   v = func_gauss_mom (p1, p2, param, Nparam);
+   else ERROR_COMMENTS("invalid function type !");
    
    return v;
 }
 
-double observable::func_const( double x, double* param, int Nparam ) {
-   
+double observable::func_const(  const double x, const double* param
+                              , const int Nparam ) {
    return param[0];
 }
 
-double observable::func_exp( double x, double* param, int Nparam ) {
-   
+double observable::func_exp(  const double x, const double* param
+                            , const int Nparam ) {
    double ex;
    double y=0.0;
    
@@ -57,8 +58,8 @@ double observable::func_exp( double x, double* param, int Nparam ) {
    return y;
 }
 
-double observable::func_gauss( double x, double* param, int Nparam ) {
-   
+double observable::func_gauss(  const double x, const double* param
+                              , const int Nparam ) {
    double ex,arg;
    double y=0.0;
    
@@ -70,8 +71,8 @@ double observable::func_gauss( double x, double* param, int Nparam ) {
    return y;
 }
 
-double observable::func_sgauss( double x, double* param, int Nparam ) {
-   
+double observable::func_sgauss(  const double x, const double* param
+                               , const int Nparam ) {
    double ex,arg;
    double y=0.0;
    
@@ -83,8 +84,28 @@ double observable::func_sgauss( double x, double* param, int Nparam ) {
    return y;
 }
 
-double observable::func_test( double x, double* param, int Nparam ) {
+double observable::func_1g1y(  const double x, const double* param
+                             , const int Nparam ) {
+   double ex, arg;
+   double y=0.0;
    
+   if (x == 0.0) return param[0];
+   
+   for (int i=0; i<2; i+=2) {
+      arg = x/param[i+1];
+      ex  = exp(-(arg*arg));
+      y  += param[i]*ex;
+   }
+   for (int i=2; i<5; i+=3) {
+      arg = x/param[i];
+      ex  = exp(-(arg*arg));
+      y  += (1.0-ex) * exp(-param[i+1]*x) / (param[i+2]*x);
+   }
+   return y;
+}
+
+double observable::func_test(  const double x, const double* param
+                             , const int Nparam ) {
    double y=0.0;
    
    if (x <= param[0]) y=-param[1] / hbar_c;
@@ -92,8 +113,8 @@ double observable::func_test( double x, double* param, int Nparam ) {
    return y;
 }
 
-double observable::func_gauss_mom(  double p1, double p2
-                                  , double* param, int Nparam ) {
+double observable::func_gauss_mom(  const double p1, const double p2
+                                  , const double* param, const int Nparam ) {
    double ex;
    double y=0.0;
    

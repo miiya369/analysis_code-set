@@ -1,0 +1,49 @@
+
+### For Data fitting ###
+
+# FPOT_Input_file_name	= /Users/miiya/Dropbox/programs/data/pacs-cs/results_kekb_pacs-cs_bridge_RHQ/Ens1_bin57/Analysis/fit/Pro-Lam_Pro-Lam_potential_S0_Sz0_fitparam_t013.bin
+FPOT_Input_file_name	= /Users/miiya/Dropbox/programs/data/pacs-cs/results_kekb_pacs-cs_bridge_RHQ/Ens2_bin40/Analysis/fit/Pro-Lam_Pro-Lam_potential_S0_Sz0_fitparam_t012.bin
+# FPOT_Input_file_name	= /Users/miiya/Dropbox/programs/data/pacs-cs/results_kekb_pacs-cs_bridge_RHQ/Ens3_bin45/Analysis/fit/Pro-Lam_Pro-Lam_potential_S0_Sz0_fitparam_t010.bin
+FPOT_Lattice_spacing	= 0.0907
+
+FPOT_Type_of_density	= Woods-Saxon
+# FPOT_Type_of_density	= Gaussian
+
+FPOT_Number_of_A	= 28
+
+# FPOT_Nucleus_radias_r0	= 0.941065
+FPOT_Nucleus_radias_r0	= 1.03735
+# FPOT_Nucleus_radias_r0	= 1.05265
+# FPOT_Nucleus_radias_r0	= 1.05764
+# FPOT_Nucleus_radias_r0	= 1.09341
+# FPOT_Nucleus_radias_r0	= 1.14768
+
+# FPOT_Diffuseness	= 0.425
+FPOT_Diffuseness	= 0.475
+# FPOT_Diffuseness	= 0.523
+# FPOT_Diffuseness	= 0.540
+# FPOT_Diffuseness	= 0.515
+# FPOT_Diffuseness	= 0.515
+
+FPOT_Output_file_name	= /dev/null
+FPOT_Number_of_plot	= 100
+FPOT_Max_range_for_fpot	= 150
+FPOT_Ndiv_for_Integral  = 1000
+
+FPOT_Use_jack_knife_data = yes
+
+FPOT_Out_phase_shift	= yes
+
+# FPOT_Reduced_mass	= 1900
+FPOT_Reduced_mass	= 2103
+# FPOT_Reduced_mass	= 2155
+# FPOT_Reduced_mass	= 2194
+# FPOT_Reduced_mass	= 2226
+# FPOT_Reduced_mass	= 2260
+
+FPOT_Calc_energy_min	= 0
+FPOT_Calc_energy_max	= 50
+FPOT_Calc_energy_div	= 1
+FPOT_Runge_kutta_delta	= 0.01
+FPOT_Runge_kutta_max_r	= 30
+FPOT_energy_scatt_len	= 0.000000001

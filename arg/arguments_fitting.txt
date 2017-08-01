@@ -1,11 +1,14 @@
 
 ### For Data fitting ###
 
-FIT_Fit_data_file_name	= /Users/miiya/test/Nuc-Sig12_Nuc-Sig12_potential_S0_Sz0_ccp_fit_t9
-FIT_Output_file_name	= ./results/fit_params4
-FIT_Stopping_condition	= 0.000001
-FIT_Function_name	= 3G
-FIT_Fit_range_min	= 6
-FIT_Fit_range_max	= 12
+FIT_Fit_data_file_name	= ./results/fpot.WS.A12.high.fit
+FIT_Output_file_name	= /dev/null
 
-FIT_Parameter		= { 2 3 4 6 1 2 }
+FIT_Function_name	= 4G
+
+FIT_Fit_range_min	= 0
+FIT_Fit_range_max	= 25
+
+FIT_Parameter		= { 0.050546 2.182393 -0.040402 0.934585 0.246700 0.934519 -0.004704 8.776825 }
+
+FIT_Stopping_condition	= 0.000001

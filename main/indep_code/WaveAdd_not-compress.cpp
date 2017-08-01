@@ -2,7 +2,7 @@
 /**
  * @file
  * @ingroup none
- * @brief   The code for averaging of 1/48 compressed NBSwave data
+ * @brief   The code for averaging of 1/48 Not-compressed NBSwave data
  * @author  Takaya Miyamoto
  * @since   Tue Jun 21 21:39:44 JST 2016
  */
@@ -22,10 +22,15 @@ static int     Nadd;
 static int WaveSize;
 static int tmp_WaveSize;
 
+static bool endian_flip;
+
 inline int set_args(int, char**);
 
 inline int input (double*, int);
-inline int output(const double*);
+inline int output(double*);
+
+inline bool machine_is_little_endian();
+inline void endian_convert(double*, size_t);
 
 //========================================================================//
 int main(int argc, char **argv)
@@ -84,6 +89,8 @@ inline int set_args(int argc, char** argv)
    }
    WaveSize /= 8;
    
+   endian_flip = machine_is_little_endian();
+   
 //   printf("Nave = %d\n", Naverage); // For Debug
 //   return 1;
    
@@ -109,6 +116,7 @@ inline int input(double* wave, int data_num)
    
    double *tmp_wave = new double[WaveSize];
    fread((void*)tmp_wave, sizeof(double), WaveSize, fp);
+   if (endian_flip) endian_convert(tmp_wave, WaveSize);
    
    fclose(fp);
    
@@ -119,7 +127,7 @@ inline int input(double* wave, int data_num)
    return 0;
 }
 
-inline int output(const double* wave)
+inline int output(double* wave)
 {
    FILE* fp;
    if ((fp = fopen(opath.c_str(), "wb")) == NULL) {
@@ -127,9 +135,28 @@ inline int output(const double* wave)
       return 1;
    }
    
+   if (endian_flip) endian_convert(wave, WaveSize);
+
    fwrite((void*)wave, sizeof(double), WaveSize, fp);
    
    fclose(fp);
    
    return 0;
+}
+
+bool machine_is_little_endian()
+{
+  int endianTEST = 1;
+  if (*(char*)&endianTEST) return true;
+  else                     return false;
+}
+
+void endian_convert(double *DATA, size_t DATA_size)
+{
+  char dummy[8];
+
+  for (size_t k=0; k<DATA_size; k++) {
+    for (int j=0; j<8; j++) dummy[j] = ((char*)&DATA[k])[j];
+    for (int j=0; j<8; j++) ((char*)&DATA[k])[j] = dummy[7-j];
+  }
 }

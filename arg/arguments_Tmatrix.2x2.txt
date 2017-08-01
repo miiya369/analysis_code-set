@@ -1,0 +1,48 @@
+
+### For observable calculation ###
+
+# TM2_Parameter_list00	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Lam12_Nuc-Lam12_potential_S1_Sz0_ccp_fitparam_t10.1conf
+# TM2_Parameter_list01	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Lam12_Nuc-Sig12_potential_S1_Sz0_ccp_fitparam_t10.1conf
+# TM2_Parameter_list01	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Sig12_Nuc-Lam12_potential_S1_Sz0_ccp_fitparam_t10.1conf
+# TM2_Parameter_list10	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Sig12_Nuc-Lam12_potential_S1_Sz0_ccp_fitparam_t10.1conf
+# TM2_Parameter_list10	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Lam12_Nuc-Sig12_potential_S1_Sz0_ccp_fitparam_t10.1conf
+# TM2_Parameter_list11	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Sig12_Nuc-Sig12_potential_S1_Sz0_ccp_fitparam_t10.1conf
+
+TM2_Parameter_list00	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Lam12_Nuc-Lam12_potential_S1_Sz0_ccp_fitparam_t10
+# TM2_Parameter_list01	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Lam12_Nuc-Sig12_potential_S1_Sz0_ccp_fitparam_t10
+# TM2_Parameter_list01	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Sig12_Nuc-Lam12_potential_S1_Sz0_ccp_fitparam_t10
+# TM2_Parameter_list10	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Sig12_Nuc-Lam12_potential_S1_Sz0_ccp_fitparam_t10
+# TM2_Parameter_list10	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Lam12_Nuc-Sig12_potential_S1_Sz0_ccp_fitparam_t10
+TM2_Parameter_list01	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Ave12_Nuc-Ave12_potential_S1_Sz0_ccp_fitparam_t10
+TM2_Parameter_list10	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Ave12_Nuc-Ave12_potential_S1_Sz0_ccp_fitparam_t10
+TM2_Parameter_list11	= /Users/miiya/Dropbox/programs/data/pacs-cs/c_quark/ens1/Nuc-Sig12_Nuc-Sig12_potential_S1_Sz0_ccp_fitparam_t10
+
+# TM2_Output_file_name	= ./results/ens1/LamN-SigN_Tmat.t10_sym.1conf_rev
+# TM2_Output_file_name	= ./results/ens1/SigN-LamN_Tmat.t10_sym.1conf_rev
+TM2_Output_file_name	= ./results/ens1/AveN-AveN_Tmat.t10
+
+TM2_Lattice_spacing	= 0.0907
+
+TM2_mass_ch1-1		= 1581.313447
+TM2_mass_ch1-2		= 2684.641486
+TM2_mass_ch2-1		= 1581.313447
+TM2_mass_ch2-2		= 2780.378849
+
+# TM2_mass_ch1-1		= 1398.530458
+# TM2_mass_ch1-2		= 2554.971427
+# TM2_mass_ch2-1		= 1398.530458
+# TM2_mass_ch2-2		= 2674.106587
+
+# TM2_mass_ch1-1		= 1215.106794
+# TM2_mass_ch1-2		= 2434.020876
+# TM2_mass_ch2-1		= 1215.106794
+# TM2_mass_ch2-2		= 2574.827330
+
+TM2_Angular_momentum	= 0
+
+TM2_Calc_energy_min	= 1
+TM2_Calc_energy_max	= 200
+TM2_Calc_energy_div	= 1
+
+TM2_Runge_kutta_delta	= 0.001
+TM2_Runge_kutta_max_r	= 10

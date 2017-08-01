@@ -4,7 +4,7 @@
  * @ingroup R-correlator
  * @brief   The function for projection of angular momentum
  * @author  Takaya Miyamoto
- * @since   Wed Feb  3 00:22:57 JST 2016
+ * @since   Mon Nov  7 16:14:42 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -17,13 +17,12 @@
  */
 //--------------------------------------------------------------------------
 void Rcorrelator::spin_projection(  const R_CORRELATOR_SRC_PRJ &srcprjRcorr
-                                  , R_CORRELATOR &Rcorr, const SPIN_TYPE spin )
-{
+                                  , R_CORRELATOR &Rcorr, const SPIN_TYPE spin ) {
    Rcorr.mem_alloc();
    
    if (spin.number == SPIN_0_0) {
       for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
-         Rcorr(n) = ( srcprjRcorr(n,1) - srcprjRcorr(n,2) ) / sqrt(2.0);
+         Rcorr(n) = (srcprjRcorr(n,1) - srcprjRcorr(n,2)) / sqrt(2.0);
    }
    else if (spin.number == SPIN_1_p1) {
       for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
@@ -31,7 +30,7 @@ void Rcorrelator::spin_projection(  const R_CORRELATOR_SRC_PRJ &srcprjRcorr
    }
    else if (spin.number == SPIN_1_0) {
       for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
-         Rcorr(n) = ( srcprjRcorr(n,1) + srcprjRcorr(n,2) ) / sqrt(2.0);
+         Rcorr(n) = (srcprjRcorr(n,1) + srcprjRcorr(n,2)) / sqrt(2.0);
    }
    else if (spin.number == SPIN_1_0ud) {
       for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
@@ -45,7 +44,7 @@ void Rcorrelator::spin_projection(  const R_CORRELATOR_SRC_PRJ &srcprjRcorr
       for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
          Rcorr(n) = srcprjRcorr(n,3);
    }
-   else analysis::error(3,"Invalid spin number !");
+   else ERROR_COMMENTS("Invalid spin number !");
 }
 
 //--------------------------------------------------------------------------
@@ -53,16 +52,15 @@ void Rcorrelator::spin_projection(  const R_CORRELATOR_SRC_PRJ &srcprjRcorr
  * @brief Function for take angular momentum (S wave) projection
  */
 //--------------------------------------------------------------------------
-void Rcorrelator::Swave_projection( R_CORRELATOR &Rcorr )
-{
-   R_CORRELATOR tmp;   tmp.mem_alloc();
+void Rcorrelator::Swave_projection(R_CORRELATOR &Rcorr) {
+   R_CORRELATOR tmp;
+   tmp.mem_alloc();
    
    int rot_xyz[3];
    for (         int rot_type=0; rot_type < 24;     rot_type++)
       for (      int z=0;        z<analysis::zSIZE; z++)
          for (   int y=0;        y<analysis::ySIZE; y++)
-            for (int x=0;        x<analysis::xSIZE; x++)
-            {
+            for (int x=0;        x<analysis::xSIZE; x++) {
                // projection to anguler momentum l = 0
                for (int k=0; k<3; k++)
                   rot_xyz[k]
@@ -84,17 +82,16 @@ void Rcorrelator::Swave_projection( R_CORRELATOR &Rcorr )
  * @brief Function for take angular momentum (S wave & (1-S) wave) projection
  */
 //--------------------------------------------------------------------------
-void Rcorrelator::Swave_division( R_CORRELATOR &Rcorr, R_CORRELATOR &Rcorr_bar )
-{
-   R_CORRELATOR tmp;   tmp.mem_alloc();
+void Rcorrelator::Swave_division(R_CORRELATOR &Rcorr, R_CORRELATOR &Rcorr_bar) {
+   R_CORRELATOR tmp;
+   tmp.mem_alloc();
    Rcorr_bar.mem_alloc();
    
    int rot_xyz[3];
    for (         int rot_type=0; rot_type < 24;     rot_type++)
       for (      int z=0;        z<analysis::zSIZE; z++)
          for (   int y=0;        y<analysis::ySIZE; y++)
-            for (int x=0;        x<analysis::xSIZE; x++)
-            {
+            for (int x=0;        x<analysis::xSIZE; x++) {
                // projection to anguler momentum l = 0 (S wave)
                for (int k=0; k<3; k++)
                   rot_xyz[k]
@@ -107,17 +104,16 @@ void Rcorrelator::Swave_division( R_CORRELATOR &Rcorr, R_CORRELATOR &Rcorr_bar )
                tmp(rot_xyz[0],rot_xyz[1],rot_xyz[2]) += Rcorr(x,y,z);
             }
    
-   for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
-   {
+   for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++) {
       Rcorr_bar(n) = Rcorr(n) - tmp(n)/24.0;
       Rcorr(n)     = tmp(n)/24.0;
    }
 }
 
 void Rcorrelator::Swave_division(  R_CORRELATOR_SRC_PRJ &Rcorr
-                                 , R_CORRELATOR_SRC_PRJ &Rcorr_bar )
-{
-   R_CORRELATOR tmp;   tmp.mem_alloc();
+                                 , R_CORRELATOR_SRC_PRJ &Rcorr_bar ) {
+   R_CORRELATOR tmp;
+   tmp.mem_alloc();
    Rcorr_bar.mem_alloc();
    
    int rot_xyz[3];
@@ -125,12 +121,10 @@ void Rcorrelator::Swave_division(  R_CORRELATOR_SRC_PRJ &Rcorr
    {
       for (      int z=0; z<analysis::zSIZE; z++)
          for (   int y=0; y<analysis::ySIZE; y++)
-            for (int x=0; x<analysis::xSIZE; x++)
-            {
+            for (int x=0; x<analysis::xSIZE; x++) {
                tmp(x,y,z) = COMP_ZERO;
                
-               for (int rot_type=0; rot_type < 24; rot_type++)
-               {
+               for (int rot_type=0; rot_type < 24; rot_type++) {
                   // projection to anguler momentum l = 0 (S wave)
                   for (int k=0; k<3; k++)
                      rot_xyz[k]
@@ -143,8 +137,7 @@ void Rcorrelator::Swave_division(  R_CORRELATOR_SRC_PRJ &Rcorr
                   tmp(x,y,z) += Rcorr(rot_xyz[0],rot_xyz[1],rot_xyz[2],ab);
                }
             }
-      for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++)
-      {
+      for (int n=0; n<analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; n++) {
          Rcorr_bar(n,ab) = Rcorr(n,ab) - tmp(n)/24.0;
          Rcorr(n,ab)     = tmp(n)/24.0;
       }
@@ -156,9 +149,9 @@ void Rcorrelator::Swave_division(  R_CORRELATOR_SRC_PRJ &Rcorr
  * @brief Function for take parity projection
  */
 //--------------------------------------------------------------------------
-void Rcorrelator::parity_projection( R_CORRELATOR &Rcorr )
-{
-   R_CORRELATOR tmp;   tmp.mem_alloc();
+void Rcorrelator::parity_projection(R_CORRELATOR &Rcorr) {
+   R_CORRELATOR tmp;
+   tmp.mem_alloc();
    
    for (      int z=0; z<analysis::zSIZE; z++)
       for (   int y=0; y<analysis::ySIZE; y++)
@@ -173,9 +166,9 @@ void Rcorrelator::parity_projection( R_CORRELATOR &Rcorr )
       Rcorr(n) = tmp(n);
 }
 
-void Rcorrelator::parity_projection( R_CORRELATOR_SRC_PRJ &Rcorr )
-{
-   R_CORRELATOR tmp;   tmp.mem_alloc();
+void Rcorrelator::parity_projection(R_CORRELATOR_SRC_PRJ &Rcorr) {
+   R_CORRELATOR tmp;
+   tmp.mem_alloc();
    
    for (int ab=0; ab<4; ab++)
    {
@@ -198,8 +191,7 @@ void Rcorrelator::parity_projection( R_CORRELATOR_SRC_PRJ &Rcorr )
  * @brief Function for divide S-wave and S_ber-wave, and parity projection at once
  */
 //--------------------------------------------------------------------------
-void Rcorrelator::LP_projection( R_CORRELATOR &Rcorr ) {
-   
+void Rcorrelator::LP_projection(R_CORRELATOR &Rcorr) {
    Swave_projection (Rcorr);
    parity_projection(Rcorr);
 }
@@ -209,8 +201,7 @@ void Rcorrelator::LP_projection( R_CORRELATOR &Rcorr ) {
  * @brief Function for devide the spherical function from R-correlator
  */
 //--------------------------------------------------------------------------
-void Rcorrelator::remove_angular( R_CORRELATOR &Rcorr, int m, double factor ) {
-   
+void Rcorrelator::remove_angular(R_CORRELATOR &Rcorr, int m, double factor) {
    int X,Y,Z;
    
    if (m == -2) {
@@ -258,7 +249,7 @@ void Rcorrelator::remove_angular( R_CORRELATOR &Rcorr, int m, double factor ) {
                Rcorr(x,y,z) /= (factor * NBSwave::Y_2_p2(X,Y,Z));
             }
    }
-   else analysis::error(3,"Invalid z-component !");
+   else ERROR_COMMENTS("Invalid z-component !");
 }
 
 //--------------------------------------------------------------------------
@@ -268,8 +259,7 @@ void Rcorrelator::remove_angular( R_CORRELATOR &Rcorr, int m, double factor ) {
 //--------------------------------------------------------------------------
 using namespace NBSwave;
 void Rcorrelator::mult_YDstar(  R_CORRELATOR_SRC_PRJ &Rcorr
-                              , const SPIN_TYPE src_spin )
-{
+                              , const SPIN_TYPE src_spin ) {
    R_CORRELATOR_SRC_PRJ tmp;
    tmp.mem_alloc();
    
@@ -328,7 +318,7 @@ void Rcorrelator::mult_YDstar(  R_CORRELATOR_SRC_PRJ &Rcorr
                                + sqrt(1.0/10.0) * Y_2_0 (X,Y,Z) * Rcorr(x,y,z,3));
             }
    }
-   else analysis::error(3,"Invalid spin number !");
+   else ERROR_COMMENTS("Invalid spin number !");
    
    for (int n=0; n<4*analysis::xSIZE*analysis::ySIZE*analysis::zSIZE; n++)
       Rcorr(n) = tmp(n);

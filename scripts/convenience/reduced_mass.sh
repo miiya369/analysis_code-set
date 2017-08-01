@@ -1,8 +1,7 @@
 #!/bin/sh
 
-if test $# != 2
-then
-   echo " usage : sh $0 [mass1] [mass2]"
+if [ $# -ne 2 ]; then
+   echo " usage : sh `basename $0` [mass1] [mass2]"
    exit 1
 fi
 

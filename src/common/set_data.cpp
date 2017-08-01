@@ -18,10 +18,9 @@ int analysis::Nconf;
 
 char analysis::data_list[MAX_N_DATA][MAX_LEN_PATH];
 
-void analysis::set_data_list( int SET_INDEX, const char* format, ... ) {
-   
+void analysis::set_data_list(int SET_INDEX, const char* format, ...) {
    char tmp_c[MAX_LEN_PATH];
-   va_list args;
+   va_list  args;
    va_start(args,  format);
    vsprintf(tmp_c, format, args);
    
@@ -31,12 +30,11 @@ void analysis::set_data_list( int SET_INDEX, const char* format, ... ) {
    va_end(args);
 }
 
-int analysis::set_data_list( const char* path_conf_file_list ) {
-   
+int analysis::set_data_list(const char* path_conf_file_list) {
    int i=0;
    
    ifstream ifs(path_conf_file_list, ios::in);
-   if (!ifs) error(2, path_conf_file_list);
+   if (!ifs) ERROR_FOPEN(path_conf_file_list);
    
    while (ifs.getline(        analysis::data_list[MAX_PATH_ARG+i]
                       ,sizeof(analysis::data_list[MAX_PATH_ARG+i]))) i++;
@@ -51,8 +49,8 @@ void analysis::set_data_list(  const char* main_path
                              , const char* N_Yshift
                              , const char* N_Zshift
                              , const char* snk_rela
-                             , const char* src_rela ) {
-   
+                             , const char* src_rela )
+{
    set_data_list(MAIN_PATH, "%s", main_path);
    set_data_list(N_T_SHIFT, "%s", N_Tshift);
    set_data_list(N_X_SHIFT, "%s", N_Xshift);
@@ -63,14 +61,14 @@ void analysis::set_data_list(  const char* main_path
 }
 
 int analysis::set_data_list(  const char* main_path
-                             , const char* N_Tshift
-                             , const char* N_Xshift
-                             , const char* N_Yshift
-                             , const char* N_Zshift
-                             , const char* snk_rela
-                             , const char* src_rela
-                             , const char* path_conf_file_list ) {
-   
+                            , const char* N_Tshift
+                            , const char* N_Xshift
+                            , const char* N_Yshift
+                            , const char* N_Zshift
+                            , const char* snk_rela
+                            , const char* src_rela
+                            , const char* path_conf_file_list )
+{
    set_data_list(MAIN_PATH, "%s", main_path);
    set_data_list(N_T_SHIFT, "%s", N_Tshift);
    set_data_list(N_X_SHIFT, "%s", N_Xshift);
@@ -82,7 +80,7 @@ int analysis::set_data_list(  const char* main_path
    int i=0;
    
    ifstream ifs(path_conf_file_list, ios::in);
-   if (!ifs) error(2, path_conf_file_list);
+   if (!ifs) ERROR_FOPEN(path_conf_file_list);
    
    while (ifs.getline(        analysis::data_list[MAX_PATH_ARG+i]
                       ,sizeof(analysis::data_list[MAX_PATH_ARG+i]))) i++;
@@ -91,8 +89,8 @@ int analysis::set_data_list(  const char* main_path
    return i;
 }
 
-void analysis::set_data( int xxx, int yyy, int zzz, int ttt, int nnn ) {
-   
+void analysis::set_data(int xxx, int yyy, int zzz, int ttt, int nnn)
+{
    analysis::xSIZE = xxx;
    analysis::ySIZE = yyy;
    analysis::zSIZE = zzz;

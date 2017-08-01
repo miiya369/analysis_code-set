@@ -1,3 +1,6 @@
+#ifndef EXT_NR__FIT_EXAMPLES_H
+#define EXT_NR__FIT_EXAMPLES_H
+
 Int fpoly_np = 10;
 
 VecDoub fpoly(const Doub x) {
@@ -41,3 +44,5 @@ void fgauss(const Doub x, VecDoub_I &a, Doub &y, VecDoub_O &dyda) {
 		dyda[i+2]=fac*arg/a[i+2];
 	}
 }
+
+#endif

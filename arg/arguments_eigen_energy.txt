@@ -1,32 +1,29 @@
 
 ### For Eigen energy ###
 
-EIGEN_Gauge_confs_list		= ./arg/conf_list/conf_list.pacs-cs_ens2
-EIGEN_Path_to_input_dir		= /Users/miiya/Dropbox/analysis_HAL_code/data/pacs-cs_ens2_64src_bin20
-EIGEN_Path_to_output_name	= ./results/eigen_vector
+EIGEN_Gauge_confs_list		= ./arg/conf_list/conf_list.pacs-cs_ens1.gfix_bin057
 EIGEN_Size_of_time		= 64
 EIGEN_Size_of_space		= 32
-EIGEN_T_shift			= A64
+EIGEN_Lattice_spacing		= 0.0907
+
+EIGEN_Path_to_input_dir		= /Users/miiya/data/OmgOmg_PACS-CS/s_quark/ens1/results.bin057
+EIGEN_T_shift			= A32
 EIGEN_X_shift			= 000
 EIGEN_Y_shift			= 000
 EIGEN_Z_shift			= 000
-EIGEN_Snk_relativistic		= CG05
-EIGEN_Src_relativistic		= CG05
-EIGEN_calc_time_slice		= 9
-EIGEN_Had1_mass			= 1.0
-EIGEN_Had2_mass			= 1.0
-EIGEN_Channel_name		= Pro-Lam_Pro-Lam
+EIGEN_Snk_relativistic		= NR
+EIGEN_Src_relativistic		= NR
+EIGEN_Channel_name		= OmgM-OmgM_OmgM-OmgM
+
+EIGEN_calc_time_slice		= 15
+
+EIGEN_Had1_mass			= 0.909819
+EIGEN_Had2_mass			= 0.909819
+
 EIGEN_Spin_projection		= S0_Sz0
 
-EIGEN_Lattice_spacing		= 0.0907
 EIGEN_Number_of_eigen_energy	= 9
 EIGEN_Stopping_condition	= 0.000000001
 
-EIGEN_Number_of_eigen_vector	= 3
-
 EIGEN_Use_jack_knife_data	= yes
 EIGEN_Take_jack_knife		= no
-
-EIGEN_Endian_convert		= yes
-EIGEN_read_compress_NBS		= yes
-

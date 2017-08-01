@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------
 /**
  * @file
- * @ingroup phase shift
+ * @ingroup observable
  * @brief   Functions for output phase shift data
  * @author  Takaya Miyamoto
  * @since   Fri Dec 11 22:25:13 JST 2015
@@ -12,114 +12,101 @@
 
 //--------------------------------------------------------------------------
 /**
- * @brief Function for output phase shift data
+ * @brief Function for all data output ( All conf, with binary )
  */
 //--------------------------------------------------------------------------
-void observable::output_phase_shift(  const char* out_file_name
-                                    , PHASE_SHIFT &data ) {
+template <>
+void analysis::output_data_all<PHASE_SHIFT>(  CONFIG<PHASE_SHIFT> &data
+                                            , const char* outfile_name )
+{
+   DEBUG_LOG
    
-   string class_name = "________________________________";
-   string func_name  = "output_phase_shift____";
-   analysis::route(class_name, func_name, 1);
+   ofstream ofs(outfile_name, ios::out | ios::binary);
    
-   ofstream ofs(out_file_name, ios::out);
+   int     itmp1, itmp2;
+   double  dtmp;
+//======================== miyamoto-format notation =======================//
+//
+//                        !! ALWAYS LITTLE ENDIAN !!
+//
+//      1) #.conf                   (int)
+//      2) #.data/conf              (int)
+//      3) bytes of data coordinate (int)
+//
+//      3) data coordinates         ((2)*(3) bytes)
+//         -> for n = 0 to #.data
+//               crd[n]
+//
+//      4) datas (double float(8 bytes) * (1)*(2))
+//         -> for    i = 0 to #.conf
+//               for n = 0 to #.data
+//                  data[n+#.data*i]
+//
+//=========================================================================//
+   itmp1 = data.Nconf();
+   if (!analysis::machine_is_little_endian())
+      analysis::endian_convert(&itmp1, 1);
+   ofs.write((char*)&itmp1, sizeof(int));
    
-   for (size_t iE=0; iE<data.data_size(); iE++)
-      ofs << data.E(iE)
-          << " " << data(iE).real() << " " << data(iE).imag() << endl;
-   
-   ofs.close();
-   
-   analysis::route(class_name, func_name, 0);
-}
-
-//--------------------------------------------------------------------------
-/**
- * @brief Function for output phase shift data every gauge configurations
- */
-//--------------------------------------------------------------------------
-void observable::output_phase_shift_all(  const char* out_file_name
-                                        , CONFIG<PHASE_SHIFT> &data) {
-    
-   string class_name = "________________________________";
-   string func_name  = "output_phase_shift_all";
-   analysis::route(class_name, func_name, 1);
-   
-   ofstream ofs(out_file_name, ios::out | ios::binary);
-   
-   int tmp_Nconf = data.Nconf();
-   int tmp_Ndata = data(0).data_size();
-   
+   itmp1 = data(0).data_size();
+   itmp2 = sizeof(double);
    if (!analysis::machine_is_little_endian()) {
-      analysis::endian_convert(&tmp_Nconf, 1);
-      analysis::endian_convert(&tmp_Ndata, 1);
+      analysis::endian_convert(&itmp1, 1);
+      analysis::endian_convert(&itmp2, 1);
    }
-   ofs.write((char*)&tmp_Nconf, sizeof(int));
-   ofs.write((char*)&tmp_Ndata, sizeof(int));   // write file header
+   ofs.write((char*)&itmp1, sizeof(int));
+   ofs.write((char*)&itmp2, sizeof(int)); // write file header
    
-   double  ftmp;
-   cdouble ctmp;
-   for (size_t loop=0; loop<data(0).data_size(); loop++) {
-      
-      ftmp = data(0).E(loop);
+   for (int n=0; n<data(0).data_size(); n++) {
+      dtmp = data(0).E(n);
       if (!analysis::machine_is_little_endian())
-         analysis::endian_convert(&ftmp, 1);
-      ofs.write((char*)&ftmp, sizeof(double));
-      
-      for (int conf=0; conf<data.Nconf(); conf++) {
-         ctmp = data(conf)(loop);
-         if (!analysis::machine_is_little_endian())
-            analysis::endian_convert(&ctmp, 1);
-         ofs.write((char*)&ctmp, sizeof(cdouble));
-      }
+         analysis::endian_convert(&dtmp, 1);
+      ofs.write((char*)&dtmp, sizeof(double));
    }
+   for (int i=0; i<data.Nconf(); i++)
+      for (int n=0; n<data(0).data_size(); n++) {
+         dtmp = data(i)(n);
+         if (!analysis::machine_is_little_endian())
+            analysis::endian_convert(&dtmp, 1);
+         ofs.write((char*)&dtmp, sizeof(double));
+      }
    ofs.close();
-   
-   analysis::route(class_name, func_name, 0);
 }
 
 //--------------------------------------------------------------------------
 /**
- * @brief Function for output mean of phase shift data with error
+ * @brief Function for data output with error
  */
 //--------------------------------------------------------------------------
-void observable::output_phase_shift_err(  const char* out_file_name
-                                        , CONFIG<PHASE_SHIFT> &data
-                                        , bool is_jack_knife_data ) {
+template <>
+void analysis::output_data_err<PHASE_SHIFT>(  CONFIG<PHASE_SHIFT> &data
+                                            , const char* outfile_name
+                                            , bool is_jack_knife_data ) {
+   DEBUG_LOG
    
-   string class_name = "________________________________";
-   string func_name  = "output_phase_shift_err";
-   analysis::route(class_name, func_name, 1);
-   
-   cdouble err, mean, sqr_mean;
-   int     num_conf  = data.Nconf();
-   int     data_size = data(0).data_size();
-   
-   double  factor;
+   double err, mean, sqr_mean;
+   double factor;
    if (is_jack_knife_data)
-      factor = double(num_conf-1);
+      factor = double(data.Nconf()-1);
    else
-      factor = 1.0 / double(num_conf-1);
+      factor = 1.0 / double(data.Nconf()-1);
    
-   ofstream ofs(out_file_name, ios::out);
-   ofs << "#   t, mean.real, err.real, mean.imag, err.imag" << endl;
+   ofstream ofs(outfile_name, ios::out);
+   ofs << "#   E, mean, err" << endl;
    
-   for (int iE=0; iE<data_size; iE++) {
-      mean     = COMP_ZERO;
-      sqr_mean = COMP_ZERO;
+   for (int iE=0; iE<data(0).data_size(); iE++) {
+      mean     = 0.0;
+      sqr_mean = 0.0;
       
-      for (int i=0; i<num_conf; i++) {
-         mean     +=          data(i)(iE);
-         sqr_mean += cmp_sqr( data(i)(iE) );
+      for (int i=0; i<data.Nconf(); i++) {
+         mean     +=     data(i)(iE);
+         sqr_mean += pow(data(i)(iE), 2.0);
       }
-      mean     /= double(num_conf);
-      sqr_mean /= double(num_conf);
-      err       = cmp_sqrt(factor * (sqr_mean - pow(mean,2)) );
+      mean     /= double(data.Nconf());
+      sqr_mean /= double(data.Nconf());
+      err       = sqrt(factor * (sqr_mean - pow(mean, 2.0)));
       
-      ofs << data(0).E(iE) << " " << mean.real() << " " << err.real()
-                           << " " << mean.imag() << " " << err.imag() << endl;
+      ofs << data(0).E(iE) << " " << mean << " " << err << endl;
    }
    ofs.close();
-   
-   analysis::route(class_name, func_name, 0);
 }

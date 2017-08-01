@@ -11,20 +11,18 @@
 #include <fitting/fitting.h>
 
 void FIT::print_param() {
-   
-   func_name = "print_param___________";
-   analysis::route(class_name, func_name, 1);
+   DEBUG_LOG
    
    if (param == NULL) {
-      analysis::error(1,"Fit function has not set yet !");
-      analysis::route(class_name, func_name, 0);
+      WORNING_COMMENTS("Fit function has not set yet !");
       return;
    }
    printf(" @ parameter infomations.\n @");
    
    for (int loop=0; loop<func_type.Nparam; loop++)
-      printf(" %lf",param[loop]);
+      if (param[loop] > 0.0001)
+         printf(" %lf",param[loop]);
+      else
+         printf(" %e",param[loop]);
    printf("\n");
-   
-   analysis::route(class_name, func_name, 0);
 }

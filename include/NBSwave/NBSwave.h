@@ -4,7 +4,7 @@
  * @ingroup NBS wave function
  * @brief   Header file for NBS wave function
  * @author  Takaya Miyamoto
- * @since   Wed Jun  8 16:24:32 JST 2016
+ * @since   Mon Nov  7 19:51:54 JST 2016
  */
 //--------------------------------------------------------------------------
 
@@ -23,21 +23,20 @@ namespace NBSwave
    extern int  rot_matrix[384];
    extern bool compress_init_flg;
    
-   cdouble Y_0_0 ( double, double, double );
-   cdouble Y_1_p1( double, double, double );
-   cdouble Y_1_0 ( double, double, double );
-   cdouble Y_1_m1( double, double, double );
-   cdouble Y_2_p2( double, double, double );
-   cdouble Y_2_p1( double, double, double );
-   cdouble Y_2_0 ( double, double, double );
-   cdouble Y_2_m1( double, double, double );
-   cdouble Y_2_m2( double, double, double );
+   cdouble Y_0_0 (double, double, double);
+   cdouble Y_1_p1(double, double, double);
+   cdouble Y_1_0 (double, double, double);
+   cdouble Y_1_m1(double, double, double);
+   cdouble Y_2_p2(double, double, double);
+   cdouble Y_2_p1(double, double, double);
+   cdouble Y_2_0 (double, double, double);
+   cdouble Y_2_m1(double, double, double);
+   cdouble Y_2_m2(double, double, double);
    
    void       rot_matrix_init();
-   inline int matrix_idx(int row, int column, int rot_type)
-   {
+   inline int matrix_idx(int row, int column, int rot_type) {
       return column + 4 * ( row + 4 * rot_type );
-   }   // rot_type = 0 -> E, 1~6 -> 6C4, 7~9 -> 3C2, 10~17 -> 8C3, 18~23 -> 6C2
+   } // rot_type = 0 -> E, 1~6 -> 6C4, 7~9 -> 3C2, 10~17 -> 8C3, 18~23 -> 6C2
 }
 
 //--------------------------------------------------------------------------
@@ -48,156 +47,76 @@ namespace NBSwave
 class NBS_WAVE_ORG
 {
 private:
-   string class_name, func_name;
-   
    cdouble *wave_org;
    
 protected:
    
 public:
 //============================ For inner index ===========================//
-   size_t idx(int x,int y,int z,int a,int b)
-   {
+   int idx(int x,int y,int z,int a,int b) {
       return    a + 4
              *( x + analysis::xSIZE
              *( y + analysis::ySIZE
              *( z + analysis::zSIZE * b )));
    }
 //============================== For writing =============================//
-   cdouble& operator()(int x,int y,int z, int a,int b)
-   {
+   cdouble& operator()(int x,int y,int z, int a,int b) {
       return wave_org[   a + 4
                       *( x + analysis::xSIZE
                       *( y + analysis::ySIZE
                       *( z + analysis::zSIZE * b ))) ];
    }
-   cdouble& operator()(int space,int a,int b)
-   {
+   cdouble& operator()(int space,int a,int b) {
       return wave_org[ a + 4
             *( space + analysis::xSIZE*analysis::ySIZE*analysis::zSIZE * b ) ];
    }
-   cdouble& operator()(size_t index)
-   {
+   cdouble& operator()(int index) {
       return wave_org[index];
    }
 //============================== For reading =============================//
-   const cdouble& operator()(int x,int y,int z, int a,int b) const
-   {
+   const cdouble& operator()(int x,int y,int z, int a,int b) const {
       return wave_org[   a + 4
                       *( x + analysis::xSIZE
                       *( y + analysis::ySIZE
                       *( z + analysis::zSIZE * b ))) ];
    }
-   const cdouble& operator()(int space,int a,int b) const
-   {
+   const cdouble& operator()(int space,int a,int b) const {
       return wave_org[ a + 4
             *( space + analysis::xSIZE*analysis::ySIZE*analysis::zSIZE * b ) ];
    }
-   const cdouble& operator()(size_t index) const
-   {
+   const cdouble& operator()(int index) const {
       return wave_org[index];
    }
 //======================== Constructor & Destructor ======================//
-   NBS_WAVE_ORG()
-   {
-      class_name = "NBS_WAVE_ORG____________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-
-      wave_org   = NULL;
-   }
-   NBS_WAVE_ORG(const char* PATH)
-   {
-      class_name = "NBS_WAVE_ORG____________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      wave_org = NULL;
-      
-      set(PATH);
-   }
-   NBS_WAVE_ORG(  const CHANNEL_TYPE ch, const int it, const int iconf
-                , const bool endian_FLG, const bool compress_FLG )
-   {
-      class_name = "NBS_WAVE_ORG____________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      wave_org = NULL;
-      
-      set( ch, it, iconf, endian_FLG, compress_FLG );
-   }
-   ~NBS_WAVE_ORG()
-   {
-      if (wave_org != NULL) delete [] wave_org;
-      
-      func_name = "______________________";
-      analysis::route( class_name, func_name, 0 );
-   }
+   NBS_WAVE_ORG();
+   NBS_WAVE_ORG(const NBS_WAVE_ORG&);
+   NBS_WAVE_ORG(const char*);
+   NBS_WAVE_ORG(const CHANNEL_TYPE, const int, const int);
+   ~NBS_WAVE_ORG();
 //============================= For initialize ===========================//
-   void mem_alloc()
-   {
-      func_name = "mem_alloc_NBS_ORG_____";
-      analysis::route( class_name, func_name, 1 );
-      
-      if (wave_org == NULL)
-      {
-         size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-         wave_org       = new cdouble[xyzSIZE * 4 * 4];
-      }
-      analysis::route(class_name, func_name, 0);
-   }
-   void set(const char* PATH)
-   {
-      func_name = "set_NBS_ORG_from_path_";
-      analysis::route( class_name, func_name, 1 );
-      
-      mem_alloc();
-      
-      input_compressed_FromPath(PATH);
-      
-      func_name = "set_NBS_ORG_from_path_";
-      analysis::route(class_name, func_name, 0);
-   }
-   void set(  const CHANNEL_TYPE ch, const int it, const int iconf
-            , const bool endian_FLG, const bool compress_FLG )
-   {
-      func_name = "set_NBS_ORG___________";
-      analysis::route( class_name, func_name, 1 );
-      
-      mem_alloc();
-      
-      if (compress_FLG) input_compressed(ch, it, iconf, endian_FLG);
-      else              input(ch, it, iconf, endian_FLG);
-      func_name = "set_NBS_ORG___________";
-      analysis::route(class_name, func_name, 0);
-   }
-   void mem_del()
-   {
-      func_name = "mem_delete_NBS_ORG____";
-      analysis::route(class_name, func_name, 1);
-      
-      if (wave_org != NULL)
-      {
-         delete [] wave_org;   wave_org = NULL;
-      }
-      analysis::route( class_name, func_name, 0 );
-   }
+   void mem_alloc();
+   void set(const char*);
+   void set(const CHANNEL_TYPE, const int, const int);
+   void mem_del();
 //============================ Operator define ===========================//
-   
+   NBS_WAVE_ORG& operator=(const NBS_WAVE_ORG&);
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
    int info_class() { return CLASS_NBS_WAVE_ORG; }
-   int data_size ()
-   {
+   int data_size () {
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE * 4 * 4;
+   }
+   const int info_class() const { return CLASS_NBS_WAVE_ORG; }
+   const int data_size () const {
       return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE * 4 * 4;
    }
    
-   void  input( const CHANNEL_TYPE, const int, const int, const bool );
-   void output( const CHANNEL_TYPE, const int, const int, const bool );
-   void input_compressed( const CHANNEL_TYPE, const int, const int, const bool );
-   void input_compressed_FromPath( const char* );
+   void input                    (const CHANNEL_TYPE, const int, const int);
+   void input_compressed         (const CHANNEL_TYPE, const int, const int);
+   void input_compressed_FromPath(const char*);
+   
+   void output(const CHANNEL_TYPE, const int, const int);
 };
 
 //--------------------------------------------------------------------------
@@ -208,94 +127,55 @@ public:
 class NBS_WAVE_SRC_PRJ
 {
 private:
-   string class_name, func_name;
-   
    cdouble *wave_src_prj;
    
 protected:
    
 public:
 //============================ For inner index ===========================//
-   size_t idx(int x,int y,int z, int a)
-   {
+   int idx(int x,int y,int z, int a) {
       return a + 4 *( x + analysis::xSIZE *( y + analysis::ySIZE * z ));
    }
 //============================== For writing =============================//
-   cdouble& operator()(int x, int y, int z, int a)
-   {
+   cdouble& operator()(int x, int y, int z, int a) {
       return wave_src_prj[   a + 4
                           *( x + analysis::xSIZE *( y + analysis::ySIZE * z )) ];
    }
-   cdouble& operator()(int space,int a)
-   {
+   cdouble& operator()(int space,int a) {
       return wave_src_prj[ a + 4 * space ];
    }
-   cdouble& operator()(size_t index)
-   {
+   cdouble& operator()(int index) {
       return wave_src_prj[index];
    }
 //============================== For reading =============================//
-   const cdouble& operator()(int x, int y, int z, int a) const
-   {
+   const cdouble& operator()(int x, int y, int z, int a) const {
       return wave_src_prj[   a + 4
                           *( x + analysis::xSIZE *( y + analysis::ySIZE * z )) ];
    }
-   const cdouble& operator()(int space,int a) const
-   {
+   const cdouble& operator()(int space,int a) const {
       return wave_src_prj[ a + 4 * space ];
    }
-   const cdouble& operator()(size_t index) const
-   {
+   const cdouble& operator()(int index) const {
       return wave_src_prj[index];
    }
 //======================== Constructor & Destructor ======================//
-   NBS_WAVE_SRC_PRJ ()
-   {
-      class_name = "NBS_WAVE_SRC_PRJ________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      wave_src_prj = NULL;
-   }
-   ~NBS_WAVE_SRC_PRJ ()
-   {
-      if (wave_src_prj != NULL) delete [] wave_src_prj;
-      
-      func_name = "______________________";
-      analysis::route( class_name, func_name, 0 );
-   }
+   NBS_WAVE_SRC_PRJ ();
+   NBS_WAVE_SRC_PRJ(const NBS_WAVE_SRC_PRJ&);
+   ~NBS_WAVE_SRC_PRJ ();
 //============================= For initialize ===========================//
-   void mem_alloc ()
-   {
-      func_name = "mem_alloc_NBS_SRC_PRJ_";
-      analysis::route( class_name, func_name, 1 );
-      
-      if (wave_src_prj == NULL)
-      {
-         size_t axyzSIZE = 4 * analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-         wave_src_prj = new cdouble[axyzSIZE];
-      }
-      analysis::route(class_name, func_name, 0);
-   }
-   void mem_del ()
-   {
-      func_name = "mem_delete_NBS_SRC_PRJ";
-      analysis::route(class_name, func_name, 1);
-      
-      if (wave_src_prj != NULL)
-      {
-         delete [] wave_src_prj;   wave_src_prj = NULL;
-      }
-      analysis::route( class_name, func_name, 0 );
-   }
+   void mem_alloc ();
+   void mem_del ();
 //============================ Operator define ===========================//
-   
+   NBS_WAVE_SRC_PRJ& operator=(const NBS_WAVE_SRC_PRJ&);
 //============================ Operator helper ===========================//
    
 //=========================== Several functions ==========================//
    int info_class() { return CLASS_NBS_WAVE_SRC_PRJ; }
-   int data_size ()
-   {
+   int data_size () {
+      return 4 * analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   }
+   int info_class() const { return CLASS_NBS_WAVE_SRC_PRJ; }
+   int data_size () const {
       return 4 * analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
    }
 };
@@ -308,132 +188,56 @@ public:
 class NBS_WAVE
 {
 private:
-   string class_name, func_name;
-   
    cdouble *wave;
     
 protected:
     
 public:
 //============================ For inner index ===========================//
-   size_t idx(int x,int y,int z)
-   {
+   int idx(int x,int y,int z) {
       return x + analysis::xSIZE *( y + analysis::ySIZE * z );
    }
 //============================== For writing =============================//
-   cdouble& operator()(int x, int y, int z)
-   {
+   cdouble& operator()(int x, int y, int z) {
       return wave[ x + analysis::xSIZE *( y + analysis::ySIZE * z ) ];
    }
-   cdouble& operator()(size_t index)
-   {
+   cdouble& operator()(int index) {
       return wave[index];
    }
 //============================== For reading =============================//
-   const cdouble& operator()(int x, int y, int z) const
-   {
+   const cdouble& operator()(int x, int y, int z) const {
       return wave[ x + analysis::xSIZE *( y + analysis::ySIZE * z ) ];
    }
-   const cdouble& operator()(size_t index) const
-   {
+   const cdouble& operator()(int index) const {
       return wave[index];
    }
 //======================== Constructor & Destructor ======================//
-   NBS_WAVE()
-   {
-      class_name = "NBS_WAVE________________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      wave       = NULL;
-   }
-   NBS_WAVE(const char* PATH)
-   {
-      class_name = "NBS_WAVE________________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      wave       = NULL;
-      
-      set(PATH);
-   }
-   NBS_WAVE(  const CHANNEL_TYPE ch, const int it, const int iconf
-            , const bool endian_FLG )
-   {
-      class_name = "NBS_WAVE________________________";
-      func_name  = "______________________";
-      analysis::route(class_name, func_name, 1);
-      
-      wave       = NULL;
-      
-      set( ch, it, iconf, endian_FLG );
-   }
-   ~NBS_WAVE()
-   {
-      if (wave != NULL) delete [] wave;
-        
-      func_name = "______________________";
-      analysis::route( class_name, func_name, 0 );
-   }
+   NBS_WAVE();
+   NBS_WAVE(const NBS_WAVE&);
+   NBS_WAVE(const char*);
+   NBS_WAVE(const CHANNEL_TYPE, const int, const int);
+   ~NBS_WAVE();
 //============================= For initialize ===========================//
-   void mem_alloc()
-   {
-      func_name = "mem_alloc_NBS_________";
-      analysis::route( class_name, func_name, 1 );
-      
-      if (wave == NULL)
-      {
-         size_t xyzSIZE = analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
-         wave = new cdouble[xyzSIZE];
-      }
-      analysis::route(class_name, func_name, 0);
-   }
-   void set(const char* PATH)
-   {
-      func_name = "set_NBS_from_path_____";
-      analysis::route( class_name, func_name, 1 );
-      
-      mem_alloc();
-      
-      input_FromPath(PATH);
-      
-      func_name = "set_NBS_from_path_____";
-      analysis::route(class_name, func_name, 0);
-   }
-   void set(  const CHANNEL_TYPE ch, const int it, const int iconf
-            , const bool endian_FLG )
-   {
-      func_name = "set_NBS_______________";
-      analysis::route( class_name, func_name, 1 );
-      
-      mem_alloc();
-      
-      input(ch, it, iconf, endian_FLG);
-      
-      func_name = "set_NBS_______________";
-      analysis::route(class_name, func_name, 0);
-   }
-   void mem_del()
-   {
-      func_name = "mem_delete_NBS________";
-      analysis::route(class_name, func_name, 1);
-        
-      if (wave != NULL)
-      {
-         delete [] wave;   wave = NULL;
-      }
-      analysis::route( class_name, func_name, 0 );
-   }
+   void mem_alloc();
+   void set(const char*);
+   void set(const CHANNEL_TYPE, const int, const int);
+   void mem_del();
 //============================ Operator define ===========================//
-    
+    NBS_WAVE& operator=(const NBS_WAVE&);
 //============================ Operator helper ===========================//
     
 //=========================== Several functions ==========================//
    int info_class() { return CLASS_NBS_WAVE; }
-   int data_size () { return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE; }
+   int data_size () {
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   }
+   int info_class() const { return CLASS_NBS_WAVE; }
+   int data_size () const {
+      return analysis::xSIZE * analysis::ySIZE * analysis::zSIZE;
+   }
    
-   void input(const CHANNEL_TYPE, const int, const int, const bool);
-   void input_FromPath( const char* );
+   void input         (const CHANNEL_TYPE, const int, const int);
+   void input_FromPath(const char*);
 };
 
 namespace NBSwave
@@ -445,21 +249,21 @@ namespace NBSwave
    void spin_projection  (  const NBS_WAVE_ORG&,     NBS_WAVE&
                           , const SPIN_TYPE );
    
-   void Swave_projection ( NBS_WAVE& );
-   void Swave_division   ( NBS_WAVE&,         NBS_WAVE& );
-   void Swave_division   ( NBS_WAVE_SRC_PRJ&, NBS_WAVE_SRC_PRJ& );
+   void Swave_projection (NBS_WAVE&);
+   void Swave_division   (NBS_WAVE&,         NBS_WAVE&);
+   void Swave_division   (NBS_WAVE_SRC_PRJ&, NBS_WAVE_SRC_PRJ&);
    
-   void parity_projection( NBS_WAVE& );
-   void parity_projection( NBS_WAVE_SRC_PRJ& );
+   void parity_projection(NBS_WAVE&);
+   void parity_projection(NBS_WAVE_SRC_PRJ&);
    
-   void LP_projection    ( NBS_WAVE& );
+   void LP_projection    (NBS_WAVE&);
    
-   void remove_angular( NBS_WAVE&, const int, const double );
+   void remove_angular(NBS_WAVE&, const int, const double);
    
-   void S12_psi( const NBS_WAVE_SRC_PRJ&, NBS_WAVE&, const SPIN_TYPE );
-   void S12_psi( const NBS_WAVE_SRC_PRJ&, NBS_WAVE_SRC_PRJ& );
+   void S12_psi(const NBS_WAVE_SRC_PRJ&, NBS_WAVE&, const SPIN_TYPE);
+   void S12_psi(const NBS_WAVE_SRC_PRJ&, NBS_WAVE_SRC_PRJ&);
    
-   void mult_YDstar( NBS_WAVE_SRC_PRJ&, const SPIN_TYPE );
+   void mult_YDstar(NBS_WAVE_SRC_PRJ&, const SPIN_TYPE);
 }
 
 #endif

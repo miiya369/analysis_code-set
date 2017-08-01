@@ -2,7 +2,7 @@
 /**
  * @file
  * @ingroup none
- * @brief   The code for averaging of 2pt-correlator data
+ * @brief   Take average for Text 2pt-correlator data
  * @author  Takaya Miyamoto
  * @since   Tue Jun 21 21:39:44 JST 2016
  */
@@ -59,7 +59,7 @@ inline int set_args(int argc, char** argv)
    opath = argv[1];
    
    FILE* fp;
-   if ((fp = fopen(ipath[0].c_str(), "rb")) == NULL) {
+   if ((fp = fopen(ipath[0].c_str(), "r")) == NULL) {
       printf("The file '%s' is not found.\n", ipath[0].c_str());
       return 1;
    }
